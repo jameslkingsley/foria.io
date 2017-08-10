@@ -29325,18 +29325,20 @@ window.Stream = function () {
 
             // Connect to the session
             session.connect(this.data.token, function (error) {
-                // Create a publisher
-                var publisher = OT.initPublisher('stream-publisher', {
-                    insertMode: 'append',
-                    width: '100%',
-                    height: '640px'
-                }, _this2.handleError);
-
                 // If the connection is successful, publish to the session
-                if (error || true) {
+                if (error) {
                     _this2.handleError(error);
                 } else {
-                    session.publish(publisher, _this2.handleError);
+                    if (_this2.data.role == 'publisher') {
+                        // Create a publisher
+                        var publisher = OT.initPublisher('stream-publisher', {
+                            insertMode: 'append',
+                            width: '100%',
+                            height: '640px'
+                        }, _this2.handleError);
+
+                        session.publish(publisher, _this2.handleError);
+                    }
                 }
             });
         }

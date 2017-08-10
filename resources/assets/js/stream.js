@@ -32,18 +32,20 @@ window.Stream = class Stream {
 
         // Connect to the session
         session.connect(this.data.token, error => {
-            // Create a publisher
-            let publisher = OT.initPublisher('stream-publisher', {
-                insertMode: 'append',
-                width: '100%',
-                height: '640px'
-            }, this.handleError);
-
             // If the connection is successful, publish to the session
-            if (error || true) {
+            if (error) {
                 this.handleError(error);
             } else {
-                session.publish(publisher, this.handleError);
+                if (this.data.role == 'publisher') {
+                    // Create a publisher
+                    let publisher = OT.initPublisher('stream-publisher', {
+                        insertMode: 'append',
+                        width: '100%',
+                        height: '640px'
+                    }, this.handleError);
+
+                    session.publish(publisher, this.handleError);
+                }
             }
         });
     }
