@@ -89,8 +89,12 @@ class WatchController extends Controller
      *
      * @return void
      */
-    public function start()
+    public function start(Request $request, User $user)
     {
+        if (auth()->guest() || $user->id != auth()->user()->id) {
+            return abort(403);
+        }
+
         $sessionId = $this->openTok
             ->createSession($this->sessionOptions)
             ->getSessionId();
