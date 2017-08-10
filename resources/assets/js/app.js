@@ -1,6 +1,7 @@
 require('./bootstrap');
+require('./stream');
 
-Vue.component('example', require('./components/Example.vue'));
+Vue.component('f-watch', require('./components/Watch.vue'));
 
 const app = new Vue({
     el: '#app'

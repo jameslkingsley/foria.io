@@ -35,6 +35,10 @@
                         </a>
 
                         <b-dropdown-item has-link>
+                            <a href="{{ url('/watch/'.auth()->user()->name) }}">Profile</a>
+                        </b-dropdown-item>
+
+                        <b-dropdown-item has-link>
                             <a>Settings</a>
                         </b-dropdown-item>
 
