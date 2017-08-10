@@ -34,7 +34,7 @@ class WatchController extends Controller
      */
     public function __construct(User $user)
     {
-        $this->middleware('auth');
+        // $this->middleware('auth');
 
         $this->user = $user;
         $this->openTok = new OpenTok(
@@ -68,7 +68,7 @@ class WatchController extends Controller
 
         $sessionId = $session->session_id;
         $apiKey = config('opentok.api_key');
-        $role = ($user->id == auth()->user()->id) ? Role::PUBLISHER : Role::SUBSCRIBER;
+        $role = (!auth()->guest() && $user->id == auth()->user()->id) ? Role::PUBLISHER : Role::SUBSCRIBER;
 
         $token = $this->openTok->generateToken(
             $sessionId,
