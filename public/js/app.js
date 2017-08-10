@@ -29319,7 +29319,7 @@ window.Stream = function () {
                 session.subscribe(event.stream, 'stream-publisher', {
                     insertMode: 'append',
                     width: '100%',
-                    height: '100%'
+                    height: '640px'
                 }, this.handleError);
             });
 
