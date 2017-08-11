@@ -29546,10 +29546,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   return _c('div', {
     staticClass: "columns"
   }, [_c('div', {
-    staticClass: "column is-9",
-    attrs: {
-      "id": "stream-publisher"
-    }
+    staticClass: "column is-9"
   }, [_c('p', {
     staticClass: "title"
   }, [_vm._v("\n            " + _vm._s(_vm.user.name) + "\n\n            "), (!_vm.user.is_mine) ? _c('f-subscribe', {
@@ -29568,7 +29565,10 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "click": _vm.start
     }
   }, [_vm._v("\n                    Start Broadcasting\n                ")])]) : _vm._e(), _vm._v(" "), _c('p'), _vm._v(" "), _c('div', {
-    staticClass: "watch-video-container"
+    staticClass: "watch-video-container",
+    attrs: {
+      "id": "stream-publisher"
+    }
   })]), _vm._v(" "), _vm._m(0)])
 },staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {

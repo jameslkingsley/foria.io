@@ -1,6 +1,6 @@
 <template>
     <div class="columns">
-        <div class="column is-9" id="stream-publisher">
+        <div class="column is-9">
             <p class="title">
                 {{ user.name }}
 
@@ -14,7 +14,7 @@
                 </div>
             </p>
 
-            <div class="watch-video-container"></div>
+            <div class="watch-video-container" id="stream-publisher"></div>
         </div>
 
         <div class="column is-3">
