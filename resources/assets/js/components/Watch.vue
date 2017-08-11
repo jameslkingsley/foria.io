@@ -7,11 +7,9 @@
                 <f-subscribe v-if="! user.is_mine" class="is-pulled-right m-l-1" :user="user"></f-subscribe>
                 <f-follow v-if="! user.is_mine" class="is-pulled-right" :user="user"></f-follow>
 
-                <div v-if="user.is_mine">
-                    <button class="button is-primary is-pulled-right" @click="start">
-                        Start Broadcasting
-                    </button>
-                </div>
+                <button v-if="user.is_mine" class="button is-primary is-pulled-right" @click="start">
+                    Start Broadcasting
+                </button>
             </p>
 
             <div class="watch-video-container" id="stream-publisher"></div>

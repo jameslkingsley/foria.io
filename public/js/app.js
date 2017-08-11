@@ -29511,8 +29511,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user'],
@@ -29559,12 +29557,12 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "user": _vm.user
     }
-  }) : _vm._e()], 1), (_vm.user.is_mine) ? _c('div', [_c('button', {
+  }) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('button', {
     staticClass: "button is-primary is-pulled-right",
     on: {
       "click": _vm.start
     }
-  }, [_vm._v("\n                    Start Broadcasting\n                ")])]) : _vm._e(), _vm._v(" "), _c('p'), _vm._v(" "), _c('div', {
+  }, [_vm._v("\n                Start Broadcasting\n            ")]) : _vm._e()], 1), _vm._v(" "), _c('div', {
     staticClass: "watch-video-container",
     attrs: {
       "id": "stream-publisher"
