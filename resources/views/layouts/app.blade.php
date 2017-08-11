@@ -15,7 +15,7 @@
     </head>
 
     <body>
-        <div id="app">
+        <div id="app" v-cloak>
             @include('layouts.nav')
 
             <section class="section">

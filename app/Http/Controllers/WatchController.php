@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
+use App\Models\User;
 use OpenTok\Role;
 use OpenTok\OpenTok;
 use OpenTok\MediaMode;
@@ -14,7 +14,7 @@ class WatchController extends Controller
     /**
      * User model.
      *
-     * @var App\User
+     * @var App\Models\User
      */
     protected $user;
 
@@ -51,6 +51,10 @@ class WatchController extends Controller
     public function index(Request $request, string $name)
     {
         $user = $this->user->where('name', $name)->first();
+
+        if (! $user) {
+            return abort(404);
+        }
 
         return view('watch.index', compact('user'));
     }

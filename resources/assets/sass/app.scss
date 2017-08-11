@@ -3,6 +3,8 @@
 @import "node_modules/bulma/bulma";
 @import "node_modules/buefy/src/scss/buefy";
 
+@import "watch";
+
 // Margin and Padding
 @each $prop, $abbrev in (margin: m, padding: p) {
     @each $size, $length in $spacers {
@@ -106,4 +108,18 @@ nav.navbar {
             background-color: $primary;
         }
     }
+}
+
+.button {
+    &:not(.is-primary) {
+        border-color: lighten($black, 50%) !important;
+    }
+
+    .material-icons {
+        font-size: 16px;
+    }
+}
+
+[v-cloak] {
+    display: none;
 }
