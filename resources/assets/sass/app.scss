@@ -4,6 +4,7 @@
 @import "node_modules/buefy/src/scss/buefy";
 
 @import "watch";
+@import "tokens";
 
 // Margin and Padding
 @each $prop, $abbrev in (margin: m, padding: p) {
@@ -122,4 +123,14 @@ nav.navbar {
 
 [v-cloak] {
     display: none;
+}
+
+.block {
+    display: inline-block;
+    width: 100%;
+    margin: 0;
+}
+
+small {
+    font-size: 13px;
 }

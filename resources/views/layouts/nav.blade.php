@@ -29,6 +29,10 @@
                         Register
                     </a>
                 @else
+                    <a class="navbar-item" href="{{ url('/tokens') }}">
+                        {{ auth()->user()->tokens }} Tokens
+                    </a>
+
                     <b-dropdown position="is-bottom-left">
                         <a class="navbar-item" slot="trigger">
                             <span>{{ auth()->user()->name }}</span>

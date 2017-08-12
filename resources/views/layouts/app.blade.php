@@ -11,6 +11,7 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 
+        <script src="https://js.stripe.com/v3/"></script>
         <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
     </head>
 

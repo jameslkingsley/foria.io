@@ -10279,18 +10279,18 @@ label.panel-block:hover {
 
 .zoom-in-enter-active,
 .zoom-in-leave-active {
-  -webkit-transition: opacity 150ms ease-out;
-  transition: opacity 150ms ease-out;
+  -webkit-transition: opacity 250ms ease-out;
+  transition: opacity 250ms ease-out;
 }
 
 .zoom-in-enter-active .animation-content,
 .zoom-in-enter-active .animation-content,
 .zoom-in-leave-active .animation-content,
 .zoom-in-leave-active .animation-content {
-  -webkit-transition: -webkit-transform 150ms ease-out;
-  transition: -webkit-transform 150ms ease-out;
-  transition: transform 150ms ease-out;
-  transition: transform 150ms ease-out, -webkit-transform 150ms ease-out;
+  -webkit-transition: -webkit-transform 250ms ease-out;
+  transition: -webkit-transform 250ms ease-out;
+  transition: transform 250ms ease-out;
+  transition: transform 250ms ease-out, -webkit-transform 250ms ease-out;
 }
 
 .zoom-in-enter,
@@ -10308,18 +10308,18 @@ label.panel-block:hover {
 
 .zoom-out-enter-active,
 .zoom-out-leave-active {
-  -webkit-transition: opacity 150ms ease-out;
-  transition: opacity 150ms ease-out;
+  -webkit-transition: opacity 250ms ease-out;
+  transition: opacity 250ms ease-out;
 }
 
 .zoom-out-enter-active .animation-content,
 .zoom-out-enter-active .animation-content,
 .zoom-out-leave-active .animation-content,
 .zoom-out-leave-active .animation-content {
-  -webkit-transition: -webkit-transform 150ms ease-out;
-  transition: -webkit-transform 150ms ease-out;
-  transition: transform 150ms ease-out;
-  transition: transform 150ms ease-out, -webkit-transform 150ms ease-out;
+  -webkit-transition: -webkit-transform 250ms ease-out;
+  transition: -webkit-transform 250ms ease-out;
+  transition: transform 250ms ease-out;
+  transition: transform 250ms ease-out, -webkit-transform 250ms ease-out;
 }
 
 .zoom-out-enter,
@@ -10339,10 +10339,10 @@ label.panel-block:hover {
 .slide-next-leave-active,
 .slide-prev-enter-active,
 .slide-prev-leave-active {
-  -webkit-transition: -webkit-transform 250ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
-  transition: -webkit-transform 250ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
-  transition: transform 250ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
-  transition: transform 250ms cubic-bezier(0.785, 0.135, 0.15, 0.86), -webkit-transform 250ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  -webkit-transition: -webkit-transform 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  transition: -webkit-transform 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  transition: transform 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  transition: transform 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86), -webkit-transform 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
 }
 
 .slide-prev-leave-to,
@@ -10430,8 +10430,8 @@ label.panel-block:hover {
   height: 1.25em;
   border-radius: 0;
   border: 2px solid #7a7a7a;
-  -webkit-transition: background 150ms ease-out;
-  transition: background 150ms ease-out;
+  -webkit-transition: background 250ms ease-out;
+  transition: background 250ms ease-out;
 }
 
 .checkbox input[type=checkbox]:checked + .check {
@@ -10865,8 +10865,8 @@ label.panel-block:hover {
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
   display: inline-flex;
-  -webkit-animation-duration: 150ms;
-          animation-duration: 150ms;
+  -webkit-animation-duration: 250ms;
+          animation-duration: 250ms;
   margin: 1.5em 0.5em;
   text-align: center;
   -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
@@ -10930,8 +10930,8 @@ label.panel-block:hover {
           align-items: center;
   -ms-flex-pack: distribute;
       justify-content: space-around;
-  -webkit-animation-duration: 150ms;
-          animation-duration: 150ms;
+  -webkit-animation-duration: 250ms;
+          animation-duration: 250ms;
   margin: 0.5em;
   -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
           box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
@@ -11115,8 +11115,8 @@ label.panel-block:hover {
   height: 1.25em;
   border: 2px solid #7a7a7a;
   border-radius: 50%;
-  -webkit-transition: background 150ms ease-out;
-  transition: background 150ms ease-out;
+  -webkit-transition: background 250ms ease-out;
+  transition: background 250ms ease-out;
 }
 
 .radio input[type=radio] + .check:before {
@@ -11127,10 +11127,10 @@ label.panel-block:hover {
   background: #c13c49;
   -webkit-transform: scale(0);
           transform: scale(0);
-  -webkit-transition: -webkit-transform 150ms ease-out;
-  transition: -webkit-transform 150ms ease-out;
-  transition: transform 150ms ease-out;
-  transition: transform 150ms ease-out, -webkit-transform 150ms ease-out;
+  -webkit-transition: -webkit-transform 250ms ease-out;
+  transition: -webkit-transform 250ms ease-out;
+  transition: transform 250ms ease-out;
+  transition: transform 250ms ease-out, -webkit-transform 250ms ease-out;
 }
 
 .radio input[type=radio]:checked + .check {
@@ -11224,8 +11224,8 @@ label.panel-block:hover {
   padding: 0.2em;
   background: #b5b5b5;
   border-radius: 1em;
-  -webkit-transition: background 150ms ease-out;
-  transition: background 150ms ease-out;
+  -webkit-transition: background 250ms ease-out;
+  transition: background 250ms ease-out;
 }
 
 .switch input[type=checkbox] + .check:before {
@@ -11236,10 +11236,10 @@ label.panel-block:hover {
   background: whitesmoke;
   -webkit-box-shadow: 0 3px 1px 0 rgba(0, 0, 0, 0.05), 0 2px 2px 0 rgba(0, 0, 0, 0.1), 0 3px 3px 0 rgba(0, 0, 0, 0.05);
           box-shadow: 0 3px 1px 0 rgba(0, 0, 0, 0.05), 0 2px 2px 0 rgba(0, 0, 0, 0.1), 0 3px 3px 0 rgba(0, 0, 0, 0.05);
-  -webkit-transition: width 150ms ease-out, -webkit-transform 150ms ease-out;
-  transition: width 150ms ease-out, -webkit-transform 150ms ease-out;
-  transition: transform 150ms ease-out, width 150ms ease-out;
-  transition: transform 150ms ease-out, width 150ms ease-out, -webkit-transform 150ms ease-out;
+  -webkit-transition: width 250ms ease-out, -webkit-transform 250ms ease-out;
+  transition: width 250ms ease-out, -webkit-transform 250ms ease-out;
+  transition: transform 250ms ease-out, width 250ms ease-out;
+  transition: transform 250ms ease-out, width 250ms ease-out, -webkit-transform 250ms ease-out;
   will-change: transform;
 }
 
@@ -11326,10 +11326,10 @@ label.panel-block:hover {
 }
 
 .b-table .icon {
-  -webkit-transition: opacity 86ms ease-out, -webkit-transform 150ms ease-out;
-  transition: opacity 86ms ease-out, -webkit-transform 150ms ease-out;
-  transition: transform 150ms ease-out, opacity 86ms ease-out;
-  transition: transform 150ms ease-out, opacity 86ms ease-out, -webkit-transform 150ms ease-out;
+  -webkit-transition: opacity 86ms ease-out, -webkit-transform 250ms ease-out;
+  transition: opacity 86ms ease-out, -webkit-transform 250ms ease-out;
+  transition: transform 250ms ease-out, opacity 86ms ease-out;
+  transition: transform 250ms ease-out, opacity 86ms ease-out, -webkit-transform 250ms ease-out;
 }
 
 .b-table .icon.is-desc {
@@ -12117,6 +12117,81 @@ label.panel-block:hover {
   background: #eee;
 }
 
+.token-checkout .b-tabs nav.tabs {
+  display: none;
+}
+
+.token-checkout .token-package {
+  display: inline-block;
+  width: 100%;
+  padding: 1rem;
+  border: 3px solid #dbdbdb;
+}
+
+.token-checkout .token-package.is-selected {
+  border-color: #c13c49;
+}
+
+.token-checkout .token-package .token-package-title {
+  width: 50%;
+  float: left;
+  font-size: 22px;
+  font-weight: 500;
+  color: black;
+}
+
+.token-checkout .token-package .token-package-controls {
+  width: 50%;
+  float: right;
+}
+
+.token-checkout .token-package .token-package-controls .token-package-controls-group {
+  float: right;
+  background: white;
+  height: 36px;
+}
+
+.token-checkout .token-package .token-package-controls .token-package-controls-group .button.token-package-button {
+  float: right;
+  border-width: 1px 1px 1px 0;
+}
+
+.token-checkout .token-package .token-package-controls .token-package-controls-group .token-package-cost {
+  float: left;
+  height: inherit;
+  line-height: 36px;
+  padding: 0 0.5rem;
+  background: #000;
+  color: white;
+}
+
+.token-checkout .StripeElement {
+  background-color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  -webkit-box-shadow: 0 1px 3px 0 #e6ebf1;
+          box-shadow: 0 1px 3px 0 #e6ebf1;
+  -webkit-transition: box-shadow 150ms ease;
+  -webkit-transition: -webkit-box-shadow 150ms ease;
+  transition: -webkit-box-shadow 150ms ease;
+  transition: box-shadow 150ms ease;
+  transition: box-shadow 150ms ease, -webkit-box-shadow 150ms ease;
+}
+
+.token-checkout .StripeElement--focus {
+  -webkit-box-shadow: 0 1px 3px 0 #cfd7df;
+          box-shadow: 0 1px 3px 0 #cfd7df;
+}
+
+.token-checkout .StripeElement--invalid {
+  border-color: #fa755a;
+}
+
+.token-checkout .StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
+}
+
 .m-0 {
   margin: 0 !important;
 }
@@ -12602,5 +12677,15 @@ nav.navbar .navbar-link:focus {
 
 [v-cloak] {
   display: none;
+}
+
+.block {
+  display: inline-block;
+  width: 100%;
+  margin: 0;
+}
+
+small {
+  font-size: 13px;
 }
 

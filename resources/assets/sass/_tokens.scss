@@ -1,0 +1,73 @@
+.token-checkout {
+    .b-tabs {
+        nav.tabs {
+            display: none;
+        }
+    }
+
+    .token-package {
+        display: inline-block;
+        width: 100%;
+        padding: 1rem;
+        border: 3px solid #dbdbdb;
+
+        &.is-selected {
+            border-color: $primary;
+        }
+
+        .token-package-title {
+            width: 50%;
+            float: left;
+            font-size: 22px;
+            font-weight: 500;
+            color: black;
+        }
+
+        .token-package-controls {
+            width: 50%;
+            float: right;
+
+            .token-package-controls-group {
+                float: right;
+                background: white;
+                height: 36px;
+
+                .button.token-package-button {
+                    float: right;
+                    border-width: 1px 1px 1px 0;
+                }
+
+                .token-package-cost {
+                    float: left;
+                    height: inherit;
+                    line-height: 36px;
+                    padding: 0 0.5rem;
+                    background: #000;
+                    color: white;
+                }
+            }
+        }
+    }
+
+    .StripeElement {
+        background-color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: 1px solid transparent;
+        box-shadow: 0 1px 3px 0 #e6ebf1;
+        -webkit-transition: box-shadow 150ms ease;
+        transition: box-shadow 150ms ease;
+    }
+
+    .StripeElement--focus {
+        box-shadow: 0 1px 3px 0 #cfd7df;
+    }
+
+    .StripeElement--invalid {
+        border-color: #fa755a;
+    }
+
+    .StripeElement--webkit-autofill {
+        background-color: #fefde5 !important;
+    }
+}

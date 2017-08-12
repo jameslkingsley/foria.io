@@ -12,6 +12,10 @@ Route::post('/watch/{user}/start', 'WatchController@start');
 Route::get('/logout', 'Auth\LogoutController@index');
 Auth::routes();
 
+// Tokens
+Route::get('/tokens/packages', 'TokenController@packages');
+Route::resource('/tokens', 'TokenController');
+
 // Following
 Route::get('/follow/{to}', 'FollowController@index');
 Route::post('/follow/{to}', 'FollowController@store');

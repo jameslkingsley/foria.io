@@ -18,6 +18,15 @@ window.Vue = require('vue');
 import Buefy from 'buefy';
 Vue.use(Buefy);
 
+Vue.filter('currency', (value) => {
+    let langage = (navigator.language || navigator.browserLanguage).split('-')[0];
+
+    return (value / 100).toLocaleString(langage, {
+        style: 'currency',
+        currency: 'usd'
+    });
+});
+
 import Echo from 'laravel-echo'
 window.Pusher = require('pusher-js');
 

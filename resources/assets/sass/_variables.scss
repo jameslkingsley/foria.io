@@ -13,3 +13,6 @@ $spacers: (
     4: ($spacer * 1.5),
     5: ($spacer * 3)
 ) !default;
+
+$speed-slow: 250ms !default;
+$speed-slower: 500ms !default;
