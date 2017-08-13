@@ -2,8 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use Stripe\Charge;
+use Stripe\Stripe;
+use Stripe\Customer;
+use Stripe\Error\Api;
+use Stripe\Error\Card;
 use App\Models\TokenPackage;
 use Illuminate\Http\Request;
+use Stripe\Error\ApiConnection;
+use Stripe\Error\InvalidRequest;
+use App\Http\Requests\TokenRequest;
 
 class TokenController extends Controller
 {
@@ -33,9 +41,20 @@ class TokenController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(TokenRequest $request)
     {
-        return $request->all();
+        $response = null;
+
+        try {
+            $response = $request->handle();
+        } catch(\Exception $e) {
+            $response = [
+                'message' => $e->getMessage(),
+                'style' => 'danger'
+            ];
+        }
+
+        return $response;
     }
 
     /**

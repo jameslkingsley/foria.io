@@ -17,6 +17,7 @@ class CreateTokenPackagesTable extends Migration
             $table->increments('id');
             $table->bigInteger('token_count');
             $table->bigInteger('cost');
+            $table->bigInteger('stripe_fee');
             $table->timestamps();
         });
     }

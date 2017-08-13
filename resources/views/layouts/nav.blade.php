@@ -29,13 +29,21 @@
                         Register
                     </a>
                 @else
-                    <a class="navbar-item" href="{{ url('/tokens') }}">
-                        {{ auth()->user()->tokens }} Tokens
-                    </a>
+                    <b-dropdown position="is-bottom-left" id="token-checkout">
+                        <a class="navbar-item" slot="trigger">
+                            <i class="material-icons m-r-2">local_play</i>
+                            <span>@{{ user.tokens }} Tokens</span>
+                        </a>
+
+                        <b-dropdown-item custom>
+                            <f-token-checkout :user="{{ auth()->user() }}"></f-token-checkout>
+                        </b-dropdown-item>
+                    </b-dropdown>
 
                     <b-dropdown position="is-bottom-left">
                         <a class="navbar-item" slot="trigger">
                             <span>{{ auth()->user()->name }}</span>
+                            <i class="material-icons">keyboard_arrow_down</i>
                         </a>
 
                         <b-dropdown-item has-link>

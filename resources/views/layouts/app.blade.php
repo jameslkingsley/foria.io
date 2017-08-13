@@ -12,7 +12,26 @@
         <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 
         <script src="https://js.stripe.com/v3/"></script>
+        <script src="https://checkout.stripe.com/checkout.js"></script>
         <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
+
+        <script>
+            var Foria = {
+                stripeKey: '{{ config('services.stripe.key') }}',
+                pusherKey: '{{ config('broadcasting.connections.pusher.key') }}',
+                csrfToken: '{{ csrf_token() }}',
+                user: null
+            };
+        </script>
+
+        @unless (auth()->guest())
+            <script>
+                Foria.user = {
+                    id: {{ auth()->user()->id }},
+                    tokens: {{ auth()->user()->tokens }}
+                };
+            </script>
+        @endunless
     </head>
 
     <body>

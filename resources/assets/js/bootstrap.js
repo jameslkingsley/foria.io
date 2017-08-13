@@ -1,6 +1,6 @@
 window._ = require('lodash');
 
-window.positions = require('positions');
+window.formToObject = require('form_to_object');
 
 window.axios = require('axios');
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -23,7 +23,7 @@ Vue.filter('currency', (value) => {
 
     return (value / 100).toLocaleString(langage, {
         style: 'currency',
-        currency: 'usd'
+        currency: 'gbp'
     });
 });
 
@@ -32,6 +32,6 @@ window.Pusher = require('pusher-js');
 
 window.Echo = new Echo({
     broadcaster: 'pusher',
-    key: '87ebcedc0427d5204a31', // TODO
+    key: Foria.pusherKey,
     cluster: 'eu'
 });

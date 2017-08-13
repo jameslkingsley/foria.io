@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Stripe\Customer;
 use App\Traits\Follows;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -49,5 +50,19 @@ class User extends Authenticatable
         if (auth()->guest()) return false;
 
         return $this->id == auth()->user()->id;
+    }
+
+    /**
+     * Gets the Stripe customer for the user.
+     *
+     * @return Stripe\Customer
+     */
+    public function stripeCustomer()
+    {
+        if (! $this->stripe_customer_id) {
+            return null;
+        }
+
+        return Customer::retrieve($this->stripe_customer_id);
     }
 }

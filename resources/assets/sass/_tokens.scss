@@ -1,3 +1,9 @@
+#token-checkout {
+    .dropdown-menu {
+        min-width: 28rem;
+    }
+}
+
 .token-checkout {
     .b-tabs {
         nav.tabs {
@@ -8,19 +14,20 @@
     .token-package {
         display: inline-block;
         width: 100%;
-        padding: 1rem;
-        border: 3px solid #dbdbdb;
+        padding: 0.75rem;
 
         &.is-selected {
-            border-color: $primary;
+            box-shadow: $shadow;
         }
 
         .token-package-title {
             width: 50%;
             float: left;
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 500;
             color: black;
+            height: 36px;
+            line-height: 36px;
         }
 
         .token-package-controls {
@@ -49,25 +56,33 @@
         }
     }
 
+    label[for="card-element"] {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 5px;
+        display: inline-block;
+        width: 100%;
+    }
+
     .StripeElement {
-        background-color: white;
         padding: 8px 12px;
-        border-radius: 4px;
-        border: 1px solid transparent;
-        box-shadow: 0 1px 3px 0 #e6ebf1;
-        -webkit-transition: box-shadow 150ms ease;
-        transition: box-shadow 150ms ease;
+        border: 1px solid $border;
     }
 
     .StripeElement--focus {
-        box-shadow: 0 1px 3px 0 #cfd7df;
+        //
     }
 
     .StripeElement--invalid {
-        border-color: #fa755a;
+        border-color: $primary;
     }
 
     .StripeElement--webkit-autofill {
         background-color: #fefde5 !important;
+    }
+
+    #card-errors {
+        font-size: 14px;
+        color: $danger;
     }
 }

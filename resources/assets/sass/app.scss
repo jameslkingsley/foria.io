@@ -44,11 +44,25 @@
     margin-bottom: auto !important;
 }
 
+.dropdown {
+    &.is-active {
+        .dropdown-trigger {
+            .navbar-item {
+                background-color: $primary;
+                color: white;
+            }
+        }
+    }
+
+    .dropdown-menu {
+        padding-top: 0;
+    }
+}
+
 nav.navbar {
-    background: black;
+    box-shadow: $shadow;
 
     .navbar-item, .navbar-link {
-        color: white !important;
         text-transform: uppercase;
         font-weight: 600;
         font-size: 14px;
@@ -107,6 +121,7 @@ nav.navbar {
 
         &:hover, &:active, &:focus {
             background-color: $primary;
+            color: white;
         }
     }
 }

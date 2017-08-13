@@ -22,6 +22,7 @@
     "laravel-echo": "~1.3.2",
     "pusher-js": "~4.1.0",
     "vue-slider-component": "~2.3.5",
-    "vee-validate": "~2.0.0-rc.10"
+    "vee-validate": "~2.0.0-rc.10",
+    "form_to_object": "~1.0.8"
   }
 }
