@@ -5,6 +5,7 @@
 
 @import "watch";
 @import "tokens";
+@import "broadcast";
 
 // Margin and Padding
 @each $prop, $abbrev in (margin: m, padding: p) {
@@ -48,8 +49,8 @@
     &.is-active {
         .dropdown-trigger {
             .navbar-item {
-                background-color: $primary;
-                color: white;
+                color: $primary;
+                background-color: $light;
             }
         }
     }
@@ -110,7 +111,7 @@ nav.navbar {
 
             .navbar-link {
                 &:hover, &:active, &:focus {
-                    background-color: $primary;
+                    color: $primary;
                 }
             }
         }
@@ -120,8 +121,7 @@ nav.navbar {
         }
 
         &:hover, &:active, &:focus {
-            background-color: $primary;
-            color: white;
+            color: $primary;
         }
     }
 }

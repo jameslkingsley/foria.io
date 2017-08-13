@@ -37,7 +37,8 @@ class User extends Authenticatable
      */
     protected $appends = [
         'is_mine',
-        'follower_count'
+        'follower_count',
+        'watch_url'
     ];
 
     /**
@@ -50,6 +51,16 @@ class User extends Authenticatable
         if (auth()->guest()) return false;
 
         return $this->id == auth()->user()->id;
+    }
+
+    /**
+     * Gets the watch URL attribute.
+     *
+     * @return string
+     */
+    public function getWatchUrlAttribute()
+    {
+        return url("/watch/{$this->name}");
     }
 
     /**
