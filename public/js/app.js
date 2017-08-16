@@ -34704,7 +34704,6 @@ window.Stream = function () {
         this.userId = userId;
         this.fetch().then(function (r) {
             _this.data = r.data;
-            console.log(_this.data);
             _this.initializeSession();
         });
     }
@@ -34726,24 +34725,24 @@ window.Stream = function () {
         value: function initializeSession() {
             var _this2 = this;
 
-            var session = OT.initSession(this.data.apiKey, this.data.sessionId);
+            this.session = OT.initSession(Foria.openTokKey, this.data.broadcast.session_id);
 
             // Subscribe to a newly created stream
-            session.on('streamCreated', function (event) {
-                session.subscribe(event.stream, 'stream-publisher', {
+            this.session.on('streamCreated', function (event) {
+                _this2.subscriber = _this2.session.subscribe(event.stream, 'stream-publisher', {
                     insertMode: 'append',
                     width: '100%',
                     height: '640px'
-                }, this.handleError);
+                }, _this2.handleError);
             });
 
             // Connect to the session
-            session.connect(this.data.token, function (error) {
+            this.session.connect(this.data.token, function (error) {
                 // If the connection is successful, publish to the session
                 if (error) {
                     _this2.handleError(error);
                 } else {
-                    if (_this2.data.role == 'publisher') {
+                    if (_this2.data.broadcast.is_mine) {
                         // Create a publisher
                         var publisher = OT.initPublisher('stream-publisher', {
                             insertMode: 'append',
@@ -34751,10 +34750,20 @@ window.Stream = function () {
                             height: '640px'
                         }, _this2.handleError);
 
-                        session.publish(publisher, _this2.handleError);
+                        _this2.publisher = _this2.session.publish(publisher, _this2.handleError);
                     }
                 }
             });
+        }
+    }, {
+        key: 'close',
+        value: function close() {
+            if (this.data.broadcast.is_mine) {
+                this.session.unpublish(this.publisher);
+            }
+
+            // this.session.unsubscribe(this.subscriber);
+            this.session.disconnect();
         }
     }]);
 
@@ -34859,47 +34868,61 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     data: function data() {
         return {
-            online: false,
+            online: this.broadcast ? this.broadcast.online : false,
             editingTopic: false,
             hasBroadcast: this.broadcast !== null,
-            topic: this.broadcast ? this.broadcast.topic : 'Untitled'
+            subscriberMode: false,
+            topic: this.broadcast ? this.broadcast.topic : 'Untitled',
+            stream: null,
+            broadcaster: this.broadcast
         };
     },
 
 
     methods: {
-        start: function start() {
+        startOrStop: function startOrStop() {
             var _this = this;
 
-            axios.post('/api/broadcast/start').then(function (r) {
-                _this.online = true;
-                _this.openStream();
-            });
-        },
-        stop: function stop() {
-            var _this2 = this;
-
-            axios.delete('/api/broadcast/stop').then(function (r) {
-                _this2.online = false;
-                _this2.openStream();
-            });
+            if (this.online) {
+                // Stop broadcast
+                axios.delete('/api/broadcast/stop').then(function (r) {
+                    _this.online = false;
+                    _this.broadcaster = null;
+                    _this.subscriberMode = false;
+                    _this.closeStream();
+                });
+            } else {
+                // Start broadcast
+                axios.post('/api/broadcast/start', {
+                    topic: this.topic,
+                    subscriberMode: this.subscriberMode
+                }).then(function (r) {
+                    _this.online = true;
+                    _this.broadcaster = r.data;
+                    _this.openStream();
+                });
+            }
         },
         openStream: function openStream() {
-            return new Stream(this.user.id);
+            this.stream = new Stream(this.user.id, this.broadcast);
+            return this.stream;
+        },
+        closeStream: function closeStream() {
+            this.stream.close();
         },
         changeTopic: function changeTopic() {
             this.editingTopic = true;
         },
         saveTopic: function saveTopic() {
-            var _this3 = this;
+            var _this2 = this;
 
             axios.post('/api/broadcast/topic', { topic: this.topic }).then(function (r) {
-                _this3.editingTopic = false;
+                _this2.editingTopic = false;
             });
         },
         cancelTopic: function cancelTopic() {
             this.editingTopic = false;
-            this.topic = this.broadcast.topic;
+            this.topic = this.broadcaster.topic;
         }
     },
 
@@ -34987,9 +35010,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_vm._v("Change topic")])], 1) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('button', {
     staticClass: "button is-primary is-pulled-right has-icon m-r-1",
     on: {
-      "click": function($event) {
-        _vm.online ? _vm.stop : _vm.start
-      }
+      "click": _vm.startOrStop
     }
   }, [_c('i', {
     staticClass: "material-icons m-r-2"

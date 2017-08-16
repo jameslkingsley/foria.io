@@ -50,7 +50,7 @@ class TokenRequest extends FormRequest
                 'currency' => 'gbp',
                 'customer' => $customer->id
             ]);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return $e;
         }
 

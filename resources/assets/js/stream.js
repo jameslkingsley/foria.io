@@ -3,7 +3,6 @@ window.Stream = class Stream {
         this.userId = userId;
         this.fetch().then(r => {
             this.data = r.data;
-            console.log(this.data);
             this.initializeSession();
         });
     }
@@ -19,11 +18,11 @@ window.Stream = class Stream {
     }
 
     initializeSession() {
-        let session = OT.initSession(this.data.apiKey, this.data.sessionId);
+        this.session = OT.initSession(Foria.openTokKey, this.data.broadcast.session_id);
 
         // Subscribe to a newly created stream
-        session.on('streamCreated', function(event) {
-            session.subscribe(event.stream, 'stream-publisher', {
+        this.session.on('streamCreated', event => {
+            this.subscriber = this.session.subscribe(event.stream, 'stream-publisher', {
                 insertMode: 'append',
                 width: '100%',
                 height: '640px'
@@ -31,12 +30,12 @@ window.Stream = class Stream {
         });
 
         // Connect to the session
-        session.connect(this.data.token, error => {
+        this.session.connect(this.data.token, error => {
             // If the connection is successful, publish to the session
             if (error) {
                 this.handleError(error);
             } else {
-                if (this.data.role == 'publisher') {
+                if (this.data.broadcast.is_mine) {
                     // Create a publisher
                     let publisher = OT.initPublisher('stream-publisher', {
                         insertMode: 'append',
@@ -44,9 +43,18 @@ window.Stream = class Stream {
                         height: '640px'
                     }, this.handleError);
 
-                    session.publish(publisher, this.handleError);
+                    this.publisher = this.session.publish(publisher, this.handleError);
                 }
             }
         });
+    }
+
+    close() {
+        if (this.data.broadcast.is_mine) {
+            this.session.unpublish(this.publisher);
+        }
+
+        // this.session.unsubscribe(this.subscriber);
+        this.session.disconnect();
     }
 }

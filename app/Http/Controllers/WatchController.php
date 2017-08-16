@@ -68,25 +68,20 @@ class WatchController extends Controller
      */
     public function show(Request $request, User $user)
     {
-        if (! $session = Broadcast::latest($user)) {
+        if (! $broadcast = Broadcast::latest($user)) {
             return abort(403);
         }
 
-        $sessionId = $session->session_id;
-        $apiKey = config('opentok.api_key');
-        $role = (!auth()->guest() && $user->id == auth()->user()->id) ? Role::PUBLISHER : Role::SUBSCRIBER;
+        $role = $broadcast->is_mine ? Role::PUBLISHER : Role::SUBSCRIBER;
 
         $token = $this->openTok->generateToken(
-            $sessionId,
+            $broadcast->session_id,
             ['role' => $role]
         );
 
         return response()->json(compact(
-            'user',
-            'apiKey',
-            'sessionId',
-            'token',
-            'role'
+            'broadcast',
+            'token'
         ));
     }
 

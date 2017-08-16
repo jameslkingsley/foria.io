@@ -2,10 +2,38 @@
 
 namespace App\Http\Controllers;
 
+use OpenTok\OpenTok;
+use OpenTok\MediaMode;
+use App\Models\Broadcast;
 use Illuminate\Http\Request;
+use App\Http\Requests\BroadcastRequest;
 
 class BroadcastController extends Controller
 {
+    /**
+     * Default OpenTok session options.
+     *
+     * @var array
+     */
+    protected $sessionOptions = [
+        'mediaMode' => MediaMode::ROUTED
+    ];
+
+    /**
+     * Constructor method.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+
+        $this->openTok = new OpenTok(
+            config('opentok.api_key'),
+            config('opentok.api_secret')
+        );
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -85,11 +113,18 @@ class BroadcastController extends Controller
     /**
      * Starts the broadcast.
      *
-     * @return mixed
+     * @return App\Models\Broadcast
      */
-    public function start()
+    public function start(Request $request)
     {
-        //
+        $sessionId = $this->openTok
+            ->createSession($this->sessionOptions)
+            ->getSessionId();
+
+        return Broadcast::start([
+            'topic' => $request->topic,
+            'session_id' => $sessionId
+        ]);
     }
 
     /**
@@ -97,9 +132,13 @@ class BroadcastController extends Controller
      *
      * @return mixed
      */
-    public function stop()
+    public function stop(BroadcastRequest $request)
     {
-        //
+        if (! $request->broadcast()) {
+            return;
+        }
+
+        $request->broadcast()->stop();
     }
 
     /**
@@ -107,8 +146,9 @@ class BroadcastController extends Controller
      *
      * @return void
      */
-    public function topic(Request $request)
+    public function topic(BroadcastRequest $request)
     {
-        //
+        $request->broadcast()->topic = $request->topic;
+        $request->broadcast()->save();
     }
 }

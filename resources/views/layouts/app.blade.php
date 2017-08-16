@@ -18,6 +18,7 @@
             var Foria = {
                 stripeKey: '{{ config('services.stripe.key') }}',
                 pusherKey: '{{ config('broadcasting.connections.pusher.key') }}',
+                openTokKey: '{{ config('opentok.api_key') }}',
                 csrfToken: '{{ csrf_token() }}',
                 user: null
             };

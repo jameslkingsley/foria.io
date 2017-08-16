@@ -27,7 +27,7 @@
                             <b-dropdown-item @click.native="changeTopic">Change topic</b-dropdown-item>
                         </b-dropdown>
 
-                        <button v-if="user.is_mine" class="button is-primary is-pulled-right has-icon m-r-1" @click="online ? stop : start">
+                        <button v-if="user.is_mine" class="button is-primary is-pulled-right has-icon m-r-1" @click="startOrStop">
                             <i class="material-icons m-r-2">{{ online ? 'stop' : 'play_arrow' }}</i>
                             {{ online ? 'Stop' : 'Start' }} Broadcast
                         </button>
@@ -50,30 +50,46 @@
 
         data() {
             return {
-                online: false,
+                online: this.broadcast ? this.broadcast.online : false,
                 editingTopic: false,
                 hasBroadcast: this.broadcast !== null,
-                topic: this.broadcast ? this.broadcast.topic : 'Untitled'
+                subscriberMode: false,
+                topic: this.broadcast ? this.broadcast.topic : 'Untitled',
+                stream: null,
+                broadcaster: this.broadcast
             };
         },
 
         methods: {
-            start() {
-                axios.post(`/api/broadcast/start`).then(r => {
-                    this.online = true;
-                    this.openStream();
-                });
-            },
-
-            stop() {
-                axios.delete(`/api/broadcast/stop`).then(r => {
-                    this.online = false;
-                    this.openStream();
-                });
+            startOrStop() {
+                if (this.online) {
+                    // Stop broadcast
+                    axios.delete(`/api/broadcast/stop`).then(r => {
+                        this.online = false;
+                        this.broadcaster = null;
+                        this.subscriberMode = false;
+                        this.closeStream();
+                    });
+                } else {
+                    // Start broadcast
+                    axios.post(`/api/broadcast/start`, {
+                        topic: this.topic,
+                        subscriberMode: this.subscriberMode
+                    }).then(r => {
+                        this.online = true;
+                        this.broadcaster = r.data;
+                        this.openStream();
+                    });
+                }
             },
 
             openStream() {
-                return new Stream(this.user.id);
+                this.stream = new Stream(this.user.id, this.broadcast);
+                return this.stream;
+            },
+
+            closeStream() {
+                this.stream.close();
             },
 
             changeTopic() {
@@ -88,7 +104,7 @@
 
             cancelTopic() {
                 this.editingTopic = false;
-                this.topic = this.broadcast.topic;
+                this.topic = this.broadcaster.topic;
             }
         },
 
