@@ -34762,7 +34762,11 @@ window.Stream = function () {
                 this.session.unpublish(this.publisher);
             }
 
-            // this.session.unsubscribe(this.subscriber);
+            this.session.unsubscribe(this.subscriber);
+        }
+    }, {
+        key: 'disconnect',
+        value: function disconnect() {
             this.session.disconnect();
         }
     }]);

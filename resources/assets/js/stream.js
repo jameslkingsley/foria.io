@@ -54,7 +54,10 @@ window.Stream = class Stream {
             this.session.unpublish(this.publisher);
         }
 
-        // this.session.unsubscribe(this.subscriber);
+        this.session.unsubscribe(this.subscriber);
+    }
+
+    disconnect() {
         this.session.disconnect();
     }
 }
