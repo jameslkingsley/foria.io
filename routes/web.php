@@ -9,7 +9,12 @@ Route::get('/watch/{user}/show', 'WatchController@show');
 Route::post('/watch/{user}/start', 'WatchController@start');
 
 // Broadcasts
-Route::resource('broadcasts', 'BroadcastController');
+Route::resource('/api/broadcast-query', 'BroadcastQueryController');
+
+Route::post('/api/broadcast/topic', 'BroadcastController@topic');
+Route::post('/api/broadcast/start', 'BroadcastController@start');
+Route::delete('/api/broadcast/stop', 'BroadcastController@stop');
+Route::resource('/api/broadcast', 'BroadcastController');
 
 // Authentication
 Route::get('/logout', 'Auth\LogoutController@index');

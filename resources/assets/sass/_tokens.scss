@@ -15,6 +15,7 @@
         display: inline-block;
         width: 100%;
         padding: 0.75rem;
+        border-radius: 4px;
 
         &.is-selected {
             box-shadow: $shadow;
@@ -37,20 +38,24 @@
             .token-package-controls-group {
                 float: right;
                 background: white;
-                height: 36px;
+                height: 31.5px;
 
                 .button.token-package-button {
                     float: right;
                     border-width: 1px 1px 1px 0;
+                    border-radius: 0 4px 4px 0 !important;
                 }
 
                 .token-package-cost {
                     float: left;
                     height: inherit;
-                    line-height: 36px;
+                    line-height: 31.5px;
+                    font-weight: 600;
                     padding: 0 0.5rem;
-                    background: #000;
-                    color: white;
+                    background: $background;
+                    color: black;
+                    border-radius: 4px 0 0 4px;
+                    box-shadow: $shadow;
                 }
             }
         }
@@ -67,6 +72,7 @@
     .StripeElement {
         padding: 8px 12px;
         border: 1px solid $border;
+        border-radius: 4px;
     }
 
     .StripeElement--focus {

@@ -3,46 +3,13 @@
 @import "node_modules/bulma/bulma";
 @import "node_modules/buefy/src/scss/buefy";
 
+@import "util";
 @import "watch";
 @import "tokens";
 @import "broadcast";
 
-// Margin and Padding
-@each $prop, $abbrev in (margin: m, padding: p) {
-    @each $size, $length in $spacers {
-        .#{$abbrev}-#{$size}  { #{$prop}: $length !important; }
-        .#{$abbrev}-t-#{$size} { #{$prop}-top: $length !important; }
-        .#{$abbrev}-r-#{$size} { #{$prop}-right: $length !important; }
-        .#{$abbrev}-b-#{$size} { #{$prop}-bottom: $length !important; }
-        .#{$abbrev}-l-#{$size} { #{$prop}-left: $length !important; }
-
-        .#{$abbrev}-x-#{$size} {
-            #{$prop}-right: $length !important;
-            #{$prop}-left: $length !important;
-        }
-
-        .#{$abbrev}-y-#{$size} {
-            #{$prop}-top: $length !important;
-            #{$prop}-bottom: $length !important;
-        }
-    }
-}
-
-// Some special margin utils
-.m-auto  { margin: auto !important; }
-.m-t-auto { margin-top: auto !important; }
-.m-r-auto { margin-right: auto !important; }
-.m-b-auto { margin-bottom: auto !important; }
-.m-l-auto { margin-left: auto !important; }
-
-.m-x-auto {
-    margin-right: auto !important;
-    margin-left: auto !important;
-}
-
-.m-y-auto {
-    margin-top: auto !important;
-    margin-bottom: auto !important;
+html {
+    background-color: $background;
 }
 
 .dropdown {
@@ -50,25 +17,60 @@
         .dropdown-trigger {
             .navbar-item {
                 color: $primary;
-                background-color: $light;
+                // background-color: $light;
             }
         }
     }
 
     .dropdown-menu {
-        padding-top: 0;
+        border-radius: 4px !important;
+
+        .dropdown-content {
+            border-radius: 4px !important;
+        }
     }
 }
 
 nav.navbar {
-    box-shadow: $shadow;
+    background-color: $background;
+    padding-top: 1rem;
+
+    .dropdown-menu::before {
+        content: '';
+        width: 20px;
+        height: 20px;
+        float: right;
+        background: white;
+        border: 1px solid rgba(10, 10, 10, 0.15);
+        border-width: 1px 1px 0 0;
+        transform: rotate(-45deg);
+        margin: -11px 25px 0 0;
+        border-radius: 0 5px 0 0;
+    }
+
+    .navbar-end, .navbar-start {
+        .navbar-item, .navbar-link {
+            margin-left: 1rem;
+        }
+    }
 
     .navbar-item, .navbar-link {
-        text-transform: uppercase;
+        // text-transform: uppercase;
+        // letter-spacing: 1px;
         font-weight: 600;
         font-size: 14px;
-        letter-spacing: 1px;
         background-color: transparent;
+        padding-left: 0;
+        padding-right: 0;
+
+        .material-icons {
+            font-size: 18px;
+            margin-top: 4px;
+        }
+
+        img {
+            max-height: 52px;
+        }
 
         &.has-dropdown {
             .navbar-dropdown {
@@ -104,7 +106,7 @@ nav.navbar {
                     color: $text !important;
 
                     &:hover, &:active, &:focus {
-                        background-color: $light;
+                        // background-color: $light;
                     }
                 }
             }
@@ -116,10 +118,6 @@ nav.navbar {
             }
         }
 
-        &::after {
-            border-color: white !important;
-        }
-
         &:hover, &:active, &:focus {
             color: $primary;
         }
@@ -127,6 +125,33 @@ nav.navbar {
 }
 
 .button {
+    padding: 4px 9px 4px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: $shadow;
+    color: $text;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    word-break: keep-all;
+    transition: box-shadow .08s ease-in,color .08s ease-in;
+    border: none;
+
+    &.has-icon {
+        padding: 4px 14px 4px 9px;
+    }
+
+    &:hover {
+        box-shadow: $shadow-hovered;
+        color: $text-hovered;
+    }
+
+    &:active {
+        box-shadow: $shadow-active;
+        color: $text-hovered;
+    }
+
     &:not(.is-primary) {
         border-color: lighten($black, 50%) !important;
     }

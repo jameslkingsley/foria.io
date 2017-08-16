@@ -870,7 +870,7 @@ module.exports = Cancel;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(10);
-module.exports = __webpack_require__(52);
+module.exports = __webpack_require__(58);
 
 
 /***/ }),
@@ -884,8 +884,8 @@ Vue.component('f-watch', __webpack_require__(40));
 Vue.component('f-follow', __webpack_require__(43));
 Vue.component('f-subscribe', __webpack_require__(46));
 Vue.component('f-token-checkout', __webpack_require__(49));
-Vue.component('f-broadcast-list', __webpack_require__(60));
-Vue.component('f-broadcast-tile', __webpack_require__(57));
+Vue.component('f-broadcast-list', __webpack_require__(52));
+Vue.component('f-broadcast-tile', __webpack_require__(55));
 
 var app = new Vue({
     el: '#app',
@@ -34830,28 +34830,81 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user'],
+    props: ['user', 'broadcast'],
 
     data: function data() {
         return {
-            //
+            online: false,
+            editingTopic: false,
+            hasBroadcast: this.broadcast !== null,
+            topic: this.broadcast ? this.broadcast.topic : 'Untitled'
         };
     },
 
 
     methods: {
         start: function start() {
-            axios.post('/watch/' + this.user.id + '/start').then(this.open);
+            var _this = this;
+
+            axios.post('/api/broadcast/start').then(function (r) {
+                _this.online = true;
+                _this.openStream();
+            });
         },
-        open: function open() {
+        stop: function stop() {
+            var _this2 = this;
+
+            axios.delete('/api/broadcast/stop').then(function (r) {
+                _this2.online = false;
+                _this2.openStream();
+            });
+        },
+        openStream: function openStream() {
             return new Stream(this.user.id);
+        },
+        changeTopic: function changeTopic() {
+            this.editingTopic = true;
+        },
+        saveTopic: function saveTopic() {
+            var _this3 = this;
+
+            axios.post('/api/broadcast/topic', { topic: this.topic }).then(function (r) {
+                _this3.editingTopic = false;
+            });
+        },
+        cancelTopic: function cancelTopic() {
+            this.editingTopic = false;
+            this.topic = this.broadcast.topic;
         }
     },
 
     created: function created() {
-        this.open();
+        this.openStream();
     }
 });
 
@@ -34864,9 +34917,48 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "columns"
   }, [_c('div', {
     staticClass: "column is-9"
-  }, [_c('p', {
-    staticClass: "title"
-  }, [_vm._v("\n            " + _vm._s(_vm.user.name) + "\n\n            "), (!_vm.user.is_mine) ? _c('f-subscribe', {
+  }, [_c('div', {
+    staticClass: "m-b-3"
+  }, [(_vm.editingTopic && _vm.user.is_mine) ? _c('div', [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.topic),
+      expression: "topic"
+    }],
+    attrs: {
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.topic)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.topic = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('button', {
+    staticClass: "button",
+    on: {
+      "click": _vm.saveTopic
+    }
+  }, [_vm._v("Save")]), _vm._v(" "), _c('button', {
+    staticClass: "button",
+    on: {
+      "click": _vm.cancelTopic
+    }
+  }, [_vm._v("Cancel")])]) : _c('div', {
+    staticClass: "watch-header"
+  }, [_c('div', {
+    staticClass: "watch-title"
+  }, [_c('span', {
+    staticClass: "watch-topic"
+  }, [_vm._v(_vm._s(_vm.topic))]), _vm._v(" "), _c('span', {
+    staticClass: "watch-user"
+  }, [_vm._v(_vm._s(_vm.user.name))])]), _vm._v(" "), _c('div', {
+    staticClass: "watch-controls"
+  }, [(!_vm.user.is_mine) ? _c('f-subscribe', {
     staticClass: "is-pulled-right m-l-1",
     attrs: {
       "user": _vm.user
@@ -34876,12 +34968,32 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "user": _vm.user
     }
-  }) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('button', {
-    staticClass: "button is-primary is-pulled-right",
-    on: {
-      "click": _vm.start
+  }) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('b-dropdown', {
+    staticClass: "is-pulled-right",
+    attrs: {
+      "position": "is-bottom-left"
     }
-  }, [_vm._v("\n                Start Broadcasting\n            ")]) : _vm._e()], 1), _vm._v(" "), _c('div', {
+  }, [_c('button', {
+    staticClass: "button",
+    slot: "trigger"
+  }, [_c('i', {
+    staticClass: "material-icons"
+  }, [_vm._v("settings")])]), _vm._v(" "), _c('b-dropdown-item', [_vm._v("Subscriber mode")]), _vm._v(" "), _c('b-dropdown-item', {
+    nativeOn: {
+      "click": function($event) {
+        _vm.changeTopic($event)
+      }
+    }
+  }, [_vm._v("Change topic")])], 1) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('button', {
+    staticClass: "button is-primary is-pulled-right has-icon m-r-1",
+    on: {
+      "click": function($event) {
+        _vm.online ? _vm.stop : _vm.start
+      }
+    }
+  }, [_c('i', {
+    staticClass: "material-icons m-r-2"
+  }, [_vm._v(_vm._s(_vm.online ? 'stop' : 'play_arrow'))]), _vm._v("\n                        " + _vm._s(_vm.online ? 'Stop' : 'Start') + " Broadcast\n                    ")]) : _vm._e()], 1)])]), _vm._v(" "), _c('div', {
     staticClass: "watch-video-container",
     attrs: {
       "id": "stream-publisher"
@@ -35447,123 +35559,14 @@ if (false) {
 
 /***/ }),
 /* 52 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 53 */,
-/* 54 */,
-/* 55 */,
-/* 56 */,
-/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(58),
+  __webpack_require__(53),
   /* template */
-  __webpack_require__(59),
-  /* styles */
-  null,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\BroadcastTile.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] BroadcastTile.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-40cec316", Component.options)
-  } else {
-    hotAPI.reload("data-v-40cec316", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 58 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['broadcaster'],
-
-    data: function data() {
-        return {
-            user: Foria.user
-        };
-    }
-});
-
-/***/ }),
-/* 59 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('a', {
-    staticClass: "box broadcast-tile",
-    attrs: {
-      "href": _vm.broadcaster.watch_url
-    }
-  }, [_c('div', {
-    staticClass: "broadcast-details"
-  }, [_c('span', {
-    staticClass: "broadcast-title"
-  }, [_vm._v(_vm._s(_vm.broadcaster.name))]), _vm._v(" "), _c('span', {
-    staticClass: "broadcast-viewers"
-  }, [_vm._v("2,346")]), _vm._v(" "), _c('span', {
-    staticClass: "broadcast-topic"
-  }, [_vm._v("A topic the broadcaster can set")]), _vm._v(" "), _c('div', {
-    staticClass: "broadcast-controls"
-  })])])
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-40cec316", module.exports)
-  }
-}
-
-/***/ }),
-/* 60 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(61),
-  /* template */
-  __webpack_require__(62),
+  __webpack_require__(54),
   /* styles */
   null,
   /* scopeId */
@@ -35595,7 +35598,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 61 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -35620,14 +35623,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     created: function created() {
         var _this = this;
 
-        axios.get('/broadcasts').then(function (r) {
+        axios.get('/api/broadcast-query').then(function (r) {
             return _this.broadcasts = r.data;
         });
     }
 });
 
 /***/ }),
-/* 62 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -35635,7 +35638,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     return _c('f-broadcast-tile', {
       key: index,
       attrs: {
-        "broadcaster": broadcast
+        "broadcast": broadcast
       }
     })
   }))
@@ -35647,6 +35650,111 @@ if (false) {
      require("vue-hot-reload-api").rerender("data-v-0e8aa906", module.exports)
   }
 }
+
+/***/ }),
+/* 55 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(56),
+  /* template */
+  __webpack_require__(57),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\BroadcastTile.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] BroadcastTile.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-40cec316", Component.options)
+  } else {
+    hotAPI.reload("data-v-40cec316", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 56 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['broadcast'],
+
+    data: function data() {
+        return {
+            user: Foria.user
+        };
+    }
+});
+
+/***/ }),
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('a', {
+    staticClass: "box broadcast-tile",
+    attrs: {
+      "href": _vm.broadcast.user.watch_url
+    }
+  }, [_c('div', {
+    staticClass: "broadcast-details"
+  }, [_c('span', {
+    staticClass: "broadcast-title"
+  }, [_vm._v(_vm._s(_vm.broadcast.user.name))]), _vm._v(" "), _c('span', {
+    staticClass: "broadcast-viewers"
+  }, [_vm._v("2,346")]), _vm._v(" "), _c('span', {
+    staticClass: "broadcast-topic"
+  }, [_vm._v("A topic the broadcaster can set")]), _vm._v(" "), _c('div', {
+    staticClass: "broadcast-controls"
+  })])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-40cec316", module.exports)
+  }
+}
+
+/***/ }),
+/* 58 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ })
 /******/ ]);

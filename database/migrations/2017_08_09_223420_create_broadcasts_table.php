@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSessionsTable extends Migration
+class CreateBroadcastsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,14 @@ class CreateSessionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('sessions', function (Blueprint $table) {
+        Schema::create('broadcasts', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('topic')->nullable();
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->string('session_id');
+            $table->string('session_id')->nullable();
+            $table->boolean('online')->default(false);
+            $table->boolean('subscriber_only')->default(false);
             $table->timestamps();
         });
     }
@@ -29,6 +32,6 @@ class CreateSessionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sessions');
+        Schema::dropIfExists('broadcasts');
     }
 }

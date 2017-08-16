@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class BroadcastController extends Controller
@@ -14,9 +13,7 @@ class BroadcastController extends Controller
      */
     public function index()
     {
-        $users = User::all();
-
-        return response()->json($users);
+        //
     }
 
     /**
@@ -37,7 +34,7 @@ class BroadcastController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Start the broadcast
     }
 
     /**
@@ -81,6 +78,36 @@ class BroadcastController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
+    {
+        // Stop the broadcast
+    }
+
+    /**
+     * Starts the broadcast.
+     *
+     * @return mixed
+     */
+    public function start()
+    {
+        //
+    }
+
+    /**
+     * Stops the broadcast.
+     *
+     * @return mixed
+     */
+    public function stop()
+    {
+        //
+    }
+
+    /**
+     * Changes the topic of the broadcast.
+     *
+     * @return void
+     */
+    public function topic(Request $request)
     {
         //
     }

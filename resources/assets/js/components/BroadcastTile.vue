@@ -1,7 +1,7 @@
 <template>
-    <a :href="broadcaster.watch_url" class="box broadcast-tile">
+    <a :href="broadcast.user.watch_url" class="box broadcast-tile">
         <div class="broadcast-details">
-            <span class="broadcast-title">{{ broadcaster.name }}</span>
+            <span class="broadcast-title">{{ broadcast.user.name }}</span>
             <span class="broadcast-viewers">2,346</span>
             <span class="broadcast-topic">A topic the broadcaster can set</span>
 
@@ -12,7 +12,7 @@
 
 <script>
     export default {
-        props: ['broadcaster'],
+        props: ['broadcast'],
 
         data() {
             return {

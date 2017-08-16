@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use OpenTok\Role;
 use OpenTok\OpenTok;
+use App\Models\User;
 use OpenTok\MediaMode;
-use App\Models\Session;
+use App\Models\Broadcast;
 use Illuminate\Http\Request;
 
 class WatchController extends Controller
@@ -56,7 +56,9 @@ class WatchController extends Controller
             return abort(404);
         }
 
-        return view('watch.index', compact('user'));
+        $broadcast = Broadcast::latest($user);
+
+        return vue('f-watch', compact('user', 'broadcast'));
     }
 
     /**
@@ -66,7 +68,7 @@ class WatchController extends Controller
      */
     public function show(Request $request, User $user)
     {
-        if (! $session = Session::latestFor($user)) {
+        if (! $session = Broadcast::latest($user)) {
             return abort(403);
         }
 
@@ -103,7 +105,7 @@ class WatchController extends Controller
             ->createSession($this->sessionOptions)
             ->getSessionId();
 
-        Session::start($sessionId);
+        Broadcast::start($sessionId);
 
         return $sessionId;
     }

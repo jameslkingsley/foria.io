@@ -12,7 +12,6 @@
         <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 
         <script src="https://js.stripe.com/v3/"></script>
-        <script src="https://checkout.stripe.com/checkout.js"></script>
         <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
 
         <script>

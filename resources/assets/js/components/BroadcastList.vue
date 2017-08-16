@@ -3,7 +3,7 @@
         <f-broadcast-tile
             v-for="(broadcast, index) in broadcasts"
             :key="index"
-            :broadcaster="broadcast">
+            :broadcast="broadcast">
         </f-broadcast-tile>
     </div>
 </template>
@@ -17,7 +17,7 @@
         },
 
         created() {
-            axios.get('/broadcasts').then(
+            axios.get('/api/broadcast-query').then(
                 r => this.broadcasts = r.data
             );
         }
