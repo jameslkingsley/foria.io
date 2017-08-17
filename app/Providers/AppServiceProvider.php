@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Stripe\Stripe;
 use OpenTok\OpenTok;
+use Laravel\Cashier\Cashier;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -19,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
         View::share('opentokApiKey', config('opentok.api_key'));
 
         Stripe::setApiKey(config('services.stripe.secret'));
+
+        Cashier::useCurrency('gbp', '£');
     }
 
     /**

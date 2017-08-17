@@ -51,7 +51,7 @@
                         </b-dropdown-item>
 
                         <b-dropdown-item has-link>
-                            <a>Settings</a>
+                            <a href="{{ url('/settings') }}">Settings</a>
                         </b-dropdown-item>
 
                         <b-dropdown-item has-link>

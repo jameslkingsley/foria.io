@@ -4,22 +4,22 @@ namespace App\Models;
 
 use Stripe\Customer;
 use App\Traits\Follows;
+use Laravel\Cashier\Billable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
     use Notifiable,
+        Billable,
         Follows;
 
     /**
-     * The attributes that are mass assignable.
+     * Guarded attributes.
      *
      * @var array
      */
-    protected $fillable = [
-        'name', 'email', 'password'
-    ];
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -48,7 +48,9 @@ class User extends Authenticatable
      */
     public function getIsMineAttribute()
     {
-        if (auth()->guest()) return false;
+        if (auth()->guest()) {
+            return false;
+        }
 
         return $this->id == auth()->user()->id;
     }
@@ -68,9 +70,21 @@ class User extends Authenticatable
      *
      * @return Stripe\Customer
      */
-    public function stripeCustomer()
+    public function stripeCustomer($token = null)
     {
         if (! $this->stripe_customer_id) {
+            if ($token) {
+                $customer = Customer::create([
+                    'email' => $this->email,
+                    'source' => $token
+                ]);
+
+                $this->stripe_customer_id = $customer->id;
+                $this->save();
+
+                return $this->stripeCustomer();
+            }
+
             return null;
         }
 

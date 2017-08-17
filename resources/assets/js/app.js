@@ -9,6 +9,13 @@ Vue.component('f-broadcast-list', require('./components/BroadcastList.vue'));
 Vue.component('f-broadcast-tile', require('./components/BroadcastTile.vue'));
 Vue.component('f-chat', require('./components/Chat.vue'));
 
+// Settings
+Vue.component('f-settings', require('./components/settings/Index.vue'));
+Vue.component('f-settings-account', require('./components/settings/Account.vue'));
+Vue.component('f-settings-billing', require('./components/settings/Billing.vue'));
+Vue.component('f-settings-subscriptions', require('./components/settings/Subscriptions.vue'));
+Vue.component('f-settings-notifications', require('./components/settings/Notifications.vue'));
+
 const app = new Vue({
     el: '#app',
 

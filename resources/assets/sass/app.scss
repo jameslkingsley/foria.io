@@ -8,6 +8,7 @@
 @import "tokens";
 @import "broadcast";
 @import "chat";
+@import "settings";
 
 html {
     background-color: $background;
@@ -174,4 +175,9 @@ nav.navbar {
 
 small {
     font-size: 13px;
+}
+
+.card {
+    border-radius: $radius;
+    box-shadow: $shadow !important;
 }

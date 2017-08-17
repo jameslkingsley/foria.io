@@ -12730,6 +12730,30 @@ label.panel-block:hover {
   font-weight: 500;
 }
 
+.settings-nav {
+  padding-top: 0;
+}
+
+.settings-nav .settings-nav-item {
+  float: left;
+  width: 100%;
+  font-weight: 400;
+  padding: 0 0 12px 0;
+  color: #525f7f;
+}
+
+.settings-nav .settings-nav-item .material-icons {
+  margin: 1px 7px 0 0;
+  float: left;
+  font-size: 24px;
+}
+
+.settings-nav .settings-nav-item:hover,
+.settings-nav .settings-nav-item.is-active {
+  font-weight: 500;
+  color: #32325d;
+}
+
 html {
   background-color: #f1f5f9;
 }
@@ -12904,5 +12928,11 @@ nav.navbar .navbar-link:focus {
 
 small {
   font-size: 13px;
+}
+
+.card {
+  border-radius: 4px;
+  -webkit-box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent !important;
+          box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent !important;
 }
 

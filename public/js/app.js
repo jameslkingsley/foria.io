@@ -870,7 +870,7 @@ module.exports = Cancel;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(10);
-module.exports = __webpack_require__(58);
+module.exports = __webpack_require__(61);
 
 
 /***/ }),
@@ -886,7 +886,14 @@ Vue.component('f-subscribe', __webpack_require__(46));
 Vue.component('f-token-checkout', __webpack_require__(49));
 Vue.component('f-broadcast-list', __webpack_require__(52));
 Vue.component('f-broadcast-tile', __webpack_require__(55));
-Vue.component('f-chat', __webpack_require__(63));
+Vue.component('f-chat', __webpack_require__(58));
+
+// Settings
+Vue.component('f-settings', __webpack_require__(69));
+Vue.component('f-settings-account', __webpack_require__(72));
+Vue.component('f-settings-billing', __webpack_require__(75));
+Vue.component('f-settings-subscriptions', __webpack_require__(78));
+Vue.component('f-settings-notifications', __webpack_require__(81));
 
 var app = new Vue({
     el: '#app',
@@ -35794,24 +35801,14 @@ if (false) {
 
 /***/ }),
 /* 58 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 59 */,
-/* 60 */,
-/* 61 */,
-/* 62 */,
-/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(64),
+  __webpack_require__(59),
   /* template */
-  __webpack_require__(65),
+  __webpack_require__(60),
   /* styles */
   null,
   /* scopeId */
@@ -35843,7 +35840,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 64 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -35922,7 +35919,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 65 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -35983,6 +35980,553 @@ if (false) {
   module.hot.accept()
   if (module.hot.data) {
      require("vue-hot-reload-api").rerender("data-v-557d0fbe", module.exports)
+  }
+}
+
+/***/ }),
+/* 61 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 62 */,
+/* 63 */,
+/* 64 */,
+/* 65 */,
+/* 66 */,
+/* 67 */,
+/* 68 */,
+/* 69 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(70),
+  /* template */
+  __webpack_require__(71),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\settings\\Index.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Index.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-7801cc2f", Component.options)
+  } else {
+    hotAPI.reload("data-v-7801cc2f", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 70 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user'],
+
+    data: function data() {
+        return {
+            activePanel: 1,
+            panels: [{ name: 'Account', icon: 'account_circle', component: 'f-settings-account' }, { name: 'Billing', icon: 'credit_card', component: 'f-settings-billing' }, { name: 'Subscriptions', icon: 'subscriptions', component: 'f-settings-subscriptions' }, { name: 'Notifications', icon: 'notifications', component: 'f-settings-notifications' }]
+        };
+    },
+
+
+    computed: {
+        contentComponent: function contentComponent() {
+            var panel = this.panels[this.activePanel];
+            return panel.component;
+        }
+    },
+
+    methods: {
+        navItemClasses: function navItemClasses(index) {
+            return {
+                'settings-nav-item': true,
+                'is-active': index === this.activePanel
+            };
+        },
+        selectPanel: function selectPanel(index) {
+            var panel = this.panels[index];
+            this.activePanel = index;
+        }
+    }
+});
+
+/***/ }),
+/* 71 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "columns"
+  }, [_c('div', {
+    staticClass: "column is-2 settings-nav"
+  }, _vm._l((_vm.panels), function(panel, index) {
+    return _c('a', {
+      class: _vm.navItemClasses(index),
+      on: {
+        "click": function($event) {
+          $event.preventDefault();
+          _vm.selectPanel(index)
+        }
+      }
+    }, [_c('i', {
+      staticClass: "material-icons"
+    }, [_vm._v(_vm._s(panel.icon))]), _vm._v("\n            " + _vm._s(panel.name) + "\n        ")])
+  })), _vm._v(" "), _c('div', {
+    staticClass: "column settings-content card"
+  }, [_c(_vm.contentComponent, {
+    tag: "component",
+    attrs: {
+      "user": _vm.user
+    }
+  })], 1)])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-7801cc2f", module.exports)
+  }
+}
+
+/***/ }),
+/* 72 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(73),
+  /* template */
+  __webpack_require__(74),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\settings\\Account.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Account.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-bd7eaa6c", Component.options)
+  } else {
+    hotAPI.reload("data-v-bd7eaa6c", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 73 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    //
+});
+
+/***/ }),
+/* 74 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_vm._v("Account")])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-bd7eaa6c", module.exports)
+  }
+}
+
+/***/ }),
+/* 75 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(76),
+  /* template */
+  __webpack_require__(77),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\settings\\Billing.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Billing.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-73206c18", Component.options)
+  } else {
+    hotAPI.reload("data-v-73206c18", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 76 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    data: function data() {
+        return {
+            csrfToken: Foria.csrfToken,
+            stripe: {}
+        };
+    },
+
+
+    methods: {
+        save: function save() {
+            var _this = this;
+
+            this.stripe.stripe.createToken(this.stripe.card).then(function (result) {
+                if (result.error) {
+                    // Inform the user if there was an error
+                    var errorElement = document.getElementById('billing-card-errors');
+                    errorElement.textContent = result.error.message;
+                } else {
+                    // Send the token to your server
+                    // Insert the token ID into the form so it gets submitted to the server
+                    var form = document.getElementById('billing-form');
+                    var hiddenInput = document.createElement('input');
+
+                    hiddenInput.setAttribute('type', 'hidden');
+                    hiddenInput.setAttribute('name', 'stripeToken');
+                    hiddenInput.setAttribute('value', result.token.id);
+                    form.appendChild(hiddenInput);
+
+                    axios.post('/settings/billing', formToObject(form)).then(function (r) {
+                        console.log(r);
+
+                        _this.$toast.open({
+                            message: 'Billing Details Saved',
+                            type: 'is-success'
+                        });
+
+                        // this.stripe.card.clear();
+                    });
+                }
+            });
+        }
+    },
+
+    mounted: function mounted() {
+        this.stripe.stripe = Stripe(Foria.stripeKey);
+        this.stripe.elements = this.stripe.stripe.elements();
+
+        // Create an instance of the card element
+        this.stripe.card = this.stripe.elements.create('card');
+
+        // Add an instance of the card Element into the `card-element` <div>
+        this.stripe.card.mount('#billing-card-element');
+
+        this.stripe.card.addEventListener('change', function (_ref) {
+            var error = _ref.error;
+
+            var displayError = document.getElementById('billing-card-errors');
+
+            if (error) {
+                displayError.textContent = error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+    }
+});
+
+/***/ }),
+/* 77 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('form', {
+    attrs: {
+      "method": "post",
+      "id": "billing-form",
+      "action": "/settings/billing"
+    },
+    on: {
+      "submit": function($event) {
+        $event.preventDefault();
+        _vm.save($event)
+      }
+    }
+  }, [_c('input', {
+    attrs: {
+      "type": "hidden",
+      "name": "_token"
+    },
+    domProps: {
+      "value": _vm.csrfToken
+    }
+  }), _vm._v(" "), _c('label', {
+    attrs: {
+      "for": "billing-card-element"
+    }
+  }, [_vm._v("\n            Credit or debit card\n        ")]), _vm._v(" "), _c('div', {
+    attrs: {
+      "id": "billing-card-element"
+    }
+  }), _vm._v(" "), _c('div', {
+    attrs: {
+      "id": "billing-card-errors",
+      "role": "alert"
+    }
+  }), _vm._v(" "), _c('button', {
+    staticClass: "button is-primary is-pulled-left"
+  }, [_vm._v("Save")])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-73206c18", module.exports)
+  }
+}
+
+/***/ }),
+/* 78 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(79),
+  /* template */
+  __webpack_require__(80),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\settings\\Subscriptions.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Subscriptions.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-7a73b15a", Component.options)
+  } else {
+    hotAPI.reload("data-v-7a73b15a", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 79 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    //
+});
+
+/***/ }),
+/* 80 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_vm._v("Subscriptions")])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-7a73b15a", module.exports)
+  }
+}
+
+/***/ }),
+/* 81 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(82),
+  /* template */
+  __webpack_require__(83),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\settings\\Notifications.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Notifications.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1d6da845", Component.options)
+  } else {
+    hotAPI.reload("data-v-1d6da845", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 82 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    //
+});
+
+/***/ }),
+/* 83 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_vm._v("Notifications")])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-1d6da845", module.exports)
   }
 }
 
