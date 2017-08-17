@@ -39,7 +39,9 @@
         </div>
 
         <div class="column is-3">
-            <div class="watch-chat-container"></div>
+            <div class="watch-chat-container">
+                <f-chat :user="user" :broadcast="broadcast"></f-chat>
+            </div>
         </div>
     </div>
 </template>
@@ -97,6 +99,11 @@
             },
 
             saveTopic() {
+                if (! this.broadcaster) {
+                    this.editingTopic = false;
+                    return;
+                }
+
                 axios.post('/api/broadcast/topic', { topic: this.topic }).then(r => {
                     this.editingTopic = false;
                 });
@@ -110,6 +117,11 @@
 
         created() {
             this.openStream();
+
+            Echo.channel(`watch-${this.user.id}`)
+                .listen('TopicChanged', e => {
+                    this.topic = e.topic;
+                });
         }
     }
 </script>

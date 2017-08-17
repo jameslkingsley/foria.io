@@ -10,11 +10,14 @@ Route::post('/watch/{user}/start', 'WatchController@start');
 
 // Broadcasts
 Route::resource('/api/broadcast-query', 'BroadcastQueryController');
-
 Route::post('/api/broadcast/topic', 'BroadcastController@topic');
 Route::post('/api/broadcast/start', 'BroadcastController@start');
 Route::delete('/api/broadcast/stop', 'BroadcastController@stop');
 Route::resource('/api/broadcast', 'BroadcastController');
+
+// Chat
+Route::get('/api/chat/past/{user}', 'ChatController@show');
+Route::resource('/api/chat', 'ChatController');
 
 // Authentication
 Route::get('/logout', 'Auth\LogoutController@index');

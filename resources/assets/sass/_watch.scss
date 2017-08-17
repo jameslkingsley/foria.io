@@ -24,9 +24,15 @@
         float: right;
     }
 
-    .watch-topic {
+    .watch-title {
         float: left;
-        font-size: 22px;
-        font-weight: 500;
+        width: 80%;
+
+        .watch-topic {
+            float: left;
+            width: 100%;
+            font-size: 22px;
+            font-weight: 500;
+        }
     }
 }

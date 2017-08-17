@@ -886,6 +886,7 @@ Vue.component('f-subscribe', __webpack_require__(46));
 Vue.component('f-token-checkout', __webpack_require__(49));
 Vue.component('f-broadcast-list', __webpack_require__(52));
 Vue.component('f-broadcast-tile', __webpack_require__(55));
+Vue.component('f-chat', __webpack_require__(63));
 
 var app = new Vue({
     el: '#app',
@@ -34866,6 +34867,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user', 'broadcast'],
@@ -34920,6 +34923,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         saveTopic: function saveTopic() {
             var _this2 = this;
 
+            if (!this.broadcaster) {
+                this.editingTopic = false;
+                return;
+            }
+
             axios.post('/api/broadcast/topic', { topic: this.topic }).then(function (r) {
                 _this2.editingTopic = false;
             });
@@ -34931,7 +34939,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
 
     created: function created() {
+        var _this3 = this;
+
         this.openStream();
+
+        Echo.channel('watch-' + this.user.id).listen('TopicChanged', function (e) {
+            _this3.topic = e.topic;
+        });
     }
 });
 
@@ -35023,14 +35037,17 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "id": "stream-publisher"
     }
-  })]), _vm._v(" "), _vm._m(0)])
-},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
+  })]), _vm._v(" "), _c('div', {
     staticClass: "column is-3"
   }, [_c('div', {
     staticClass: "watch-chat-container"
-  })])
-}]}
+  }, [_c('f-chat', {
+    attrs: {
+      "user": _vm.user,
+      "broadcast": _vm.broadcast
+    }
+  })], 1)])])
+},staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
   module.hot.accept()
@@ -35763,7 +35780,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "broadcast-viewers"
   }, [_vm._v("2,346")]), _vm._v(" "), _c('span', {
     staticClass: "broadcast-topic"
-  }, [_vm._v("A topic the broadcaster can set")]), _vm._v(" "), _c('div', {
+  }, [_vm._v(_vm._s(_vm.broadcast.topic))]), _vm._v(" "), _c('div', {
     staticClass: "broadcast-controls"
   })])])
 },staticRenderFns: []}
@@ -35780,6 +35797,194 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 59 */,
+/* 60 */,
+/* 61 */,
+/* 62 */,
+/* 63 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(64),
+  /* template */
+  __webpack_require__(65),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\Chat.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Chat.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-557d0fbe", Component.options)
+  } else {
+    hotAPI.reload("data-v-557d0fbe", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 64 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user', 'broadcast'],
+
+    data: function data() {
+        return {
+            messages: [],
+            fetchCompleted: false,
+            form: {
+                text: '',
+                receiver: this.user,
+                broadcast: this.broadcast
+            }
+        };
+    },
+
+
+    computed: {
+        sortedMessages: function sortedMessages() {
+            return _.sortBy(this.messages, ['created_at']);
+        }
+    },
+
+    methods: {
+        send: function send() {
+            var _this = this;
+
+            axios.post('/api/chat', this.form).then(function (r) {
+                _this.form.text = '';
+            });
+        },
+        fetch: function fetch() {
+            var _this2 = this;
+
+            axios.get('/api/chat/past/' + this.user.id).then(function (r) {
+                _this2.messages = r.data;
+                _this2.fetchCompleted = true;
+            });
+        }
+    },
+
+    updated: function updated() {
+        var list = document.getElementById('f-chat-list');
+        list.scrollTop = list.scrollHeight;
+    },
+    mounted: function mounted() {
+        var _this3 = this;
+
+        this.fetch();
+
+        Echo.channel('watch-' + this.user.id).listen('ChatMessageSent', function (e) {
+            _this3.messages.push(e.message);
+        });
+    }
+});
+
+/***/ }),
+/* 65 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "chat"
+  }, [_c('div', {
+    staticClass: "chat-list",
+    attrs: {
+      "id": "f-chat-list"
+    }
+  }, _vm._l((_vm.sortedMessages), function(message, index) {
+    return _c('div', {
+      key: index,
+      staticClass: "chat-item"
+    }, [_c('span', {
+      staticClass: "chat-item-author"
+    }, [_vm._v(_vm._s(message.sender.name))]), _vm._v(" "), _c('span', {
+      staticClass: "chat-item-text"
+    }, [_vm._v(_vm._s(message.text))])])
+  })), _vm._v(" "), _c('div', {
+    staticClass: "chat-form"
+  }, [_c('form', {
+    attrs: {
+      "method": "post"
+    },
+    on: {
+      "submit": function($event) {
+        $event.preventDefault();
+        _vm.send($event)
+      }
+    }
+  }, [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.text),
+      expression: "form.text"
+    }],
+    staticClass: "input",
+    attrs: {
+      "name": "text",
+      "placeholder": "Type a message",
+      "disabled": !_vm.fetchCompleted
+    },
+    domProps: {
+      "value": (_vm.form.text)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.text = $event.target.value
+      }
+    }
+  })])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-557d0fbe", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

@@ -7,6 +7,7 @@ Vue.component('f-subscribe', require('./components/Subscribe.vue'));
 Vue.component('f-token-checkout', require('./components/TokenCheckout.vue'));
 Vue.component('f-broadcast-list', require('./components/BroadcastList.vue'));
 Vue.component('f-broadcast-tile', require('./components/BroadcastTile.vue'));
+Vue.component('f-chat', require('./components/Chat.vue'));
 
 const app = new Vue({
     el: '#app',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use OpenTok\OpenTok;
 use OpenTok\MediaMode;
 use App\Models\Broadcast;
+use App\Events\TopicChanged;
 use Illuminate\Http\Request;
 use App\Http\Requests\BroadcastRequest;
 
@@ -148,7 +149,11 @@ class BroadcastController extends Controller
      */
     public function topic(BroadcastRequest $request)
     {
-        $request->broadcast()->topic = $request->topic;
-        $request->broadcast()->save();
+        $broadcast = $request->broadcast();
+
+        $broadcast->topic = $request->topic;
+        $broadcast->save();
+
+        event(new TopicChanged($request->topic, $broadcast->user));
     }
 }
