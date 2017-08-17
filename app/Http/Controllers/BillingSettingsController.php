@@ -41,6 +41,7 @@ class BillingSettingsController extends Controller
         // Add a new card to the customer
         $card = $customer->sources->create(['source' => $request->stripeToken]);
 
+        // Update our user reference
         auth()->user()->update([
             'stripe_id' => $card->id,
             'card_brand' => $card->brand,
