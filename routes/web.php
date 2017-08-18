@@ -33,5 +33,8 @@ Route::post('/follow/{to}', 'FollowController@store');
 Route::delete('/follow/{to}', 'FollowController@destroy');
 
 // Settings
-Route::resource('/settings', 'SettingsController');
+Route::resource('/settings', 'SettingsController', [
+    'except' => ['show']
+]);
+
 Route::resource('/settings/billing', 'BillingSettingsController');

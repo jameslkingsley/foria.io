@@ -60,35 +60,35 @@
             }
         }
     }
+}
 
-    label[for="card-element"] {
-        font-weight: 600;
-        font-size: 14px;
-        margin-bottom: 5px;
-        display: inline-block;
-        width: 100%;
-    }
+label[for="card-element"] {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: inline-block;
+    width: 100%;
+}
 
-    .StripeElement {
-        padding: 8px 12px;
-        border: 1px solid $border;
-        border-radius: 4px;
-    }
+.StripeElement {
+    padding: 8px 12px;
+    border: 1px solid $border;
+    border-radius: 4px;
+}
 
-    .StripeElement--focus {
-        //
-    }
+.StripeElement--focus {
+    //
+}
 
-    .StripeElement--invalid {
-        border-color: $primary;
-    }
+.StripeElement--invalid {
+    border-color: $primary;
+}
 
-    .StripeElement--webkit-autofill {
-        background-color: #fefde5 !important;
-    }
+.StripeElement--webkit-autofill {
+    background-color: #fefde5 !important;
+}
 
-    #card-errors {
-        font-size: 14px;
-        color: $danger;
-    }
+#card-errors {
+    font-size: 14px;
+    color: $danger;
 }

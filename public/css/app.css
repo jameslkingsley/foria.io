@@ -12597,7 +12597,7 @@ label.panel-block:hover {
           box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent;
 }
 
-.token-checkout label[for="card-element"] {
+label[for="card-element"] {
   font-weight: 600;
   font-size: 14px;
   margin-bottom: 5px;
@@ -12605,21 +12605,21 @@ label.panel-block:hover {
   width: 100%;
 }
 
-.token-checkout .StripeElement {
+.StripeElement {
   padding: 8px 12px;
   border: 1px solid #dbdbdb;
   border-radius: 4px;
 }
 
-.token-checkout .StripeElement--invalid {
+.StripeElement--invalid {
   border-color: #555abf;
 }
 
-.token-checkout .StripeElement--webkit-autofill {
+.StripeElement--webkit-autofill {
   background-color: #fefde5 !important;
 }
 
-.token-checkout #card-errors {
+#card-errors {
   font-size: 14px;
   color: #ff3860;
 }
@@ -12754,8 +12754,30 @@ label.panel-block:hover {
   color: #32325d;
 }
 
+.settings-title {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 18px;
+  margin-bottom: 10px;
+}
+
+.settings-subtitle {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 18px;
+  margin-bottom: 10px;
+}
+
+.settings-content {
+  padding: 1rem;
+}
+
 html {
   background-color: #f1f5f9;
+}
+
+.w100 {
+  width: 100%;
 }
 
 .dropdown.is-active .dropdown-trigger .navbar-item {
@@ -12934,5 +12956,29 @@ small {
   border-radius: 4px;
   -webkit-box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent !important;
           box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent !important;
+}
+
+.table {
+  width: 100%;
+  font-size: 14px;
+  color: #525f7f !important;
+  margin: 0;
+}
+
+.table tr:hover {
+  background-color: transparent;
+}
+
+.table th {
+  border: none !important;
+  font-weight: 500;
+  padding-left: 0;
+  color: inherit !important;
+}
+
+.table td {
+  border: none !important;
+  padding: 0.33rem 0.75rem 0.33rem 0 !important;
+  color: inherit !important;
 }
 

@@ -870,7 +870,7 @@ module.exports = Cancel;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(10);
-module.exports = __webpack_require__(61);
+module.exports = __webpack_require__(76);
 
 
 /***/ }),
@@ -889,11 +889,11 @@ Vue.component('f-broadcast-tile', __webpack_require__(55));
 Vue.component('f-chat', __webpack_require__(58));
 
 // Settings
-Vue.component('f-settings', __webpack_require__(69));
-Vue.component('f-settings-account', __webpack_require__(72));
-Vue.component('f-settings-billing', __webpack_require__(75));
-Vue.component('f-settings-subscriptions', __webpack_require__(78));
-Vue.component('f-settings-notifications', __webpack_require__(81));
+Vue.component('f-settings', __webpack_require__(61));
+Vue.component('f-settings-account', __webpack_require__(64));
+Vue.component('f-settings-billing', __webpack_require__(67));
+Vue.component('f-settings-subscriptions', __webpack_require__(70));
+Vue.component('f-settings-notifications', __webpack_require__(73));
 
 var app = new Vue({
     el: '#app',
@@ -35985,27 +35985,14 @@ if (false) {
 
 /***/ }),
 /* 61 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 62 */,
-/* 63 */,
-/* 64 */,
-/* 65 */,
-/* 66 */,
-/* 67 */,
-/* 68 */,
-/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(70),
+  __webpack_require__(62),
   /* template */
-  __webpack_require__(71),
+  __webpack_require__(63),
   /* styles */
   null,
   /* scopeId */
@@ -36037,7 +36024,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 70 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -36097,7 +36084,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 71 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -36135,15 +36122,15 @@ if (false) {
 }
 
 /***/ }),
-/* 72 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(73),
+  __webpack_require__(65),
   /* template */
-  __webpack_require__(74),
+  __webpack_require__(66),
   /* styles */
   null,
   /* scopeId */
@@ -36175,7 +36162,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 73 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -36190,7 +36177,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 74 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -36205,15 +36192,15 @@ if (false) {
 }
 
 /***/ }),
-/* 75 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(76),
+  __webpack_require__(68),
   /* template */
-  __webpack_require__(77),
+  __webpack_require__(69),
   /* styles */
   null,
   /* scopeId */
@@ -36245,7 +36232,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 76 */
+/* 68 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -36271,28 +36258,111 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user'],
+
     data: function data() {
         return {
             csrfToken: Foria.csrfToken,
-            stripe: {}
+            stripe: {},
+            cards: [],
+            isAddingCard: false,
+            isRemovingCard: false,
+            isFetchingCards: false,
+            isSavingCard: false
         };
     },
 
 
+    computed: {
+        addCardModalClasses: function addCardModalClasses() {
+            return {
+                'modal': true,
+                'is-active': this.isAddingCard
+            };
+        }
+    },
+
     methods: {
-        save: function save() {
+        removeCard: function removeCard(card, index) {
             var _this = this;
+
+            this.isRemovingCard = true;
+
+            axios.delete('/settings/billing/' + card.id).then(function (r) {
+                _this.cards.splice(index, 1);
+                _this.isRemovingCard = false;
+
+                _this.$toast.open({
+                    message: 'Card Removed',
+                    type: 'is-success'
+                });
+            });
+        },
+        addCard: function addCard() {
+            this.isAddingCard = true;
+        },
+        cancelAddCard: function cancelAddCard() {
+            this.isAddingCard = false;
+            this.stripe.card.clear();
+        },
+        fetchCards: function fetchCards() {
+            var _this2 = this;
+
+            this.isFetchingCards = true;
+
+            axios.get('/settings/billing').then(function (r) {
+                _this2.cards = r.data.data;
+                _this2.isFetchingCards = false;
+            });
+        },
+        saveCard: function saveCard() {
+            var _this3 = this;
+
+            this.isSavingCard = true;
 
             this.stripe.stripe.createToken(this.stripe.card).then(function (result) {
                 if (result.error) {
-                    // Inform the user if there was an error
                     var errorElement = document.getElementById('billing-card-errors');
                     errorElement.textContent = result.error.message;
                 } else {
-                    // Send the token to your server
-                    // Insert the token ID into the form so it gets submitted to the server
                     var form = document.getElementById('billing-form');
                     var hiddenInput = document.createElement('input');
 
@@ -36304,26 +36374,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     axios.post('/settings/billing', formToObject(form)).then(function (r) {
                         console.log(r);
 
-                        _this.$toast.open({
-                            message: 'Billing Details Saved',
+                        _this3.$toast.open({
+                            message: 'Card Added',
                             type: 'is-success'
                         });
 
-                        // this.stripe.card.clear();
+                        _this3.stripe.card.clear();
+                        _this3.isAddingCard = false;
+                        _this3.isSavingCard = false;
+
+                        _this3.fetchCards();
                     });
                 }
             });
         }
     },
 
+    created: function created() {
+        this.fetchCards();
+    },
     mounted: function mounted() {
         this.stripe.stripe = Stripe(Foria.stripeKey);
         this.stripe.elements = this.stripe.stripe.elements();
-
-        // Create an instance of the card element
         this.stripe.card = this.stripe.elements.create('card');
-
-        // Add an instance of the card Element into the `card-element` <div>
         this.stripe.card.mount('#billing-card-element');
 
         this.stripe.card.addEventListener('change', function (_ref) {
@@ -36341,11 +36414,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 77 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('form', {
+  return _c('div', [_c('div', {
+    class: _vm.addCardModalClasses
+  }, [_c('div', {
+    staticClass: "modal-background",
+    on: {
+      "click": function($event) {
+        _vm.isAddingCard = false
+      }
+    }
+  }), _vm._v(" "), _c('div', {
+    staticClass: "modal-content card p-4"
+  }, [_c('form', {
     attrs: {
       "method": "post",
       "id": "billing-form",
@@ -36354,7 +36438,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "submit": function($event) {
         $event.preventDefault();
-        _vm.save($event)
+        _vm.saveCard($event)
       }
     }
   }, [_c('input', {
@@ -36365,23 +36449,119 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     domProps: {
       "value": _vm.csrfToken
     }
-  }), _vm._v(" "), _c('label', {
+  }), _vm._v(" "), _c('span', {
+    staticClass: "settings-title is-pulled-left w100 m-b-3",
     attrs: {
       "for": "billing-card-element"
     }
-  }, [_vm._v("\n            Credit or debit card\n        ")]), _vm._v(" "), _c('div', {
+  }, [_vm._v("\n                    Credit or debit card\n                ")]), _vm._v(" "), _c('div', {
+    staticClass: "is-pulled-left w100",
     attrs: {
       "id": "billing-card-element"
     }
   }), _vm._v(" "), _c('div', {
+    staticClass: "is-pulled-left w100",
     attrs: {
       "id": "billing-card-errors",
       "role": "alert"
     }
   }), _vm._v(" "), _c('button', {
-    staticClass: "button is-primary is-pulled-left"
-  }, [_vm._v("Save")])])])
-},staticRenderFns: []}
+    staticClass: "button is-primary is-pulled-right m-t-3 m-l-2",
+    attrs: {
+      "type": "submit",
+      "disabled": _vm.isSavingCard
+    }
+  }, [_vm._v("Save Card")]), _vm._v(" "), _c('button', {
+    staticClass: "button is-pulled-right m-t-3",
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.cancelAddCard($event)
+      }
+    }
+  }, [_vm._v("Cancel")])])]), _vm._v(" "), _c('button', {
+    staticClass: "modal-close is-large",
+    attrs: {
+      "aria-label": "close"
+    },
+    on: {
+      "click": function($event) {
+        _vm.isAddingCard = false
+      }
+    }
+  })]), _vm._v(" "), _c('h3', {
+    staticClass: "settings-title"
+  }, [_vm._v("\n        Your Cards\n        "), _c('button', {
+    staticClass: "button is-pulled-right is-primary",
+    on: {
+      "click": _vm.addCard
+    }
+  }, [_vm._v("Add Card")])]), _vm._v(" "), _c('p', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.isFetchingCards),
+      expression: "isFetchingCards"
+    }]
+  }, [_vm._v("Retreiving cards...")]), _vm._v(" "), _c('table', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.isFetchingCards),
+      expression: "! isFetchingCards"
+    }],
+    staticClass: "table"
+  }, [_vm._m(0), _vm._v(" "), _c('tbody', _vm._l((_vm.cards), function(card, index) {
+    return _c('tr', [_c('td', {
+      attrs: {
+        "align": "left"
+      }
+    }, [_vm._v(_vm._s(card.brand))]), _vm._v(" "), _c('td', {
+      attrs: {
+        "align": "left"
+      }
+    }, [_vm._v("⚹⚹⚹⚹ ⚹⚹⚹⚹ ⚹⚹⚹⚹ " + _vm._s(card.last4))]), _vm._v(" "), _c('td', {
+      attrs: {
+        "align": "left"
+      }
+    }, [_vm._v(_vm._s(card.exp_month) + " / " + _vm._s(card.exp_year))]), _vm._v(" "), _c('td', {
+      staticStyle: {
+        "padding-right": "0 !important"
+      },
+      attrs: {
+        "align": "right"
+      }
+    }, [_c('button', {
+      staticClass: "button is-pulled-right",
+      attrs: {
+        "disabled": _vm.isRemovingCard
+      },
+      on: {
+        "click": function($event) {
+          _vm.removeCard(card, index)
+        }
+      }
+    }, [_vm._v("Remove Card")])])])
+  }))])])
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('thead', [_c('tr', [_c('th', {
+    attrs: {
+      "align": "left"
+    }
+  }, [_vm._v("Brand")]), _vm._v(" "), _c('th', {
+    attrs: {
+      "align": "left"
+    }
+  }, [_vm._v("Number")]), _vm._v(" "), _c('th', {
+    attrs: {
+      "align": "left"
+    }
+  }, [_vm._v("Expiry")]), _vm._v(" "), _c('th', {
+    attrs: {
+      "align": "right"
+    }
+  }, [_vm._v(" ")])])])
+}]}
 module.exports.render._withStripped = true
 if (false) {
   module.hot.accept()
@@ -36391,15 +36571,15 @@ if (false) {
 }
 
 /***/ }),
-/* 78 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(79),
+  __webpack_require__(71),
   /* template */
-  __webpack_require__(80),
+  __webpack_require__(72),
   /* styles */
   null,
   /* scopeId */
@@ -36431,7 +36611,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 79 */
+/* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -36446,7 +36626,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 80 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -36461,15 +36641,15 @@ if (false) {
 }
 
 /***/ }),
-/* 81 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(82),
+  __webpack_require__(74),
   /* template */
-  __webpack_require__(83),
+  __webpack_require__(75),
   /* styles */
   null,
   /* scopeId */
@@ -36501,7 +36681,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 82 */
+/* 74 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -36516,7 +36696,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 83 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -36529,6 +36709,12 @@ if (false) {
      require("vue-hot-reload-api").rerender("data-v-1d6da845", module.exports)
   }
 }
+
+/***/ }),
+/* 76 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ })
 /******/ ]);

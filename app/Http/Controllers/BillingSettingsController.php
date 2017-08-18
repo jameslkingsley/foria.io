@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Stripe\Customer;
 use Illuminate\Http\Request;
+use App\Exceptions\NoCustomerException;
 
 class BillingSettingsController extends Controller
 {
@@ -14,7 +15,14 @@ class BillingSettingsController extends Controller
      */
     public function index()
     {
-        //
+        if ($customer = auth()->user()->stripeCustomer()) {
+            return response()->json($customer->sources->all([
+                'object' => 'card',
+                'limit' => 100
+            ]));
+        }
+
+        throw new NoCustomerException;
     }
 
     /**
@@ -39,7 +47,9 @@ class BillingSettingsController extends Controller
         $customer = auth()->user()->stripeCustomer($request->stripeToken);
 
         // Add a new card to the customer
-        $card = $customer->sources->create(['source' => $request->stripeToken]);
+        $card = $customer->sources->create([
+            'source' => $request->stripeToken
+        ]);
 
         // Update our user reference
         auth()->user()->update([
@@ -91,8 +101,12 @@ class BillingSettingsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($cardId)
     {
-        //
+        if ($customer = auth()->user()->stripeCustomer()) {
+            $customer->sources->retrieve($cardId)->delete();
+        } else {
+            throw new NoCustomerException;
+        }
     }
 }

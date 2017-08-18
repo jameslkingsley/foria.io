@@ -14,6 +14,10 @@ html {
     background-color: $background;
 }
 
+.w100 {
+    width: 100%;
+}
+
 .dropdown {
     &.is-active {
         .dropdown-trigger {
@@ -180,4 +184,28 @@ small {
 .card {
     border-radius: $radius;
     box-shadow: $shadow !important;
+}
+
+.table {
+    width: 100%;
+    font-size: 14px;
+    color: $text !important;
+    margin: 0;
+
+    tr:hover {
+        background-color: transparent;
+    }
+
+    th {
+        border: none !important;
+        font-weight: 500;
+        padding-left: 0;
+        color: inherit !important;
+    }
+
+    td {
+        border: none !important;
+        padding: 0.33rem 0.75rem 0.33rem 0 !important;
+        color: inherit !important;
+    }
 }
