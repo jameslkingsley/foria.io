@@ -927,6 +927,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_laravel_echo___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_laravel_echo__);
 window._ = __webpack_require__(12);
 
+__webpack_require__(81);
+
 window.formToObject = __webpack_require__(14);
 
 window.axios = __webpack_require__(15);
@@ -945,14 +947,7 @@ window.Vue = __webpack_require__(35);
 
 Vue.use(__WEBPACK_IMPORTED_MODULE_0_buefy___default.a);
 
-Vue.filter('currency', function (value) {
-    var langage = (navigator.language || navigator.browserLanguage).split('-')[0];
-
-    return (value / 100).toLocaleString(langage, {
-        style: 'currency',
-        currency: 'gbp'
-    });
-});
+__webpack_require__(82);
 
 
 window.Pusher = __webpack_require__(38);
@@ -35394,6 +35389,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user'],
@@ -35420,6 +35427,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
 
     methods: {
+        formatLastFour: function formatLastFour(value) {
+            return Util.formatLastFour(value);
+        },
         selectPackage: function selectPackage(p) {
             this.packageId = p.id;
         },
@@ -35434,36 +35444,49 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             this.buttonState = true;
 
-            this.stripe.stripe.createToken(this.stripe.card).then(function (result) {
-                if (result.error) {
-                    // Inform the user if there was an error
-                    var errorElement = document.getElementById('card-errors');
-                    errorElement.textContent = result.error.message;
-                } else {
-                    // Send the token to your server
-                    // Insert the token ID into the form so it gets submitted to the server
-                    var form = document.getElementById('payment-form');
-                    var hiddenInput = document.createElement('input');
+            if (this.user.has_card_on_file) {
+                var form = document.getElementById('payment-form');
 
-                    hiddenInput.setAttribute('type', 'hidden');
-                    hiddenInput.setAttribute('name', 'stripeToken');
-                    hiddenInput.setAttribute('value', result.token.id);
-                    form.appendChild(hiddenInput);
-
-                    axios.post('/tokens', formToObject(form)).then(function (r) {
-                        console.log(r);
-
-                        _this2.$toast.open({
-                            message: r.data.message,
-                            type: 'is-' + r.data.style
-                        });
-
-                        _this2.buttonState = false;
-
-                        _this2.stripe.card.clear();
+                axios.post('/tokens', formToObject(form)).then(function (r) {
+                    _this2.$toast.open({
+                        message: r.data.message,
+                        type: 'is-' + r.data.style
                     });
-                }
-            });
+
+                    _this2.buttonState = false;
+                });
+            } else {
+                this.stripe.stripe.createToken(this.stripe.card).then(function (result) {
+                    if (result.error) {
+                        // Inform the user if there was an error
+                        var errorElement = document.getElementById('card-errors');
+                        errorElement.textContent = result.error.message;
+                    } else {
+                        // Send the token to your server
+                        // Insert the token ID into the form so it gets submitted to the server
+                        var _form = document.getElementById('payment-form');
+                        var hiddenInput = document.createElement('input');
+
+                        hiddenInput.setAttribute('type', 'hidden');
+                        hiddenInput.setAttribute('name', 'stripeToken');
+                        hiddenInput.setAttribute('value', result.token.id);
+                        _form.appendChild(hiddenInput);
+
+                        axios.post('/tokens', formToObject(_form)).then(function (r) {
+                            console.log(r);
+
+                            _this2.$toast.open({
+                                message: r.data.message,
+                                type: 'is-' + r.data.style
+                            });
+
+                            _this2.buttonState = false;
+
+                            _this2.stripe.card.clear();
+                        });
+                    }
+                });
+            }
         }
     },
 
@@ -35475,26 +35498,24 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         });
     },
     mounted: function mounted() {
-        this.stripe.stripe = Stripe(Foria.stripeKey);
-        this.stripe.elements = this.stripe.stripe.elements();
+        if (!this.user.has_card_on_file) {
+            this.stripe.stripe = Stripe(Foria.stripeKey);
+            this.stripe.elements = this.stripe.stripe.elements();
+            this.stripe.card = this.stripe.elements.create('card');
+            this.stripe.card.mount('#card-element');
 
-        // Create an instance of the card element
-        this.stripe.card = this.stripe.elements.create('card');
+            this.stripe.card.addEventListener('change', function (_ref) {
+                var error = _ref.error;
 
-        // Add an instance of the card Element into the `card-element` <div>
-        this.stripe.card.mount('#card-element');
+                var displayError = document.getElementById('card-errors');
 
-        this.stripe.card.addEventListener('change', function (_ref) {
-            var error = _ref.error;
-
-            var displayError = document.getElementById('card-errors');
-
-            if (error) {
-                displayError.textContent = error.message;
-            } else {
-                displayError.textContent = '';
-            }
-        });
+                if (error) {
+                    displayError.textContent = error.message;
+                } else {
+                    displayError.textContent = '';
+                }
+            });
+        }
     }
 });
 
@@ -35568,15 +35589,22 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_vm._v("Choose")])])])])
   }), _vm._v(" "), _c('div', {
     staticClass: "block m-t-3"
-  }, [_c('label', {
+  }, [(!_vm.user.has_card_on_file) ? _c('div', [_c('label', {
     attrs: {
       "for": "card-element"
     }
-  }, [_vm._v("\n                Credit or debit card\n            ")]), _vm._v(" "), _c('div', {
+  }, [_vm._v("\n                    Credit or debit card\n                ")]), _vm._v(" "), _c('div', {
     attrs: {
       "id": "card-element"
     }
-  }), _vm._v(" "), _c('div', {
+  })]) : _c('div', [_vm._m(0), _vm._v(" "), _c('span', {
+    staticClass: "token-checkout-card-brand"
+  }, [_vm._v(_vm._s(_vm.user.card_brand))]), _vm._v(" "), _c('span', {
+    staticClass: "token-checkout-card-number",
+    domProps: {
+      "innerHTML": _vm._s(_vm.formatLastFour(_vm.user.card_last_four))
+    }
+  })]), _vm._v(" "), _c('div', {
     attrs: {
       "id": "card-errors",
       "role": "alert"
@@ -35585,7 +35613,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "block m-t-3"
   }, [_c('div', {
     staticClass: "columns"
-  }, [_vm._m(0), _vm._v(" "), _c('div', {
+  }, [_vm._m(1), _vm._v(" "), _c('div', {
     staticClass: "column"
   }, [_c('button', {
     staticClass: "button is-primary is-pulled-right",
@@ -35594,6 +35622,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("Agree & Pay " + _vm._s(_vm._f("currency")(_vm.cost)))])])])])])], 2)])
 },staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('span', {
+    staticClass: "token-checkout-subtitle"
+  }, [_vm._v("\n                    Using card on file\n                    "), _c('a', {
+    staticClass: "is-pulled-right",
+    attrs: {
+      "href": "/settings/#billing"
+    }
+  }, [_vm._v("Change")])])
+},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "column"
   }, [_c('small', [_vm._v("\n                            All purchases are final and cannot be refunded. "), _c('a', [_vm._v("Terms & Conditions")]), _vm._v(".\n                        ")])])
@@ -36321,6 +36358,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
 
     methods: {
+        formatLastFour: function formatLastFour(value) {
+            return Util.formatLastFour(value);
+        },
         removeCard: function removeCard(card, index) {
             var _this = this;
 
@@ -36519,8 +36559,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_vm._v(_vm._s(card.brand))]), _vm._v(" "), _c('td', {
       attrs: {
         "align": "left"
+      },
+      domProps: {
+        "innerHTML": _vm._s(_vm.formatLastFour(card.last4))
       }
-    }, [_vm._v("⚹⚹⚹⚹ ⚹⚹⚹⚹ ⚹⚹⚹⚹ " + _vm._s(card.last4))]), _vm._v(" "), _c('td', {
+    }), _vm._v(" "), _c('td', {
       attrs: {
         "align": "left"
       }
@@ -36715,6 +36758,39 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 77 */,
+/* 78 */,
+/* 79 */,
+/* 80 */,
+/* 81 */
+/***/ (function(module, __webpack_exports__) {
+
+"use strict";
+window.Util = {
+    formatLastFour: function formatLastFour(lastFour) {
+        var blanks = '&#9913;&#9913;&#9913;&#9913; '.repeat(3);
+        return '' + blanks + lastFour;
+    }
+};
+
+/***/ }),
+/* 82 */
+/***/ (function(module, exports) {
+
+Vue.filter('currency', function (value) {
+    var langage = (navigator.language || navigator.browserLanguage).split('-')[0];
+
+    return (value / 100).toLocaleString(langage, {
+        style: 'currency',
+        currency: 'gbp'
+    });
+});
+
+Vue.filter('lastFour', function (value) {
+    return Util.formatLastFour(value);
+});
 
 /***/ })
 /******/ ]);

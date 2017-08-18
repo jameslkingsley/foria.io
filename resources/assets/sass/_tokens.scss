@@ -60,6 +60,22 @@
             }
         }
     }
+
+    .token-checkout-subtitle {
+        float: left;
+        width: 100%;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .token-checkout-card-brand {
+        float: left;
+        margin-right: 15px;
+    }
+
+    .token-checkout-card-number {
+        float: left;
+    }
 }
 
 label[for="card-element"] {

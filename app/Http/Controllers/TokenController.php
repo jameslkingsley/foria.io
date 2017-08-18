@@ -47,7 +47,7 @@ class TokenController extends Controller
 
         try {
             $response = $request->handle();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $response = [
                 'message' => $e->getMessage(),
                 'style' => 'danger'

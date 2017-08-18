@@ -16,12 +16,24 @@
             </div>
 
             <div class="block m-t-3">
-                <label for="card-element">
-                    Credit or debit card
-                </label>
+                <div v-if="! user.has_card_on_file">
+                    <label for="card-element">
+                        Credit or debit card
+                    </label>
 
-                <div id="card-element">
-                    <!-- Stripe element will be inserted here. -->
+                    <div id="card-element">
+                        <!-- Stripe element will be inserted here. -->
+                    </div>
+                </div>
+
+                <div v-else>
+                    <span class="token-checkout-subtitle">
+                        Using card on file
+                        <a href="/settings/#billing" class="is-pulled-right">Change</a>
+                    </span>
+
+                    <span class="token-checkout-card-brand">{{ user.card_brand }}</span>
+                    <span class="token-checkout-card-number" v-html="formatLastFour(user.card_last_four)"></span>
                 </div>
 
                 <!-- Used to display element errors -->
@@ -68,6 +80,10 @@
         },
 
         methods: {
+            formatLastFour(value) {
+                return Util.formatLastFour(value);
+            },
+
             selectPackage(p) {
                 this.packageId = p.id;
             },
@@ -82,36 +98,49 @@
             pay() {
                 this.buttonState = true;
 
-                this.stripe.stripe.createToken(this.stripe.card).then(result => {
-                    if (result.error) {
-                        // Inform the user if there was an error
-                        var errorElement = document.getElementById('card-errors');
-                        errorElement.textContent = result.error.message;
-                    } else {
-                        // Send the token to your server
-                        // Insert the token ID into the form so it gets submitted to the server
-                        const form = document.getElementById('payment-form');
-                        const hiddenInput = document.createElement('input');
+                if (this.user.has_card_on_file) {
+                    const form = document.getElementById('payment-form');
 
-                        hiddenInput.setAttribute('type', 'hidden');
-                        hiddenInput.setAttribute('name', 'stripeToken');
-                        hiddenInput.setAttribute('value', result.token.id);
-                        form.appendChild(hiddenInput);
-
-                        axios.post('/tokens', formToObject(form)).then(r => {
-                            console.log(r);
-
-                            this.$toast.open({
-                                message: r.data.message,
-                                type: `is-${r.data.style}`
-                            });
-
-                            this.buttonState = false;
-
-                            this.stripe.card.clear();
+                    axios.post('/tokens', formToObject(form)).then(r => {
+                        this.$toast.open({
+                            message: r.data.message,
+                            type: `is-${r.data.style}`
                         });
-                    }
-                });
+
+                        this.buttonState = false;
+                    });
+                } else {
+                    this.stripe.stripe.createToken(this.stripe.card).then(result => {
+                        if (result.error) {
+                            // Inform the user if there was an error
+                            var errorElement = document.getElementById('card-errors');
+                            errorElement.textContent = result.error.message;
+                        } else {
+                            // Send the token to your server
+                            // Insert the token ID into the form so it gets submitted to the server
+                            const form = document.getElementById('payment-form');
+                            const hiddenInput = document.createElement('input');
+
+                            hiddenInput.setAttribute('type', 'hidden');
+                            hiddenInput.setAttribute('name', 'stripeToken');
+                            hiddenInput.setAttribute('value', result.token.id);
+                            form.appendChild(hiddenInput);
+
+                            axios.post('/tokens', formToObject(form)).then(r => {
+                                console.log(r);
+
+                                this.$toast.open({
+                                    message: r.data.message,
+                                    type: `is-${r.data.style}`
+                                });
+
+                                this.buttonState = false;
+
+                                this.stripe.card.clear();
+                            });
+                        }
+                    });
+                }
             }
         },
 
@@ -122,24 +151,22 @@
         },
 
         mounted() {
-            this.stripe.stripe = Stripe(Foria.stripeKey);
-            this.stripe.elements = this.stripe.stripe.elements();
+            if (! this.user.has_card_on_file) {
+                this.stripe.stripe = Stripe(Foria.stripeKey);
+                this.stripe.elements = this.stripe.stripe.elements();
+                this.stripe.card = this.stripe.elements.create('card');
+                this.stripe.card.mount('#card-element');
 
-            // Create an instance of the card element
-            this.stripe.card = this.stripe.elements.create('card');
+                this.stripe.card.addEventListener('change', ({error}) => {
+                    const displayError = document.getElementById('card-errors');
 
-            // Add an instance of the card Element into the `card-element` <div>
-            this.stripe.card.mount('#card-element');
-
-            this.stripe.card.addEventListener('change', ({error}) => {
-                const displayError = document.getElementById('card-errors');
-
-                if (error) {
-                    displayError.textContent = error.message;
-                } else {
-                    displayError.textContent = '';
-                }
-            });
+                    if (error) {
+                        displayError.textContent = error.message;
+                    } else {
+                        displayError.textContent = '';
+                    }
+                });
+            }
         }
     }
 </script>

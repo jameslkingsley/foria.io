@@ -53,7 +53,7 @@ class BillingSettingsController extends Controller
 
         // Update our user reference
         auth()->user()->update([
-            'stripe_id' => $card->id,
+            'stripe_id' => $customer->id,
             'card_brand' => $card->brand,
             'card_last_four' => $card->last4,
         ]);
@@ -105,6 +105,32 @@ class BillingSettingsController extends Controller
     {
         if ($customer = auth()->user()->stripeCustomer()) {
             $customer->sources->retrieve($cardId)->delete();
+            $this->cleanupCards();
+        } else {
+            throw new NoCustomerException;
+        }
+    }
+
+    /**
+     * Cleans up the card on file if no cards are available.
+     *
+     * @return void
+     */
+    public function cleanupCards()
+    {
+        if ($customer = auth()->user()->stripeCustomer()) {
+            $cards = $customer->sources->all([
+                'object' => 'card',
+                'limit' => 100
+            ])->data;
+
+            if (empty($cards)) {
+                auth()->user()->update([
+                    'stripe_id' => null,
+                    'card_brand' => null,
+                    'card_last_four' => null,
+                ]);
+            }
         } else {
             throw new NoCustomerException;
         }

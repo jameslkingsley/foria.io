@@ -28,7 +28,6 @@ class TokenRequest extends FormRequest
     public function rules()
     {
         return [
-            'stripeToken' => 'required',
             'package_id' => 'required|integer'
         ];
     }
@@ -40,18 +39,28 @@ class TokenRequest extends FormRequest
      */
     public function handle()
     {
-        $customer = $this->customer();
-
         $package = TokenPackage::findOrFail($this->package_id);
 
-        try {
-            $charge = Charge::create([
-                'amount' => $package->cost,
-                'currency' => 'gbp',
-                'customer' => $customer->id
-            ]);
-        } catch (\Exception $e) {
-            return $e;
+        if (auth()->user()->hasCardOnFile()) {
+            // Use card on file
+            try {
+                auth()->user()->charge($package->cost);
+            } catch (\Exception $e) {
+                return $e;
+            }
+        } else {
+            // Use given card token
+            $customer = auth()->user()->stripeCustomer($this->stripeToken);
+
+            try {
+                $charge = Charge::create([
+                    'amount' => $package->cost,
+                    'currency' => 'gbp',
+                    'customer' => $customer->id
+                ]);
+            } catch (\Exception $e) {
+                return $e;
+            }
         }
 
         auth()->user()->tokens += $package->token_count;
@@ -63,25 +72,5 @@ class TokenRequest extends FormRequest
             'message' => "{$package->token_count} tokens added to your account",
             'style' => 'success'
         ];
-    }
-
-    /**
-     * Gets the Stripe customer instance.
-     *
-     * @return Stripe\Customer
-     */
-    public function customer()
-    {
-        if (! $customer = auth()->user()->stripeCustomer()) {
-            $customer = Customer::create([
-                'email' => auth()->user()->email,
-                'source' => $this->stripeToken
-            ]);
-
-            auth()->user()->stripe_customer_id = $customer->id;
-            auth()->user()->save();
-        }
-
-        return $customer;
     }
 }

@@ -46,7 +46,7 @@
             <tbody>
                 <tr v-for="(card, index) in cards">
                     <td align="left">{{ card.brand }}</td>
-                    <td align="left">&#9913;&#9913;&#9913;&#9913; &#9913;&#9913;&#9913;&#9913; &#9913;&#9913;&#9913;&#9913; {{ card.last4 }}</td>
+                    <td align="left" v-html="formatLastFour(card.last4)"></td>
                     <td align="left">{{ card.exp_month }} / {{ card.exp_year }}</td>
                     <td align="right" style="padding-right: 0 !important"><button class="button is-pulled-right" @click="removeCard(card, index)" :disabled="isRemovingCard">Remove Card</button></td>
                 </tr>
@@ -81,6 +81,10 @@
         },
 
         methods: {
+            formatLastFour(value) {
+                return Util.formatLastFour(value);
+            },
+
             removeCard(card, index) {
                 this.isRemovingCard = true;
 

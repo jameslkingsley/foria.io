@@ -38,8 +38,19 @@ class User extends Authenticatable
     protected $appends = [
         'is_mine',
         'follower_count',
-        'watch_url'
+        'watch_url',
+        'has_card_on_file'
     ];
+
+    /**
+     * Checks whether the user has a card on file.
+     *
+     * @return boolean
+     */
+    public function getHasCardOnFileAttribute()
+    {
+        return $this->hasCardOnFile();
+    }
 
     /**
      * Gets the is_mine attribute.
