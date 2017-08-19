@@ -33,6 +33,7 @@ html {
 
         .dropdown-content {
             border-radius: 4px !important;
+            box-shadow: $shadow-large;
         }
     }
 }
@@ -47,7 +48,7 @@ nav.navbar {
         height: 20px;
         float: right;
         background: white;
-        border: 1px solid rgba(10, 10, 10, 0.25);
+        border: 1px solid rgba(10, 10, 10, 0.07);
         border-width: 1px 1px 0 0;
         transform: rotate(-45deg);
         margin: -11px 25px 0 0;
@@ -183,7 +184,7 @@ small {
 
 .card {
     border-radius: $radius;
-    box-shadow: $shadow !important;
+    box-shadow: $shadow-large !important;
 }
 
 .table {

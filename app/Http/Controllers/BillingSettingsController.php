@@ -43,22 +43,26 @@ class BillingSettingsController extends Controller
      */
     public function store(Request $request)
     {
-        // Get the stripe customer
-        $customer = auth()->user()->stripeCustomer($request->stripeToken);
+        try {
+            // Get the stripe customer
+            $customer = auth()->user()->stripeCustomer($request->stripeToken);
 
-        // Add a new card to the customer
-        $card = $customer->sources->create([
-            'source' => $request->stripeToken
-        ]);
+            // Add a new card to the customer
+            $card = $customer->sources->create([
+                'source' => $request->stripeToken
+            ]);
 
-        // Update our user reference
-        auth()->user()->update([
-            'stripe_id' => $customer->id,
-            'card_brand' => $card->brand,
-            'card_last_four' => $card->last4,
-        ]);
+            // Update our user reference
+            auth()->user()->update([
+                'stripe_id' => $customer->id,
+                'card_brand' => $card->brand,
+                'card_last_four' => $card->last4,
+            ]);
 
-        return $card;
+            return $card;
+        } catch (\Exception $e) {
+            return abort(500, $e->getMessage());
+        }
     }
 
     /**

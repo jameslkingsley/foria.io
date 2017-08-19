@@ -33,7 +33,9 @@
 
         <p v-show="isFetchingCards">Retreiving cards...</p>
 
-        <table v-show="! isFetchingCards" class="table">
+        <p v-show="! isFetchingCards && cards.length == 0">You haven't added any cards.</p>
+
+        <table v-show="! isFetchingCards && cards.length > 0" class="table">
             <thead>
                 <tr>
                     <th align="left">Brand</th>
@@ -48,7 +50,10 @@
                     <td align="left">{{ card.brand }}</td>
                     <td align="left" v-html="formatLastFour(card.last4)"></td>
                     <td align="left">{{ card.exp_month }} / {{ card.exp_year }}</td>
-                    <td align="right" style="padding-right: 0 !important"><button class="button is-pulled-right" @click="removeCard(card, index)" :disabled="isRemovingCard">Remove Card</button></td>
+
+                    <td align="right" style="padding-right: 0 !important">
+                        <button class="button is-pulled-right m-l-2" @click="removeCard(card, index)" :disabled="isRemovingCard">Remove Card</button>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -134,8 +139,6 @@
                         form.appendChild(hiddenInput);
 
                         axios.post('/settings/billing', formToObject(form)).then(r => {
-                            console.log(r);
-
                             this.$toast.open({
                                 message: 'Card Added',
                                 type: 'is-success'
@@ -146,6 +149,14 @@
                             this.isSavingCard = false;
 
                             this.fetchCards();
+                        }).catch(({ response }) => {
+                            this.isAddingCard = false;
+                            this.isSavingCard = false;
+
+                            this.$toast.open({
+                                message: response.data.message,
+                                type: 'is-danger'
+                            });
                         });
                     }
                 });

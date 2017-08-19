@@ -83,14 +83,14 @@ class User extends Authenticatable
      */
     public function stripeCustomer($token = null)
     {
-        if (! $this->stripe_customer_id) {
+        if (! $this->stripe_id) {
             if ($token) {
                 $customer = Customer::create([
                     'email' => $this->email,
                     'source' => $token
                 ]);
 
-                $this->stripe_customer_id = $customer->id;
+                $this->stripe_id = $customer->id;
                 $this->save();
 
                 return $this->stripeCustomer();
@@ -99,6 +99,6 @@ class User extends Authenticatable
             return null;
         }
 
-        return Customer::retrieve($this->stripe_customer_id);
+        return Customer::retrieve($this->stripe_id);
     }
 }

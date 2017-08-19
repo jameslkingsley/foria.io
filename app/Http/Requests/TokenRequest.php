@@ -17,7 +17,7 @@ class TokenRequest extends FormRequest
      */
     public function authorize()
     {
-        return ! auth()->guest();
+        return ! auth()->guest() && auth()->user()->hasCardOnFile();
     }
 
     /**
@@ -41,27 +41,7 @@ class TokenRequest extends FormRequest
     {
         $package = TokenPackage::findOrFail($this->package_id);
 
-        if (auth()->user()->hasCardOnFile()) {
-            // Use card on file
-            try {
-                auth()->user()->charge($package->cost);
-            } catch (\Exception $e) {
-                return $e;
-            }
-        } else {
-            // Use given card token
-            $customer = auth()->user()->stripeCustomer($this->stripeToken);
-
-            try {
-                $charge = Charge::create([
-                    'amount' => $package->cost,
-                    'currency' => 'gbp',
-                    'customer' => $customer->id
-                ]);
-            } catch (\Exception $e) {
-                return $e;
-            }
-        }
+        auth()->user()->charge($package->cost);
 
         auth()->user()->tokens += $package->token_count;
         auth()->user()->save();
