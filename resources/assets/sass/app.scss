@@ -187,6 +187,10 @@ small {
     box-shadow: $shadow-large !important;
 }
 
+.box {
+    box-shadow: $shadow;
+}
+
 .table {
     width: 100%;
     font-size: 14px;
@@ -209,4 +213,12 @@ small {
         padding: 0.33rem 0.75rem 0.33rem 0 !important;
         color: inherit !important;
     }
+}
+
+hr {
+    float: left;
+    width: 100%;
+    margin: 2rem 0;
+    padding: 0;
+    opacity: .5;
 }

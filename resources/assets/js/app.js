@@ -16,6 +16,10 @@ Vue.component('f-settings-billing', require('./components/settings/Billing.vue')
 Vue.component('f-settings-subscriptions', require('./components/settings/Subscriptions.vue'));
 Vue.component('f-settings-notifications', require('./components/settings/Notifications.vue'));
 
+// Form
+Vue.component('f-form', require('./components/form/Form.vue'));
+Vue.component('f-form-button', require('./components/form/Button.vue'));
+
 const app = new Vue({
     el: '#app',
 

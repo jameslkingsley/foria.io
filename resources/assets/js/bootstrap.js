@@ -15,12 +15,20 @@ if (token) {
     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
 }
 
+axios.interceptors.response.use(response => {
+    Event.fire('f-form-submitting', false);
+    return response;
+}, error => {
+    return Promise.reject(error);
+});
+
 window.Vue = require('vue');
 
 import Buefy from 'buefy';
 Vue.use(Buefy);
 
 require('./filters');
+require('./event');
 
 import Echo from 'laravel-echo'
 window.Pusher = require('pusher-js');

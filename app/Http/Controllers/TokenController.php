@@ -109,6 +109,6 @@ class TokenController extends Controller
      */
     public function packages()
     {
-        return response()->json(TokenPackage::all());
+        return TokenPackage::all();
     }
 }

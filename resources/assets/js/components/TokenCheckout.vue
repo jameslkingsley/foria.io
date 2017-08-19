@@ -3,7 +3,6 @@
         <div v-if="user.has_card_on_file">
             <form method="post" id="payment-form" action="/tokens" @submit.prevent="pay">
                 <input type="hidden" name="package_id" v-model="packageId">
-                <input type="hidden" name="_token" :value="csrfToken">
 
                 <div v-for="(package, index) in packages" :key="index" :class="packageClasses(package)">
                     <span class="token-package-title">{{ package.token_count }} Tokens</span>
@@ -34,7 +33,7 @@
                             </div>
 
                             <div class="column">
-                                <button class="button is-primary is-pulled-right" :disabled="buttonState">Agree &amp; Pay {{ cost | currency }}</button>
+                                <button :class="submitButtonClasses" :disabled="buttonState">Agree &amp; Pay {{ cost | currency }}</button>
                             </div>
                         </div>
                     </div>
@@ -56,7 +55,6 @@
         data() {
             return {
                 packageId: 1,
-                csrfToken: Foria.csrfToken,
                 packages: [],
                 buttonState: false
             };
@@ -67,6 +65,15 @@
                 return (! this.packages.length) ? 0 : this.packages.find(
                     p => p.id == this.packageId
                 ).cost;
+            },
+
+            submitButtonClasses() {
+                return {
+                    'button': true,
+                    'is-primary': true,
+                    'is-pulled-right': true,
+                    'is-loading': this.buttonState
+                };
             }
         },
 

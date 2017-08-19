@@ -19,8 +19,11 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->bigInteger('tokens')->default(0);
-            $table->longText('stripe_customer_id')->nullable();
             $table->boolean('is_model')->default(false);
+            $table->string('stripe_id')->nullable();
+            $table->string('card_brand')->nullable();
+            $table->string('card_last_four')->nullable();
+            $table->timestamp('trial_ends_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

@@ -15,14 +15,11 @@ class BillingSettingsController extends Controller
      */
     public function index()
     {
-        if ($customer = auth()->user()->stripeCustomer()) {
-            return response()->json($customer->sources->all([
-                'object' => 'card',
-                'limit' => 100
-            ]));
-        }
-
-        throw new NoCustomerException;
+        return [
+            'card_brand' => auth()->user()->card_brand,
+            'card_last_four' => auth()->user()->card_last_four,
+            'has_card_on_file' => auth()->user()->has_card_on_file,
+        ];
     }
 
     /**
@@ -44,22 +41,13 @@ class BillingSettingsController extends Controller
     public function store(Request $request)
     {
         try {
-            // Get the stripe customer
-            $customer = auth()->user()->stripeCustomer($request->stripeToken);
+            // Create Stripe customer if none available
+            if (! auth()->user()->stripe_id) {
+                auth()->user()->createAsStripeCustomer($request->stripeToken);
+            }
 
-            // Add a new card to the customer
-            $card = $customer->sources->create([
-                'source' => $request->stripeToken
-            ]);
-
-            // Update our user reference
-            auth()->user()->update([
-                'stripe_id' => $customer->id,
-                'card_brand' => $card->brand,
-                'card_last_four' => $card->last4,
-            ]);
-
-            return $card;
+            // Update card details
+            auth()->user()->updateCard($request->stripeToken);
         } catch (\Exception $e) {
             return abort(500, $e->getMessage());
         }
@@ -105,38 +93,15 @@ class BillingSettingsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($cardId)
+    public function destroy()
     {
-        if ($customer = auth()->user()->stripeCustomer()) {
-            $customer->sources->retrieve($cardId)->delete();
-            $this->cleanupCards();
-        } else {
-            throw new NoCustomerException;
-        }
-    }
+        auth()->user()->cards()->each(function ($card) {
+            $card->delete();
+        });
 
-    /**
-     * Cleans up the card on file if no cards are available.
-     *
-     * @return void
-     */
-    public function cleanupCards()
-    {
-        if ($customer = auth()->user()->stripeCustomer()) {
-            $cards = $customer->sources->all([
-                'object' => 'card',
-                'limit' => 100
-            ])->data;
-
-            if (empty($cards)) {
-                auth()->user()->update([
-                    'stripe_id' => null,
-                    'card_brand' => null,
-                    'card_last_four' => null,
-                ]);
-            }
-        } else {
-            throw new NoCustomerException;
-        }
+        auth()->user()->update([
+            'card_brand' => null,
+            'card_last_four' => null,
+        ]);
     }
 }

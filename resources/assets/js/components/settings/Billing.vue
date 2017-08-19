@@ -1,78 +1,60 @@
 <template>
-    <div>
+    <div v-if="user">
         <div :class="addCardModalClasses">
             <div class="modal-background" @click="isAddingCard = false"></div>
 
             <div class="modal-content card p-4">
-                <form method="post" id="billing-form" action="/settings/billing" @submit.prevent="saveCard">
-                    <input type="hidden" name="_token" :value="csrfToken">
-
+                <f-form url="/settings/billing" :submit="submitCard" confirm="Save Card" id="billing-form">
                     <span class="settings-title is-pulled-left w100 m-b-3" for="billing-card-element">
                         Credit or debit card
                     </span>
 
-                    <div class="is-pulled-left w100" id="billing-card-element">
-                        <!-- Stripe element will be inserted here. -->
-                    </div>
-
-                    <!-- Used to display element errors -->
+                    <div class="is-pulled-left w100" id="billing-card-element"></div>
                     <div class="is-pulled-left w100" id="billing-card-errors" role="alert"></div>
 
-                    <button type="submit" class="button is-primary is-pulled-right m-t-3 m-l-2" :disabled="isSavingCard">Save Card</button>
-                    <button class="button is-pulled-right m-t-3" @click.prevent="cancelAddCard">Cancel</button>
-                </form>
+                    <!-- <button class="button is-pulled-right m-t-3" @click.prevent="cancelAddCard">Cancel</button> -->
+                </f-form>
             </div>
 
             <button class="modal-close is-large" aria-label="close" @click="isAddingCard = false"></button>
         </div>
 
         <h3 class="settings-title">
-            Your Cards
-            <button class="button is-pulled-right is-primary" @click="addCard">Add Card</button>
+            Your Card
+            <button
+                class="button is-pulled-right is-primary"
+                @click="addCard"
+                :disabled="user.has_card_on_file"
+                v-show="! user.has_card_on_file">
+                Add Card
+            </button>
         </h3>
 
-        <p v-show="isFetchingCards">Retreiving cards...</p>
+        <p v-show="! user.has_card_on_file">You haven't added a card.</p>
 
-        <p v-show="! isFetchingCards && cards.length == 0">You haven't added any cards.</p>
+        <div v-show="user.has_card_on_file" class="is-pulled-left w100 box billing-card p-3 m-t-3 m-b-0">
+            {{ user.card_brand }} <span v-html="formatLastFour(user.card_last_four)"></span>
+            <button class="button is-pulled-right is-small" @click="removeCard" :disabled="isRemovingCard">Remove</button>
+        </div>
 
-        <table v-show="! isFetchingCards && cards.length > 0" class="table">
-            <thead>
-                <tr>
-                    <th align="left">Brand</th>
-                    <th align="left">Number</th>
-                    <th align="left">Expiry</th>
-                    <th align="right">&nbsp;</th>
-                </tr>
-            </thead>
+        <hr />
 
-            <tbody>
-                <tr v-for="(card, index) in cards">
-                    <td align="left">{{ card.brand }}</td>
-                    <td align="left" v-html="formatLastFour(card.last4)"></td>
-                    <td align="left">{{ card.exp_month }} / {{ card.exp_year }}</td>
+        <h3 class="settings-title">
+            Your Purchases
+        </h3>
 
-                    <td align="right" style="padding-right: 0 !important">
-                        <button class="button is-pulled-right m-l-2" @click="removeCard(card, index)" :disabled="isRemovingCard">Remove Card</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <p>You haven't made any purchases.</p>
     </div>
 </template>
 
 <script>
     export default {
-        props: ['user'],
-
         data() {
             return {
-                csrfToken: Foria.csrfToken,
+                user: {},
                 stripe: {},
-                cards: [],
                 isAddingCard: false,
-                isRemovingCard: false,
-                isFetchingCards: false,
-                isSavingCard: false
+                isRemovingCard: false
             };
         },
 
@@ -90,11 +72,11 @@
                 return Util.formatLastFour(value);
             },
 
-            removeCard(card, index) {
+            removeCard() {
                 this.isRemovingCard = true;
 
-                axios.delete(`/settings/billing/${card.id}`).then(r => {
-                    this.cards.splice(index, 1);
+                axios.delete(`/settings/billing/1`).then(r => {
+                    this.getBillingInfo();
                     this.isRemovingCard = false;
 
                     this.$toast.open({
@@ -104,27 +86,19 @@
                 });
             },
 
+            getBillingInfo() {
+                axios.get('/settings/billing').then(({ data }) => this.user = data);
+            },
+
             addCard() {
                 this.isAddingCard = true;
             },
 
             cancelAddCard() {
                 this.isAddingCard = false;
-                this.stripe.card.clear();
             },
 
-            fetchCards() {
-                this.isFetchingCards = true;
-
-                axios.get('/settings/billing').then(r => {
-                    this.cards = r.data.data;
-                    this.isFetchingCards = false;
-                });
-            },
-
-            saveCard() {
-                this.isSavingCard = true;
-
+            submitCard() {
                 this.stripe.stripe.createToken(this.stripe.card).then(result => {
                     if (result.error) {
                         var errorElement = document.getElementById('billing-card-errors');
@@ -144,14 +118,11 @@
                                 type: 'is-success'
                             });
 
+                            this.getBillingInfo();
                             this.stripe.card.clear();
                             this.isAddingCard = false;
-                            this.isSavingCard = false;
-
-                            this.fetchCards();
                         }).catch(({ response }) => {
                             this.isAddingCard = false;
-                            this.isSavingCard = false;
 
                             this.$toast.open({
                                 message: response.data.message,
@@ -164,7 +135,7 @@
         },
 
         created() {
-            this.fetchCards();
+            this.getBillingInfo();
         },
 
         mounted() {
