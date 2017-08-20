@@ -1,0 +1,36 @@
+.button {
+    padding: 4px 9px 4px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: $shadow;
+    color: $text;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    word-break: keep-all;
+    transition: box-shadow .08s ease-in,color .08s ease-in;
+    border: none;
+
+    &.has-icon {
+        padding: 4px 14px 4px 9px;
+    }
+
+    &:hover {
+        box-shadow: $shadow-hovered;
+        color: $text-hovered;
+    }
+
+    &:active {
+        box-shadow: $shadow-active;
+        color: $text-hovered;
+    }
+
+    &:not(.is-primary) {
+        border-color: lighten($black, 50%) !important;
+    }
+
+    .material-icons {
+        font-size: 16px;
+    }
+}

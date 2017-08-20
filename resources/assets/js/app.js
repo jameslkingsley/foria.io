@@ -19,6 +19,10 @@ Vue.component('f-settings-notifications', require('./components/settings/Notific
 // Form
 Vue.component('f-form', require('./components/form/Form.vue'));
 Vue.component('f-form-button', require('./components/form/Button.vue'));
+Vue.component('f-modal-form', require('./components/form/ModalForm.vue'));
+
+// Modal
+Vue.component('f-modal', require('./components/Modal.vue'));
 
 const app = new Vue({
     el: '#app',

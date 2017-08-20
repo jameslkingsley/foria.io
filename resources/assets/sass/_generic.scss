@@ -1,0 +1,49 @@
+html {
+    background-color: $background;
+}
+
+strong {
+    color: inherit;
+}
+
+.w100 {
+    width: 100%;
+}
+
+[v-cloak] {
+    display: none;
+}
+
+.block {
+    display: inline-block;
+    width: 100%;
+    margin: 0;
+}
+
+small {
+    font-size: 13px;
+}
+
+.card {
+    border-radius: $radius;
+    box-shadow: $shadow-large !important;
+}
+
+.box {
+    box-shadow: $shadow;
+}
+
+hr {
+    float: left;
+    width: 100%;
+    margin: 2rem 0;
+    padding: 0;
+    opacity: .5;
+}
+
+.column {
+    &.is-sidebar {
+        width: 275px;
+        flex: none;
+    }
+}

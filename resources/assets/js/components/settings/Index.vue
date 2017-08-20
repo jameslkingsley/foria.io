@@ -25,7 +25,7 @@
 
         data() {
             return {
-                activePanel: 1,
+                activePanel: 0,
                 panels: [
                     { name: 'Account', icon: 'account_circle', component: 'f-settings-account' },
                     { name: 'Billing', icon: 'credit_card', component: 'f-settings-billing' },
@@ -50,10 +50,31 @@
                 };
             },
 
+            getHashIndex() {
+                if (window.location.hash) {
+                    let hash = window.location.hash.substring(1).toLowerCase();
+                    let foundIndex = _.findIndex(this.panels, p => p.name.toLowerCase() == hash);
+                    return foundIndex !== -1 ? foundIndex : index;
+                }
+
+                return -1;
+            },
+
             selectPanel(index) {
                 let panel = this.panels[index];
                 this.activePanel = index;
+
+                if (history.pushState) {
+                    history.pushState(null, null, `#${panel.name.toLowerCase()}`);
+                } else {
+                    location.hash = `#${panel.name.toLowerCase()}`;
+                }
             }
+        },
+
+        mounted() {
+            let hashIndex = this.getHashIndex();
+            this.activePanel = hashIndex !== -1 ? hashIndex : 0;
         }
     }
 </script>

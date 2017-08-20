@@ -1,0 +1,27 @@
+.table {
+    width: 100%;
+    font-size: 14px;
+    color: $text !important;
+    margin: 0;
+
+    tr:hover {
+        background-color: transparent;
+    }
+
+    th[align="right"], td[align="right"] {
+        text-align: right;
+    }
+
+    th {
+        border: none !important;
+        font-weight: 500;
+        padding-left: 0;
+        color: inherit !important;
+    }
+
+    td {
+        border: none !important;
+        padding: 0.33rem 0.75rem 0.33rem 0 !important;
+        color: inherit !important;
+    }
+}

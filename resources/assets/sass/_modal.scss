@@ -1,0 +1,32 @@
+$modal-background: white;
+$modal-title-color: #333;
+
+.modal {
+    .modal-card {
+        .modal-card-head {
+            border: none;
+            background-color: $modal-background;
+            color: $modal-title-color;
+
+            .modal-card-title {
+                font-size: 22px;
+                color: inherit;
+            }
+
+            .material-icons {
+                color: inherit;
+                cursor: pointer;
+                opacity: 0.25;
+
+                &:hover {
+                    opacity: 0.33;
+                }
+            }
+        }
+
+        .modal-card-foot {
+            justify-content: flex-end;
+            border: none;
+        }
+    }
+}

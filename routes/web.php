@@ -40,4 +40,5 @@ Route::resource('/settings', 'SettingsController', [
     'except' => ['show']
 ]);
 
+Route::resource('/settings/account', 'AccountSettingsController');
 Route::resource('/settings/billing', 'BillingSettingsController');

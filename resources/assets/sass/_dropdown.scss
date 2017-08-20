@@ -1,0 +1,19 @@
+.dropdown {
+    &.is-active {
+        .dropdown-trigger {
+            .navbar-item {
+                color: $primary;
+                // background-color: $light;
+            }
+        }
+    }
+
+    .dropdown-menu {
+        border-radius: 4px !important;
+
+        .dropdown-content {
+            border-radius: 4px !important;
+            box-shadow: $shadow-large;
+        }
+    }
+}

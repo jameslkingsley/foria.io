@@ -1,0 +1,23 @@
+.input, .textarea {
+    border: 1px solid transparent;
+    box-shadow: $shadow;
+
+    &:hover {
+        border: 1px solid transparent;
+    }
+
+    &:focus {
+        box-shadow: $shadow;
+        box-shadow: $shadow-outline;
+        border: 1px solid transparentize($primary, 0.25);
+    }
+}
+
+.label {
+    font-size: 14px;
+    color: inherit;
+}
+
+.field:not(:last-child) {
+    margin-bottom: 1.5rem;
+}

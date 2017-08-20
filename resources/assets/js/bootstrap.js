@@ -21,6 +21,7 @@ axios.interceptors.response.use(response => {
     Event.fire('f-form-submitting', false);
     return response;
 }, error => {
+    Event.fire('f-form-submitting', false);
     return Promise.reject(error);
 });
 
