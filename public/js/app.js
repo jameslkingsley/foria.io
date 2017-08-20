@@ -36320,17 +36320,26 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
             user: null,
             stripe: {},
+            loaded: false,
             isAddingCard: false,
             isRemovingCard: false
         };
+    },
+    activate: function activate(done) {
+        var _this = this;
+
+        axios.get('/settings/billing').then(function (_ref) {
+            var data = _ref.data;
+
+            _this.user = data;
+            done();
+        });
     },
 
 
@@ -36381,15 +36390,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             return Util.formatLastFour(value);
         },
         removeCard: function removeCard() {
-            var _this = this;
+            var _this2 = this;
 
             this.isRemovingCard = true;
 
             axios.delete('/settings/billing/1').then(function (r) {
-                _this.getBillingInfo();
-                _this.isRemovingCard = false;
+                _this2.getBillingInfo();
+                _this2.isRemovingCard = false;
 
-                _this.$toast.open({
+                _this2.$toast.open({
                     message: 'Card Removed',
                     type: 'is-success',
                     duration: 4000
@@ -36397,11 +36406,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             });
         },
         getBillingInfo: function getBillingInfo() {
-            var _this2 = this;
+            var _this3 = this;
 
-            axios.get('/settings/billing').then(function (_ref) {
-                var data = _ref.data;
-                return _this2.user = data;
+            return axios.get('/settings/billing').then(function (_ref2) {
+                var data = _ref2.data;
+
+                _this3.user = data;
+                _this3.loaded = true;
             });
         },
         addCard: function addCard() {
@@ -36411,7 +36422,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.isAddingCard = false;
         },
         submitCard: function submitCard() {
-            var _this3 = this;
+            var _this4 = this;
 
             this.stripe.stripe.createToken(this.stripe.card).then(function (result) {
                 if (result.error) {
@@ -36427,21 +36438,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     form.appendChild(hiddenInput);
 
                     axios.post('/settings/billing', formToObject(form)).then(function (r) {
-                        _this3.$toast.open({
+                        _this4.$toast.open({
                             message: 'Card Added',
                             type: 'is-success',
                             duration: 4000
                         });
 
-                        _this3.getBillingInfo();
-                        _this3.stripe.card.clear();
-                        _this3.isAddingCard = false;
-                    }).catch(function (_ref2) {
-                        var response = _ref2.response;
+                        _this4.getBillingInfo();
+                        _this4.stripe.card.clear();
+                        _this4.isAddingCard = false;
+                    }).catch(function (_ref3) {
+                        var response = _ref3.response;
 
-                        _this3.isAddingCard = false;
+                        _this4.isAddingCard = false;
 
-                        _this3.$toast.open({
+                        _this4.$toast.open({
                             message: response.data.message,
                             type: 'is-danger',
                             duration: 4000
@@ -36452,31 +36463,30 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         }
     },
 
-    created: function created() {
-        var _this4 = this;
+    mounted: function mounted() {
+        var _this5 = this;
 
-        this.getBillingInfo();
+        this.getBillingInfo().then(function (r) {
+            _this5.stripe.stripe = Stripe(Foria.stripeKey);
+            _this5.stripe.elements = _this5.stripe.stripe.elements();
+            _this5.stripe.card = _this5.stripe.elements.create('card');
+            _this5.stripe.card.mount('#billing-card-element');
+
+            _this5.stripe.card.addEventListener('change', function (_ref4) {
+                var error = _ref4.error;
+
+                var displayError = document.getElementById('billing-card-errors');
+
+                if (error) {
+                    displayError.textContent = error.message;
+                } else {
+                    displayError.textContent = '';
+                }
+            });
+        });
 
         Echo.private('App.User.' + Foria.user.id).listen('Purchased', function (e) {
-            _this4.user.purchases = e.purchases;
-        });
-    },
-    mounted: function mounted() {
-        this.stripe.stripe = Stripe(Foria.stripeKey);
-        this.stripe.elements = this.stripe.stripe.elements();
-        this.stripe.card = this.stripe.elements.create('card');
-        this.stripe.card.mount('#billing-card-element');
-
-        this.stripe.card.addEventListener('change', function (_ref3) {
-            var error = _ref3.error;
-
-            var displayError = document.getElementById('billing-card-errors');
-
-            if (error) {
-                displayError.textContent = error.message;
-            } else {
-                displayError.textContent = '';
-            }
+            _this5.user.purchases = e.purchases;
         });
     }
 });
@@ -36486,7 +36496,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return (_vm.user) ? _c('div', [_c('div', {
+  return (_vm.loaded) ? _c('div', [_c('div', {
     class: _vm.addCardModalClasses
   }, [_c('div', {
     staticClass: "modal-background",
@@ -36579,10 +36589,10 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     directives: [{
       name: "show",
       rawName: "v-show",
-      value: (_vm.user.purchases && _vm.user.purchases.length === 0),
-      expression: "user.purchases && user.purchases.length === 0"
+      value: (_vm.user.purchases.length === 0),
+      expression: "user.purchases.length === 0"
     }]
-  }, [_vm._v("You haven't made any purchases.")]), _vm._v(" "), (_vm.user.purchases && _vm.user.purchases.length > 0) ? _c('table', {
+  }, [_vm._v("You haven't made any purchases.")]), _vm._v(" "), (_vm.user.purchases.length > 0) ? _c('table', {
     staticClass: "table"
   }, [_vm._m(0), _vm._v(" "), _vm._l((_vm.filteredPurchases), function(purchase) {
     return _c('tr', [_c('td', {

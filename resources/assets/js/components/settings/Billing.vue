@@ -1,5 +1,5 @@
 <template>
-    <div v-if="user">
+    <div v-if="loaded">
         <div :class="addCardModalClasses">
             <div class="modal-background" @click="isAddingCard = false"></div>
 
@@ -11,8 +11,6 @@
 
                     <div class="is-pulled-left w100" id="billing-card-element"></div>
                     <div class="is-pulled-left w100" id="billing-card-errors" role="alert"></div>
-
-                    <!-- <button class="button is-pulled-right m-t-3" @click.prevent="cancelAddCard">Cancel</button> -->
                 </f-form>
             </div>
 
@@ -43,9 +41,9 @@
             Your Purchases
         </h3>
 
-        <p v-show="user.purchases && user.purchases.length === 0">You haven't made any purchases.</p>
+        <p v-show="user.purchases.length === 0">You haven't made any purchases.</p>
 
-        <table v-if="user.purchases && user.purchases.length > 0" class="table">
+        <table v-if="user.purchases.length > 0" class="table">
             <tr>
                 <th width="200">Timestamp</th>
                 <th>Description</th>
@@ -72,9 +70,17 @@
             return {
                 user: null,
                 stripe: {},
+                loaded: false,
                 isAddingCard: false,
                 isRemovingCard: false
             };
+        },
+
+        activate(done) {
+            axios.get('/settings/billing').then(({ data }) => {
+                this.user = data;
+                done();
+            });
         },
 
         computed: {
@@ -121,7 +127,10 @@
             },
 
             getBillingInfo() {
-                axios.get('/settings/billing').then(({ data }) => this.user = data);
+                return axios.get('/settings/billing').then(({ data }) => {
+                    this.user = data;
+                    this.loaded = true;
+                });
             },
 
             addCard() {
@@ -170,30 +179,28 @@
             }
         },
 
-        created() {
-            this.getBillingInfo();
+        mounted() {
+            this.getBillingInfo().then(r => {
+                this.stripe.stripe = Stripe(Foria.stripeKey);
+                this.stripe.elements = this.stripe.stripe.elements();
+                this.stripe.card = this.stripe.elements.create('card');
+                this.stripe.card.mount('#billing-card-element');
+
+                this.stripe.card.addEventListener('change', ({error}) => {
+                    const displayError = document.getElementById('billing-card-errors');
+
+                    if (error) {
+                        displayError.textContent = error.message;
+                    } else {
+                        displayError.textContent = '';
+                    }
+                });
+            });
 
             Echo.private(`App.User.${Foria.user.id}`)
                 .listen('Purchased', e => {
                     this.user.purchases = e.purchases;
                 });
-        },
-
-        mounted() {
-            this.stripe.stripe = Stripe(Foria.stripeKey);
-            this.stripe.elements = this.stripe.stripe.elements();
-            this.stripe.card = this.stripe.elements.create('card');
-            this.stripe.card.mount('#billing-card-element');
-
-            this.stripe.card.addEventListener('change', ({error}) => {
-                const displayError = document.getElementById('billing-card-errors');
-
-                if (error) {
-                    displayError.textContent = error.message;
-                } else {
-                    displayError.textContent = '';
-                }
-            });
         }
     }
 </script>
