@@ -99,7 +99,8 @@
                 axios.post('/tokens', { package_id: this.packageId }).then(r => {
                     this.$toast.open({
                         message: r.data.message,
-                        type: `is-${r.data.style}`
+                        type: `is-${r.data.style}`,
+                        duration: 4000
                     });
 
                     this.buttonState = false;

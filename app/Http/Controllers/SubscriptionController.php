@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Stripe\Customer;
 use Illuminate\Http\Request;
-use App\Exceptions\NoCustomerException;
 
-class BillingSettingsController extends Controller
+class SubscriptionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,12 +13,7 @@ class BillingSettingsController extends Controller
      */
     public function index()
     {
-        return [
-            'card_brand' => auth()->user()->card_brand,
-            'card_last_four' => auth()->user()->card_last_four,
-            'has_card_on_file' => auth()->user()->has_card_on_file,
-            'purchases' => auth()->user()->purchases()
-        ];
+        //
     }
 
     /**
@@ -41,17 +34,7 @@ class BillingSettingsController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            // Create Stripe customer if none available
-            if (! auth()->user()->stripe_id) {
-                auth()->user()->createAsStripeCustomer($request->stripeToken);
-            }
-
-            // Update card details
-            auth()->user()->updateCard($request->stripeToken);
-        } catch (\Exception $e) {
-            return abort(500, $e->getMessage());
-        }
+        //
     }
 
     /**
@@ -94,15 +77,8 @@ class BillingSettingsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy()
+    public function destroy($id)
     {
-        auth()->user()->cards()->each(function ($card) {
-            $card->delete();
-        });
-
-        auth()->user()->update([
-            'card_brand' => null,
-            'card_last_four' => null,
-        ]);
+        //
     }
 }

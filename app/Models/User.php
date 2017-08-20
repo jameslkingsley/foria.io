@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Stripe\Customer;
 use App\Traits\Follows;
+use App\Traits\Purchases;
 use Laravel\Cashier\Billable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,6 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     use Notifiable,
+        Purchases,
         Billable,
         Follows;
 

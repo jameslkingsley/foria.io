@@ -2,6 +2,8 @@ window._ = require('lodash');
 
 require('./utils');
 
+window.moment = require('moment');
+
 window.formToObject = require('form_to_object');
 
 window.axios = require('axios');

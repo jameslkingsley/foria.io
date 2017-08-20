@@ -7,6 +7,16 @@ use Illuminate\Http\Request;
 class SettingsController extends Controller
 {
     /**
+     * Constructor method.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response

@@ -1,6 +1,6 @@
 <template>
     <div class="columns">
-        <div class="column is-2 settings-nav">
+        <div class="column is-sidebar settings-nav">
             <a
                 :class="navItemClasses(index)"
                 v-for="(panel, index) in panels"

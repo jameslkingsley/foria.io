@@ -201,6 +201,10 @@ small {
         background-color: transparent;
     }
 
+    th[align="right"], td[align="right"] {
+        text-align: right;
+    }
+
     th {
         border: none !important;
         font-weight: 500;
@@ -221,4 +225,11 @@ hr {
     margin: 2rem 0;
     padding: 0;
     opacity: .5;
+}
+
+.column {
+    &.is-sidebar {
+        width: 275px;
+        flex: none;
+    }
 }

@@ -32,6 +32,9 @@ Route::get('/follow/{to}', 'FollowController@index');
 Route::post('/follow/{to}', 'FollowController@store');
 Route::delete('/follow/{to}', 'FollowController@destroy');
 
+// Subscriptions
+Route::resource('/subscription', 'SubscriptionController');
+
 // Settings
 Route::resource('/settings', 'SettingsController', [
     'except' => ['show']

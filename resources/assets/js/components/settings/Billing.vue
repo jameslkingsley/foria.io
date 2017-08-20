@@ -34,7 +34,7 @@
 
         <div v-show="user.has_card_on_file" class="is-pulled-left w100 box billing-card p-3 m-t-3 m-b-0">
             {{ user.card_brand }} <span v-html="formatLastFour(user.card_last_four)"></span>
-            <button class="button is-pulled-right is-small" @click="removeCard" :disabled="isRemovingCard">Remove</button>
+            <button class="button is-danger is-pulled-right is-small" @click="removeCard" :disabled="isRemovingCard">Remove</button>
         </div>
 
         <hr />
@@ -43,7 +43,26 @@
             Your Purchases
         </h3>
 
-        <p>You haven't made any purchases.</p>
+        <p v-show="user.purchases && user.purchases.length === 0">You haven't made any purchases.</p>
+
+        <table v-if="user.purchases && user.purchases.length > 0" class="table">
+            <tr>
+                <th width="200">Timestamp</th>
+                <th>Description</th>
+                <th width="100" align="right">Amount</th>
+            </tr>
+
+            <tr v-for="purchase in filteredPurchases">
+                <td width="200">{{ purchase.created_at | datetime }}</td>
+                <td>{{ purchase.description }}</td>
+                <td width="100" align="right">{{ purchase.amount | currency }}</td>
+            </tr>
+
+            <tr>
+                <th colspan="2" align="right">Total</th>
+                <th align="right">{{ purchasesTotal | currency }}</th>
+            </tr>
+        </table>
     </div>
 </template>
 
@@ -51,7 +70,7 @@
     export default {
         data() {
             return {
-                user: {},
+                user: null,
                 stripe: {},
                 isAddingCard: false,
                 isRemovingCard: false
@@ -64,6 +83,20 @@
                     'modal': true,
                     'is-active': this.isAddingCard
                 };
+            },
+
+            filteredPurchases() {
+                return _.reverse(_.sortBy(this.user.purchases, 'created_at'));
+            },
+
+            purchasesTotal() {
+                let amount = 0;
+
+                for (let purchase of this.user.purchases) {
+                    amount += purchase.amount;
+                }
+
+                return amount;
             }
         },
 
@@ -81,7 +114,8 @@
 
                     this.$toast.open({
                         message: 'Card Removed',
-                        type: 'is-success'
+                        type: 'is-success',
+                        duration: 4000
                     });
                 });
             },
@@ -115,7 +149,8 @@
                         axios.post('/settings/billing', formToObject(form)).then(r => {
                             this.$toast.open({
                                 message: 'Card Added',
-                                type: 'is-success'
+                                type: 'is-success',
+                                duration: 4000
                             });
 
                             this.getBillingInfo();
@@ -126,7 +161,8 @@
 
                             this.$toast.open({
                                 message: response.data.message,
-                                type: 'is-danger'
+                                type: 'is-danger',
+                                duration: 4000
                             });
                         });
                     }
@@ -136,6 +172,11 @@
 
         created() {
             this.getBillingInfo();
+
+            Echo.private(`App.User.${Foria.user.id}`)
+                .listen('Purchased', e => {
+                    this.user.purchases = e.purchases;
+                });
         },
 
         mounted() {
