@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Rules\Username;
 use Illuminate\Http\Request;
+use App\Rules\CurrentPassword;
 
 class AccountSettingsController extends Controller
 {
@@ -59,11 +60,21 @@ class AccountSettingsController extends Controller
 
             case 'email':
                 $attributes = $request->validate([
-                    'email' => ['required', 'string'],
-                    'confirm_email' => ['required', 'string']
+                    'email' => 'required|string|confirmed|unique:users,email'
                 ]);
 
-                // auth()->user()->update($attributes);
+                auth()->user()->update($attributes);
+
+                break;
+
+            case 'password':
+                $attributes = $request->validate([
+                    'current_password' => ['required', 'string', new CurrentPassword],
+                    'password' => 'required|string|confirmed|min:6'
+                ]);
+
+                auth()->user()->password = bcrypt($attributes['password']);
+                auth()->user()->save();
 
                 break;
         }

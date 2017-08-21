@@ -21,7 +21,7 @@
             </b-field>
 
             <b-field label="Confirm New Email Address">
-                <b-input type="email" name="confirm_email"></b-input>
+                <b-input type="email" name="email_confirmation"></b-input>
             </b-field>
         </f-modal-form>
 
@@ -31,8 +31,24 @@
 
         <hr />
 
+        <f-modal-form title="Change Password" confirm="Save Changes" :submit="changePassword" :active.sync="isChangingPassword">
+            <input type="hidden" name="method" value="password">
+
+            <b-field label="Current Password">
+                <b-input type="password" name="current_password"></b-input>
+            </b-field>
+
+            <b-field label="New Password">
+                <b-input type="password" name="password"></b-input>
+            </b-field>
+
+            <b-field label="Confirm New Password">
+                <b-input type="password" name="password_confirmation"></b-input>
+            </b-field>
+        </f-modal-form>
+
         <h3 class="settings-title">Password</h3>
-        <button class="button is-primary m-t-2">Change Password</button>
+        <button class="button is-primary m-t-2" @click="isChangingPassword = true">Change Password</button>
     </div>
 </template>
 
@@ -93,6 +109,28 @@
                         type: 'is-danger',
                         duration: 4000
                     });
+                });
+            },
+
+            changePassword(data) {
+                return axios.post('/settings/account', data).then(r => {
+                    this.isChangingPassword = false;
+
+                    this.$toast.open({
+                        message: 'Password Changed',
+                        type: 'is-success',
+                        duration: 4000
+                    });
+
+                    this.getUser();
+                }).catch(({ response }) => {
+                    for (let error in response.data.errors) {
+                        this.$toast.open({
+                            message: response.data.errors[error][0],
+                            type: 'is-danger',
+                            duration: 4000
+                        });
+                    }
                 });
             }
         },
