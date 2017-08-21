@@ -30,7 +30,8 @@
                     { name: 'Account', icon: 'account_circle', component: 'f-settings-account' },
                     { name: 'Billing', icon: 'credit_card', component: 'f-settings-billing' },
                     { name: 'Subscriptions', icon: 'subscriptions', component: 'f-settings-subscriptions' },
-                    { name: 'Notifications', icon: 'notifications', component: 'f-settings-notifications' }
+                    { name: 'Notifications', icon: 'notifications', component: 'f-settings-notifications' },
+                    { name: 'Model Status', icon: 'photo_camera', component: 'f-settings-model' }
                 ]
             };
         },
@@ -53,7 +54,7 @@
             getHashIndex() {
                 if (window.location.hash) {
                     let hash = window.location.hash.substring(1).toLowerCase();
-                    let foundIndex = _.findIndex(this.panels, p => p.name.toLowerCase() == hash);
+                    let foundIndex = _.findIndex(this.panels, p => _.kebabCase(p.name) == hash);
                     return foundIndex !== -1 ? foundIndex : index;
                 }
 
@@ -65,9 +66,9 @@
                 this.activePanel = index;
 
                 if (history.pushState) {
-                    history.pushState(null, null, `#${panel.name.toLowerCase()}`);
+                    history.pushState(null, null, `#${_.kebabCase(panel.name)}`);
                 } else {
-                    location.hash = `#${panel.name.toLowerCase()}`;
+                    location.hash = `#${_.kebabCase(panel.name)}`;
                 }
             }
         },

@@ -40,7 +40,7 @@
             handle() {
                 this.submitting = true;
 
-                this.submit();
+                this.submit(formToObject(this.$el));
             }
         },
 

@@ -16472,6 +16472,7 @@ Vue.component('f-settings-account', __webpack_require__(184));
 Vue.component('f-settings-billing', __webpack_require__(187));
 Vue.component('f-settings-subscriptions', __webpack_require__(190));
 Vue.component('f-settings-notifications', __webpack_require__(193));
+Vue.component('f-settings-model', __webpack_require__(213));
 
 // Form
 Vue.component('f-form', __webpack_require__(196));
@@ -51916,7 +51917,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     data: function data() {
         return {
             activePanel: 0,
-            panels: [{ name: 'Account', icon: 'account_circle', component: 'f-settings-account' }, { name: 'Billing', icon: 'credit_card', component: 'f-settings-billing' }, { name: 'Subscriptions', icon: 'subscriptions', component: 'f-settings-subscriptions' }, { name: 'Notifications', icon: 'notifications', component: 'f-settings-notifications' }]
+            panels: [{ name: 'Account', icon: 'account_circle', component: 'f-settings-account' }, { name: 'Billing', icon: 'credit_card', component: 'f-settings-billing' }, { name: 'Subscriptions', icon: 'subscriptions', component: 'f-settings-subscriptions' }, { name: 'Notifications', icon: 'notifications', component: 'f-settings-notifications' }, { name: 'Model Status', icon: 'photo_camera', component: 'f-settings-model' }]
         };
     },
 
@@ -51939,7 +51940,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             if (window.location.hash) {
                 var hash = window.location.hash.substring(1).toLowerCase();
                 var foundIndex = _.findIndex(this.panels, function (p) {
-                    return p.name.toLowerCase() == hash;
+                    return _.kebabCase(p.name) == hash;
                 });
                 return foundIndex !== -1 ? foundIndex : index;
             }
@@ -51951,9 +51952,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.activePanel = index;
 
             if (history.pushState) {
-                history.pushState(null, null, '#' + panel.name.toLowerCase());
+                history.pushState(null, null, '#' + _.kebabCase(panel.name));
             } else {
-                location.hash = '#' + panel.name.toLowerCase();
+                location.hash = '#' + _.kebabCase(panel.name);
             }
         }
     },
@@ -53007,7 +53008,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         handle: function handle() {
             this.submitting = true;
 
-            this.submit();
+            this.submit(formToObject(this.$el));
         }
     },
 
@@ -53528,6 +53529,130 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 209 */,
+/* 210 */,
+/* 211 */,
+/* 212 */,
+/* 213 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(214),
+  /* template */
+  __webpack_require__(215),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\settings\\Model.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Model.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-304b9b06", Component.options)
+  } else {
+    hotAPI.reload("data-v-304b9b06", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 214 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user'],
+
+    methods: {
+        submitRequest: function submitRequest(data) {
+            console.log(data);
+        }
+    }
+});
+
+/***/ }),
+/* 215 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('h3', {
+    staticClass: "settings-title"
+  }, [_vm._v("Model Status")]), _vm._v(" "), (!_vm.user.is_model) ? _c('div', [_c('p', [_vm._v("\n            You are not an approved model. You can fill out the form below to request to become a model. The information you submit is private and will be temporarily stored to verify your identity.\n        ")]), _vm._v(" "), _c('hr'), _vm._v(" "), _c('f-form', {
+    attrs: {
+      "confirm": "Submit Application",
+      "submit": _vm.submitRequest
+    }
+  }, [_c('b-field', {
+    attrs: {
+      "label": "Full Legal Name"
+    }
+  }, [_c('b-input', {
+    attrs: {
+      "name": "full_name"
+    }
+  })], 1), _vm._v(" "), _c('b-field', {
+    attrs: {
+      "label": "About Yourself"
+    }
+  }, [_c('b-input', {
+    attrs: {
+      "type": "textarea",
+      "name": "about"
+    }
+  })], 1)], 1)], 1) : _vm._e()])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-304b9b06", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

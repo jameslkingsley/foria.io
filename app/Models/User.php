@@ -45,6 +45,15 @@ class User extends Authenticatable
     ];
 
     /**
+     * Casted attributes.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_model' => 'boolean'
+    ];
+
+    /**
      * Checks whether the user has a card on file.
      *
      * @return boolean
