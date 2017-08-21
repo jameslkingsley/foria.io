@@ -15,8 +15,8 @@
                     </div>
 
                     <div class="watch-controls">
-                        <f-subscribe v-if="! user.is_mine" class="is-pulled-right m-l-1" :user="user"></f-subscribe>
-                        <f-follow v-if="! user.is_mine" class="is-pulled-right" :user="user"></f-follow>
+                        <f-watch-subscribe v-if="! user.is_mine" class="is-pulled-right m-l-1" :user="user"></f-watch-subscribe>
+                        <f-watch-follow v-if="! user.is_mine" class="is-pulled-right" :user="user"></f-watch-follow>
 
                         <b-dropdown v-if="user.is_mine" class="is-pulled-right" position="is-bottom-left">
                             <button class="button" slot="trigger">
@@ -40,7 +40,7 @@
 
         <div class="column is-3">
             <div class="watch-chat-container">
-                <f-chat :user="user" :broadcast="broadcast"></f-chat>
+                <f-watch-chat :user="user" :broadcast="broadcast"></f-watch-chat>
             </div>
         </div>
     </div>

@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use Stripe\Customer;
+use App\Traits\Billing;
 use App\Traits\Follows;
 use App\Traits\Purchases;
-use Laravel\Cashier\Billable;
+use App\Traits\Subscriptions;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use Notifiable,
+    use Subscriptions,
+        Notifiable,
         Purchases,
-        Billable,
+        Billing,
         Follows;
 
     /**
@@ -29,7 +31,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token'
+        'password',
+        'remember_token'
     ];
 
     /**

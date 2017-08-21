@@ -1,13 +1,18 @@
 require('./bootstrap');
 require('./stream');
 
-Vue.component('f-watch', require('./components/Watch.vue'));
-Vue.component('f-follow', require('./components/Follow.vue'));
-Vue.component('f-subscribe', require('./components/Subscribe.vue'));
+// Watch
+Vue.component('f-watch', require('./components/watch/Index.vue'));
+Vue.component('f-watch-follow', require('./components/watch/Follow.vue'));
+Vue.component('f-watch-subscribe', require('./components/watch/Subscribe.vue'));
+Vue.component('f-watch-chat', require('./components/watch/Chat.vue'));
+
+// Tokens
 Vue.component('f-token-checkout', require('./components/TokenCheckout.vue'));
+
+// Broadcasts
 Vue.component('f-broadcast-list', require('./components/BroadcastList.vue'));
 Vue.component('f-broadcast-tile', require('./components/BroadcastTile.vue'));
-Vue.component('f-chat', require('./components/Chat.vue'));
 
 // Settings
 Vue.component('f-settings', require('./components/settings/Index.vue'));

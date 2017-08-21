@@ -16448,7 +16448,7 @@ module.exports = Cancel;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(127);
-module.exports = __webpack_require__(208);
+module.exports = __webpack_require__(211);
 
 
 /***/ }),
@@ -16458,13 +16458,18 @@ module.exports = __webpack_require__(208);
 __webpack_require__(128);
 __webpack_require__(159);
 
-Vue.component('f-watch', __webpack_require__(160));
-Vue.component('f-follow', __webpack_require__(163));
-Vue.component('f-subscribe', __webpack_require__(166));
+// Watch
+Vue.component('f-watch', __webpack_require__(216));
+Vue.component('f-watch-follow', __webpack_require__(219));
+Vue.component('f-watch-subscribe', __webpack_require__(222));
+Vue.component('f-watch-chat', __webpack_require__(225));
+
+// Tokens
 Vue.component('f-token-checkout', __webpack_require__(169));
+
+// Broadcasts
 Vue.component('f-broadcast-list', __webpack_require__(172));
 Vue.component('f-broadcast-tile', __webpack_require__(175));
-Vue.component('f-chat', __webpack_require__(178));
 
 // Settings
 Vue.component('f-settings', __webpack_require__(181));
@@ -16472,15 +16477,15 @@ Vue.component('f-settings-account', __webpack_require__(184));
 Vue.component('f-settings-billing', __webpack_require__(187));
 Vue.component('f-settings-subscriptions', __webpack_require__(190));
 Vue.component('f-settings-notifications', __webpack_require__(193));
-Vue.component('f-settings-model', __webpack_require__(213));
+Vue.component('f-settings-model', __webpack_require__(196));
 
 // Form
-Vue.component('f-form', __webpack_require__(196));
-Vue.component('f-form-button', __webpack_require__(199));
-Vue.component('f-modal-form', __webpack_require__(202));
+Vue.component('f-form', __webpack_require__(199));
+Vue.component('f-form-button', __webpack_require__(202));
+Vue.component('f-modal-form', __webpack_require__(205));
 
 // Modal
-Vue.component('f-modal', __webpack_require__(205));
+Vue.component('f-modal', __webpack_require__(208));
 
 var app = new Vue({
     el: '#app',
@@ -50669,525 +50674,15 @@ window.Stream = function () {
 }();
 
 /***/ }),
-/* 160 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(161),
-  /* template */
-  __webpack_require__(162),
-  /* styles */
-  null,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\Watch.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] Watch.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-64429fd6", Component.options)
-  } else {
-    hotAPI.reload("data-v-64429fd6", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 161 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user', 'broadcast'],
-
-    data: function data() {
-        return {
-            online: this.broadcast ? this.broadcast.online : false,
-            editingTopic: false,
-            hasBroadcast: this.broadcast !== null,
-            subscriberMode: false,
-            topic: this.broadcast ? this.broadcast.topic : 'Untitled',
-            stream: null,
-            broadcaster: this.broadcast
-        };
-    },
-
-
-    methods: {
-        startOrStop: function startOrStop() {
-            var _this = this;
-
-            if (this.online) {
-                // Stop broadcast
-                axios.delete('/api/broadcast/stop').then(function (r) {
-                    _this.online = false;
-                    _this.broadcaster = null;
-                    _this.subscriberMode = false;
-                    _this.closeStream();
-                });
-            } else {
-                // Start broadcast
-                axios.post('/api/broadcast/start', {
-                    topic: this.topic,
-                    subscriberMode: this.subscriberMode
-                }).then(function (r) {
-                    _this.online = true;
-                    _this.broadcaster = r.data;
-                    _this.openStream();
-                });
-            }
-        },
-        openStream: function openStream() {
-            this.stream = new Stream(this.user.id, this.broadcast);
-            return this.stream;
-        },
-        closeStream: function closeStream() {
-            this.stream.close();
-        },
-        changeTopic: function changeTopic() {
-            this.editingTopic = true;
-        },
-        saveTopic: function saveTopic() {
-            var _this2 = this;
-
-            if (!this.broadcaster) {
-                this.editingTopic = false;
-                return;
-            }
-
-            axios.post('/api/broadcast/topic', { topic: this.topic }).then(function (r) {
-                _this2.editingTopic = false;
-            });
-        },
-        cancelTopic: function cancelTopic() {
-            this.editingTopic = false;
-            this.topic = this.broadcaster.topic;
-        }
-    },
-
-    created: function created() {
-        var _this3 = this;
-
-        this.openStream();
-
-        Echo.channel('watch-' + this.user.id).listen('TopicChanged', function (e) {
-            _this3.topic = e.topic;
-        });
-    }
-});
-
-/***/ }),
-/* 162 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "columns"
-  }, [_c('div', {
-    staticClass: "column is-9"
-  }, [_c('div', {
-    staticClass: "m-b-3"
-  }, [(_vm.editingTopic && _vm.user.is_mine) ? _c('div', [_c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.topic),
-      expression: "topic"
-    }],
-    attrs: {
-      "type": "text"
-    },
-    domProps: {
-      "value": (_vm.topic)
-    },
-    on: {
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.topic = $event.target.value
-      }
-    }
-  }), _vm._v(" "), _c('button', {
-    staticClass: "button",
-    on: {
-      "click": _vm.saveTopic
-    }
-  }, [_vm._v("Save")]), _vm._v(" "), _c('button', {
-    staticClass: "button",
-    on: {
-      "click": _vm.cancelTopic
-    }
-  }, [_vm._v("Cancel")])]) : _c('div', {
-    staticClass: "watch-header"
-  }, [_c('div', {
-    staticClass: "watch-title"
-  }, [_c('span', {
-    staticClass: "watch-topic"
-  }, [_vm._v(_vm._s(_vm.topic))]), _vm._v(" "), _c('span', {
-    staticClass: "watch-user"
-  }, [_vm._v(_vm._s(_vm.user.name))])]), _vm._v(" "), _c('div', {
-    staticClass: "watch-controls"
-  }, [(!_vm.user.is_mine) ? _c('f-subscribe', {
-    staticClass: "is-pulled-right m-l-1",
-    attrs: {
-      "user": _vm.user
-    }
-  }) : _vm._e(), _vm._v(" "), (!_vm.user.is_mine) ? _c('f-follow', {
-    staticClass: "is-pulled-right",
-    attrs: {
-      "user": _vm.user
-    }
-  }) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('b-dropdown', {
-    staticClass: "is-pulled-right",
-    attrs: {
-      "position": "is-bottom-left"
-    }
-  }, [_c('button', {
-    staticClass: "button",
-    slot: "trigger"
-  }, [_c('i', {
-    staticClass: "material-icons"
-  }, [_vm._v("settings")])]), _vm._v(" "), _c('b-dropdown-item', [_vm._v("Subscriber mode")]), _vm._v(" "), _c('b-dropdown-item', {
-    nativeOn: {
-      "click": function($event) {
-        _vm.changeTopic($event)
-      }
-    }
-  }, [_vm._v("Change topic")])], 1) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('button', {
-    staticClass: "button is-primary is-pulled-right has-icon m-r-1",
-    on: {
-      "click": _vm.startOrStop
-    }
-  }, [_c('i', {
-    staticClass: "material-icons m-r-2"
-  }, [_vm._v(_vm._s(_vm.online ? 'stop' : 'play_arrow'))]), _vm._v("\n                        " + _vm._s(_vm.online ? 'Stop' : 'Start') + " Broadcast\n                    ")]) : _vm._e()], 1)])]), _vm._v(" "), _c('div', {
-    staticClass: "watch-video-container",
-    attrs: {
-      "id": "stream-publisher"
-    }
-  })]), _vm._v(" "), _c('div', {
-    staticClass: "column is-3"
-  }, [_c('div', {
-    staticClass: "watch-chat-container"
-  }, [_c('f-chat', {
-    attrs: {
-      "user": _vm.user,
-      "broadcast": _vm.broadcast
-    }
-  })], 1)])])
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-64429fd6", module.exports)
-  }
-}
-
-/***/ }),
-/* 163 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(164),
-  /* template */
-  __webpack_require__(165),
-  /* styles */
-  null,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\Follow.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] Follow.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-9858f88c", Component.options)
-  } else {
-    hotAPI.reload("data-v-9858f88c", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 164 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user'],
-
-    data: function data() {
-        return {
-            state: null,
-            count: this.user.follower_count
-        };
-    },
-
-
-    computed: {
-        icon: function icon() {
-            return this.state ? 'favorite_border' : 'favorite';
-        },
-        text: function text() {
-            return this.state ? 'Unfollow' : 'Follow';
-        }
-    },
-
-    methods: {
-        handle: function handle() {
-            return axios[this.state ? 'delete' : 'post']('/follow/' + this.user.id).then(this.fetch);
-        },
-        fetch: function fetch() {
-            var _this = this;
-
-            axios.get('/follow/' + this.user.id).then(function (r) {
-                _this.state = r.data;
-            });
-        }
-    },
-
-    created: function created() {
-        var _this2 = this;
-
-        this.fetch();
-
-        Echo.channel('followed-' + this.user.id).listen('Followed', function (e) {
-            _this2.count = e.count;
-        }).listen('Unfollowed', function (e) {
-            _this2.count = e.count;
-        });
-    }
-});
-
-/***/ }),
-/* 165 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return (_vm.state != null) ? _c('button', {
-    staticClass: "button",
-    attrs: {
-      "title": _vm.text
-    },
-    on: {
-      "click": _vm.handle
-    }
-  }, [_c('i', {
-    staticClass: "material-icons m-r-2"
-  }, [_vm._v(_vm._s(_vm.icon))]), _vm._v("\n    " + _vm._s(_vm.count) + "\n")]) : _vm._e()
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-9858f88c", module.exports)
-  }
-}
-
-/***/ }),
-/* 166 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(167),
-  /* template */
-  __webpack_require__(168),
-  /* styles */
-  null,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\Subscribe.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] Subscribe.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-6325195e", Component.options)
-  } else {
-    hotAPI.reload("data-v-6325195e", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 167 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user'],
-
-    data: function data() {
-        return {
-            state: false
-        };
-    },
-
-
-    computed: {
-        icon: function icon() {
-            return this.state ? 'close' : 'check';
-        },
-        text: function text() {
-            return this.state ? 'Subscription' : 'Subscribe';
-        }
-    },
-
-    methods: {
-        handle: function handle() {
-            return axios[this.state ? 'delete' : 'post']('/subscribe/' + this.user.id).then(this.fetch);
-        },
-        fetch: function fetch() {
-            var _this = this;
-
-            axios.get('/subscribe/' + this.user.id).then(function (r) {
-                _this.state = r.data;
-            });
-        }
-    },
-
-    created: function created() {
-        // this.fetch();
-    }
-});
-
-/***/ }),
-/* 168 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return (_vm.state != null) ? _c('button', {
-    staticClass: "button is-primary",
-    on: {
-      "click": _vm.handle
-    }
-  }, [_c('i', {
-    staticClass: "material-icons m-r-2"
-  }, [_vm._v(_vm._s(_vm.icon))]), _vm._v("\n    " + _vm._s(_vm.text) + "\n")]) : _vm._e()
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-6325195e", module.exports)
-  }
-}
-
-/***/ }),
+/* 160 */,
+/* 161 */,
+/* 162 */,
+/* 163 */,
+/* 164 */,
+/* 165 */,
+/* 166 */,
+/* 167 */,
+/* 168 */,
 /* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -51660,190 +51155,9 @@ if (false) {
 }
 
 /***/ }),
-/* 178 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(179),
-  /* template */
-  __webpack_require__(180),
-  /* styles */
-  null,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\Chat.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] Chat.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-557d0fbe", Component.options)
-  } else {
-    hotAPI.reload("data-v-557d0fbe", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 179 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user', 'broadcast'],
-
-    data: function data() {
-        return {
-            messages: [],
-            fetchCompleted: false,
-            form: {
-                text: '',
-                receiver: this.user,
-                broadcast: this.broadcast
-            }
-        };
-    },
-
-
-    computed: {
-        sortedMessages: function sortedMessages() {
-            return _.sortBy(this.messages, ['created_at']);
-        }
-    },
-
-    methods: {
-        send: function send() {
-            var _this = this;
-
-            axios.post('/api/chat', this.form).then(function (r) {
-                _this.form.text = '';
-            });
-        },
-        fetch: function fetch() {
-            var _this2 = this;
-
-            axios.get('/api/chat/past/' + this.user.id).then(function (r) {
-                _this2.messages = r.data;
-                _this2.fetchCompleted = true;
-            });
-        }
-    },
-
-    updated: function updated() {
-        var list = document.getElementById('f-chat-list');
-        list.scrollTop = list.scrollHeight;
-    },
-    mounted: function mounted() {
-        var _this3 = this;
-
-        this.fetch();
-
-        Echo.channel('watch-' + this.user.id).listen('ChatMessageSent', function (e) {
-            _this3.messages.push(e.message);
-        });
-    }
-});
-
-/***/ }),
-/* 180 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "chat"
-  }, [_c('div', {
-    staticClass: "chat-list",
-    attrs: {
-      "id": "f-chat-list"
-    }
-  }, _vm._l((_vm.sortedMessages), function(message, index) {
-    return _c('div', {
-      key: index,
-      staticClass: "chat-item"
-    }, [_c('span', {
-      staticClass: "chat-item-author"
-    }, [_vm._v(_vm._s(message.sender.name))]), _vm._v(" "), _c('span', {
-      staticClass: "chat-item-text"
-    }, [_vm._v(_vm._s(message.text))])])
-  })), _vm._v(" "), _c('div', {
-    staticClass: "chat-form"
-  }, [_c('form', {
-    attrs: {
-      "method": "post"
-    },
-    on: {
-      "submit": function($event) {
-        $event.preventDefault();
-        _vm.send($event)
-      }
-    }
-  }, [_c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.form.text),
-      expression: "form.text"
-    }],
-    staticClass: "input",
-    attrs: {
-      "name": "text",
-      "placeholder": "Type a message",
-      "disabled": !_vm.fetchCompleted
-    },
-    domProps: {
-      "value": (_vm.form.text)
-    },
-    on: {
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.form.text = $event.target.value
-      }
-    }
-  })])])])
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-557d0fbe", module.exports)
-  }
-}
-
-/***/ }),
+/* 178 */,
+/* 179 */,
+/* 180 */,
 /* 181 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -52936,6 +52250,126 @@ var Component = __webpack_require__(1)(
   /* moduleIdentifier (server only) */
   null
 )
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\settings\\Model.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Model.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-304b9b06", Component.options)
+  } else {
+    hotAPI.reload("data-v-304b9b06", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 197 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user'],
+
+    methods: {
+        submitRequest: function submitRequest(data) {
+            console.log(data);
+        }
+    }
+});
+
+/***/ }),
+/* 198 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('h3', {
+    staticClass: "settings-title"
+  }, [_vm._v("Model Status")]), _vm._v(" "), (!_vm.user.is_model) ? _c('div', [_c('p', [_vm._v("\n            You are not an approved model. You can fill out the form below to request to become a model. The information you submit is private and will be temporarily stored to verify your identity.\n        ")]), _vm._v(" "), _c('hr'), _vm._v(" "), _c('f-form', {
+    attrs: {
+      "confirm": "Submit Application",
+      "submit": _vm.submitRequest
+    }
+  }, [_c('b-field', {
+    attrs: {
+      "label": "Full Legal Name"
+    }
+  }, [_c('b-input', {
+    attrs: {
+      "name": "full_name"
+    }
+  })], 1), _vm._v(" "), _c('b-field', {
+    attrs: {
+      "label": "About Yourself"
+    }
+  }, [_c('b-input', {
+    attrs: {
+      "type": "textarea",
+      "name": "about"
+    }
+  })], 1)], 1)], 1) : _vm._e()])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-304b9b06", module.exports)
+  }
+}
+
+/***/ }),
+/* 199 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(200),
+  /* template */
+  __webpack_require__(201),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
 Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\form\\Form.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] Form.vue: functional components are not supported with templates, they should use render functions.")}
@@ -52960,7 +52394,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 197 */
+/* 200 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -53022,7 +52456,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 198 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -53052,15 +52486,15 @@ if (false) {
 }
 
 /***/ }),
-/* 199 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(200),
+  __webpack_require__(203),
   /* template */
-  __webpack_require__(201),
+  __webpack_require__(204),
   /* styles */
   null,
   /* scopeId */
@@ -53092,7 +52526,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 200 */
+/* 203 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -53129,7 +52563,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 201 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -53150,15 +52584,15 @@ if (false) {
 }
 
 /***/ }),
-/* 202 */
+/* 205 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(203),
+  __webpack_require__(206),
   /* template */
-  __webpack_require__(204),
+  __webpack_require__(207),
   /* styles */
   null,
   /* scopeId */
@@ -53190,7 +52624,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 203 */
+/* 206 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -53295,7 +52729,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 204 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -53363,15 +52797,15 @@ if (false) {
 }
 
 /***/ }),
-/* 205 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(206),
+  __webpack_require__(209),
   /* template */
-  __webpack_require__(207),
+  __webpack_require__(210),
   /* styles */
   null,
   /* scopeId */
@@ -53403,7 +52837,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 206 */
+/* 209 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -53480,7 +52914,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 207 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -53525,25 +52959,25 @@ if (false) {
 }
 
 /***/ }),
-/* 208 */
+/* 211 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
-/* 209 */,
-/* 210 */,
-/* 211 */,
 /* 212 */,
-/* 213 */
+/* 213 */,
+/* 214 */,
+/* 215 */,
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(214),
+  __webpack_require__(217),
   /* template */
-  __webpack_require__(215),
+  __webpack_require__(218),
   /* styles */
   null,
   /* scopeId */
@@ -53551,9 +52985,9 @@ var Component = __webpack_require__(1)(
   /* moduleIdentifier (server only) */
   null
 )
-Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\settings\\Model.vue"
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Index.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] Model.vue: functional components are not supported with templates, they should use render functions.")}
+if (Component.options.functional) {console.error("[vue-loader] Index.vue: functional components are not supported with templates, they should use render functions.")}
 
 /* hot reload */
 if (false) {(function () {
@@ -53562,9 +52996,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-304b9b06", Component.options)
+    hotAPI.createRecord("data-v-ae9e544e", Component.options)
   } else {
-    hotAPI.reload("data-v-304b9b06", Component.options)
+    hotAPI.reload("data-v-ae9e544e", Component.options)
   }
   module.hot.dispose(function (data) {
     disposed = true
@@ -53575,7 +53009,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 214 */
+/* 217 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -53604,53 +53038,644 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user'],
+    props: ['user', 'broadcast'],
+
+    data: function data() {
+        return {
+            online: this.broadcast ? this.broadcast.online : false,
+            editingTopic: false,
+            hasBroadcast: this.broadcast !== null,
+            subscriberMode: false,
+            topic: this.broadcast ? this.broadcast.topic : 'Untitled',
+            stream: null,
+            broadcaster: this.broadcast
+        };
+    },
+
 
     methods: {
-        submitRequest: function submitRequest(data) {
-            console.log(data);
+        startOrStop: function startOrStop() {
+            var _this = this;
+
+            if (this.online) {
+                // Stop broadcast
+                axios.delete('/api/broadcast/stop').then(function (r) {
+                    _this.online = false;
+                    _this.broadcaster = null;
+                    _this.subscriberMode = false;
+                    _this.closeStream();
+                });
+            } else {
+                // Start broadcast
+                axios.post('/api/broadcast/start', {
+                    topic: this.topic,
+                    subscriberMode: this.subscriberMode
+                }).then(function (r) {
+                    _this.online = true;
+                    _this.broadcaster = r.data;
+                    _this.openStream();
+                });
+            }
+        },
+        openStream: function openStream() {
+            this.stream = new Stream(this.user.id, this.broadcast);
+            return this.stream;
+        },
+        closeStream: function closeStream() {
+            this.stream.close();
+        },
+        changeTopic: function changeTopic() {
+            this.editingTopic = true;
+        },
+        saveTopic: function saveTopic() {
+            var _this2 = this;
+
+            if (!this.broadcaster) {
+                this.editingTopic = false;
+                return;
+            }
+
+            axios.post('/api/broadcast/topic', { topic: this.topic }).then(function (r) {
+                _this2.editingTopic = false;
+            });
+        },
+        cancelTopic: function cancelTopic() {
+            this.editingTopic = false;
+            this.topic = this.broadcaster.topic;
         }
+    },
+
+    created: function created() {
+        var _this3 = this;
+
+        this.openStream();
+
+        Echo.channel('watch-' + this.user.id).listen('TopicChanged', function (e) {
+            _this3.topic = e.topic;
+        });
     }
 });
 
 /***/ }),
-/* 215 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('h3', {
-    staticClass: "settings-title"
-  }, [_vm._v("Model Status")]), _vm._v(" "), (!_vm.user.is_model) ? _c('div', [_c('p', [_vm._v("\n            You are not an approved model. You can fill out the form below to request to become a model. The information you submit is private and will be temporarily stored to verify your identity.\n        ")]), _vm._v(" "), _c('hr'), _vm._v(" "), _c('f-form', {
+  return _c('div', {
+    staticClass: "columns"
+  }, [_c('div', {
+    staticClass: "column is-9"
+  }, [_c('div', {
+    staticClass: "m-b-3"
+  }, [(_vm.editingTopic && _vm.user.is_mine) ? _c('div', [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.topic),
+      expression: "topic"
+    }],
     attrs: {
-      "confirm": "Submit Application",
-      "submit": _vm.submitRequest
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.topic)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.topic = $event.target.value
+      }
     }
-  }, [_c('b-field', {
+  }), _vm._v(" "), _c('button', {
+    staticClass: "button",
+    on: {
+      "click": _vm.saveTopic
+    }
+  }, [_vm._v("Save")]), _vm._v(" "), _c('button', {
+    staticClass: "button",
+    on: {
+      "click": _vm.cancelTopic
+    }
+  }, [_vm._v("Cancel")])]) : _c('div', {
+    staticClass: "watch-header"
+  }, [_c('div', {
+    staticClass: "watch-title"
+  }, [_c('span', {
+    staticClass: "watch-topic"
+  }, [_vm._v(_vm._s(_vm.topic))]), _vm._v(" "), _c('span', {
+    staticClass: "watch-user"
+  }, [_vm._v(_vm._s(_vm.user.name))])]), _vm._v(" "), _c('div', {
+    staticClass: "watch-controls"
+  }, [(!_vm.user.is_mine) ? _c('f-watch-subscribe', {
+    staticClass: "is-pulled-right m-l-1",
     attrs: {
-      "label": "Full Legal Name"
+      "user": _vm.user
     }
-  }, [_c('b-input', {
+  }) : _vm._e(), _vm._v(" "), (!_vm.user.is_mine) ? _c('f-watch-follow', {
+    staticClass: "is-pulled-right",
     attrs: {
-      "name": "full_name"
+      "user": _vm.user
     }
-  })], 1), _vm._v(" "), _c('b-field', {
+  }) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('b-dropdown', {
+    staticClass: "is-pulled-right",
     attrs: {
-      "label": "About Yourself"
+      "position": "is-bottom-left"
     }
-  }, [_c('b-input', {
+  }, [_c('button', {
+    staticClass: "button",
+    slot: "trigger"
+  }, [_c('i', {
+    staticClass: "material-icons"
+  }, [_vm._v("settings")])]), _vm._v(" "), _c('b-dropdown-item', [_vm._v("Subscriber mode")]), _vm._v(" "), _c('b-dropdown-item', {
+    nativeOn: {
+      "click": function($event) {
+        _vm.changeTopic($event)
+      }
+    }
+  }, [_vm._v("Change topic")])], 1) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('button', {
+    staticClass: "button is-primary is-pulled-right has-icon m-r-1",
+    on: {
+      "click": _vm.startOrStop
+    }
+  }, [_c('i', {
+    staticClass: "material-icons m-r-2"
+  }, [_vm._v(_vm._s(_vm.online ? 'stop' : 'play_arrow'))]), _vm._v("\n                        " + _vm._s(_vm.online ? 'Stop' : 'Start') + " Broadcast\n                    ")]) : _vm._e()], 1)])]), _vm._v(" "), _c('div', {
+    staticClass: "watch-video-container",
     attrs: {
-      "type": "textarea",
-      "name": "about"
+      "id": "stream-publisher"
     }
-  })], 1)], 1)], 1) : _vm._e()])
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "column is-3"
+  }, [_c('div', {
+    staticClass: "watch-chat-container"
+  }, [_c('f-watch-chat', {
+    attrs: {
+      "user": _vm.user,
+      "broadcast": _vm.broadcast
+    }
+  })], 1)])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-304b9b06", module.exports)
+     require("vue-hot-reload-api").rerender("data-v-ae9e544e", module.exports)
+  }
+}
+
+/***/ }),
+/* 219 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(220),
+  /* template */
+  __webpack_require__(221),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Follow.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Follow.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-6aa12f8c", Component.options)
+  } else {
+    hotAPI.reload("data-v-6aa12f8c", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 220 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user'],
+
+    data: function data() {
+        return {
+            state: null,
+            count: this.user.follower_count
+        };
+    },
+
+
+    computed: {
+        icon: function icon() {
+            return this.state ? 'favorite_border' : 'favorite';
+        },
+        text: function text() {
+            return this.state ? 'Unfollow' : 'Follow';
+        }
+    },
+
+    methods: {
+        handle: function handle() {
+            return axios[this.state ? 'delete' : 'post']('/follow/' + this.user.id).then(this.fetch);
+        },
+        fetch: function fetch() {
+            var _this = this;
+
+            axios.get('/follow/' + this.user.id).then(function (r) {
+                _this.state = r.data;
+            });
+        }
+    },
+
+    created: function created() {
+        var _this2 = this;
+
+        this.fetch();
+
+        Echo.channel('followed-' + this.user.id).listen('Followed', function (e) {
+            _this2.count = e.count;
+        }).listen('Unfollowed', function (e) {
+            _this2.count = e.count;
+        });
+    }
+});
+
+/***/ }),
+/* 221 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return (_vm.state != null) ? _c('button', {
+    staticClass: "button",
+    attrs: {
+      "title": _vm.text
+    },
+    on: {
+      "click": _vm.handle
+    }
+  }, [_c('i', {
+    staticClass: "material-icons m-r-2"
+  }, [_vm._v(_vm._s(_vm.icon))]), _vm._v("\n    " + _vm._s(_vm.count) + "\n")]) : _vm._e()
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-6aa12f8c", module.exports)
+  }
+}
+
+/***/ }),
+/* 222 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(223),
+  /* template */
+  __webpack_require__(224),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Subscribe.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Subscribe.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-24dd825e", Component.options)
+  } else {
+    hotAPI.reload("data-v-24dd825e", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 223 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user'],
+
+    data: function data() {
+        return {
+            subscribed: false
+        };
+    },
+
+
+    computed: {
+        icon: function icon() {
+            return this.subscribed ? 'close' : 'check';
+        },
+        text: function text() {
+            return this.subscribed ? 'Subscription' : 'Subscribe';
+        }
+    },
+
+    methods: {
+        handle: function handle() {
+            if (this.subscribed) {
+                axios.delete('/api/subscription/' + this.user.id).then(function (r) {
+                    //
+                });
+            } else {
+                axios.post('/api/subscription', { user_id: this.user.id }).then(function (r) {
+                    //
+                });
+            }
+        },
+        fetch: function fetch() {
+            var _this = this;
+
+            axios.get('/api/subscription/' + this.user.id).then(function (r) {
+                _this.subscribed = r.data;
+            });
+        }
+    },
+
+    created: function created() {
+        this.fetch();
+    }
+});
+
+/***/ }),
+/* 224 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return (_vm.subscribed != null) ? _c('button', {
+    staticClass: "button is-primary",
+    on: {
+      "click": _vm.handle
+    }
+  }, [_c('i', {
+    staticClass: "material-icons m-r-2"
+  }, [_vm._v(_vm._s(_vm.icon))]), _vm._v("\n    " + _vm._s(_vm.text) + "\n")]) : _vm._e()
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-24dd825e", module.exports)
+  }
+}
+
+/***/ }),
+/* 225 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(226),
+  /* template */
+  __webpack_require__(227),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Chat.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Chat.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-22cc7ca1", Component.options)
+  } else {
+    hotAPI.reload("data-v-22cc7ca1", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 226 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user', 'broadcast'],
+
+    data: function data() {
+        return {
+            messages: [],
+            fetchCompleted: false,
+            form: {
+                text: '',
+                receiver: this.user,
+                broadcast: this.broadcast
+            }
+        };
+    },
+
+
+    computed: {
+        sortedMessages: function sortedMessages() {
+            return _.sortBy(this.messages, ['created_at']);
+        }
+    },
+
+    methods: {
+        send: function send() {
+            var _this = this;
+
+            axios.post('/api/chat', this.form).then(function (r) {
+                _this.form.text = '';
+            });
+        },
+        fetch: function fetch() {
+            var _this2 = this;
+
+            axios.get('/api/chat/past/' + this.user.id).then(function (r) {
+                _this2.messages = r.data;
+                _this2.fetchCompleted = true;
+            });
+        }
+    },
+
+    updated: function updated() {
+        var list = document.getElementById('f-chat-list');
+        list.scrollTop = list.scrollHeight;
+    },
+    mounted: function mounted() {
+        var _this3 = this;
+
+        this.fetch();
+
+        Echo.channel('watch-' + this.user.id).listen('ChatMessageSent', function (e) {
+            _this3.messages.push(e.message);
+        });
+    }
+});
+
+/***/ }),
+/* 227 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "chat"
+  }, [_c('div', {
+    staticClass: "chat-list",
+    attrs: {
+      "id": "f-chat-list"
+    }
+  }, _vm._l((_vm.sortedMessages), function(message, index) {
+    return _c('div', {
+      key: index,
+      staticClass: "chat-item"
+    }, [_c('span', {
+      staticClass: "chat-item-author"
+    }, [_vm._v(_vm._s(message.sender.name))]), _vm._v(" "), _c('span', {
+      staticClass: "chat-item-text"
+    }, [_vm._v(_vm._s(message.text))])])
+  })), _vm._v(" "), _c('div', {
+    staticClass: "chat-form"
+  }, [_c('form', {
+    attrs: {
+      "method": "post"
+    },
+    on: {
+      "submit": function($event) {
+        $event.preventDefault();
+        _vm.send($event)
+      }
+    }
+  }, [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.text),
+      expression: "form.text"
+    }],
+    staticClass: "input",
+    attrs: {
+      "name": "text",
+      "placeholder": "Type a message",
+      "disabled": !_vm.fetchCompleted
+    },
+    domProps: {
+      "value": (_vm.form.text)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.text = $event.target.value
+      }
+    }
+  })])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-22cc7ca1", module.exports)
   }
 }
 

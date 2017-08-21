@@ -1,4 +1,4 @@
-.input, .textarea {
+.input, .textarea, .StripeElement {
     border: 1px solid transparent;
     box-shadow: $shadow;
 
@@ -6,7 +6,7 @@
         border: 1px solid transparent;
     }
 
-    &:focus {
+    &:focus, &:active, &.StripeElement--focus {
         box-shadow: $shadow;
         box-shadow: $shadow-outline;
         border: 1px solid transparentize($primary, 0.25);
@@ -20,4 +20,17 @@
 
 .field:not(:last-child) {
     margin-bottom: 1.5rem;
+}
+
+.StripeElement {
+    border-radius: $radius;
+    padding: calc(0.625em - 1px);
+}
+
+.StripeElement--invalid {
+    border-color: $danger;
+}
+
+.StripeElement--webkit-autofill {
+    background-color: #fefde5 !important;
 }

@@ -12673,20 +12673,6 @@ label[for="card-element"] {
   width: 100%;
 }
 
-.StripeElement {
-  padding: 8px 12px;
-  border: 1px solid #dbdbdb;
-  border-radius: 4px;
-}
-
-.StripeElement--invalid {
-  border-color: #555abf;
-}
-
-.StripeElement--webkit-autofill {
-  background-color: #fefde5 !important;
-}
-
 #card-errors {
   font-size: 14px;
   color: #ff4242;
@@ -12756,13 +12742,6 @@ label[for="card-element"] {
   bottom: 0;
   padding: 1rem;
   height: 68px;
-}
-
-.chat .chat-form input {
-  border: none !important;
-  -webkit-box-shadow: none !important;
-          box-shadow: none !important;
-  background: #eee;
 }
 
 .chat .chat-list {
@@ -13059,19 +13038,28 @@ nav.navbar .navbar-link:focus {
 }
 
 .input,
-.textarea {
+.textarea,
+.StripeElement {
   border: 1px solid transparent;
   -webkit-box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent;
           box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent;
 }
 
 .input:hover,
-.textarea:hover {
+.textarea:hover,
+.StripeElement:hover {
   border: 1px solid transparent;
 }
 
 .input:focus,
-.textarea:focus {
+.input:active,
+.input.StripeElement--focus,
+.textarea:focus,
+.textarea:active,
+.textarea.StripeElement--focus,
+.StripeElement:focus,
+.StripeElement:active,
+.StripeElement.StripeElement--focus {
   -webkit-box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent;
           box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent;
   -webkit-box-shadow: inset 0 1px 2px rgba(27, 31, 35, 0.075), 0 0 0 0.2em rgba(85, 90, 191, 0.3);
@@ -13086,5 +13074,18 @@ nav.navbar .navbar-link:focus {
 
 .field:not(:last-child) {
   margin-bottom: 1.5rem;
+}
+
+.StripeElement {
+  border-radius: 4px;
+  padding: calc(0.625em - 1px);
+}
+
+.StripeElement--invalid {
+  border-color: #ff4242;
+}
+
+.StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
 }
 
