@@ -1,7 +1,7 @@
 .watch-video-container {
     height: 640px;
     background: #fff;
-    box-shadow: $shadow;
+    box-shadow: $shadow-large;
     border-radius: $radius;
     float: left;
     width: 100%;
@@ -11,7 +11,7 @@
     width: 100%;
     height: 100%;
     background: #fff;
-    box-shadow: $shadow;
+    box-shadow: $shadow-large;
     border-radius: $radius;
 }
 
@@ -34,5 +34,19 @@
             font-size: 22px;
             font-weight: 500;
         }
+    }
+}
+
+.subscription-content {
+    padding: 1rem;
+    width: 20rem;
+    display: inline-block;
+
+    .subtitle {
+        float: left;
+        width: 100%;
+        font-size: 28px;
+        font-weight: 300;
+        margin: 1rem 0 1.5rem 0;
     }
 }

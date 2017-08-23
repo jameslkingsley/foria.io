@@ -16459,17 +16459,17 @@ __webpack_require__(128);
 __webpack_require__(159);
 
 // Watch
-Vue.component('f-watch', __webpack_require__(216));
-Vue.component('f-watch-follow', __webpack_require__(219));
-Vue.component('f-watch-subscribe', __webpack_require__(222));
-Vue.component('f-watch-chat', __webpack_require__(225));
+Vue.component('f-watch', __webpack_require__(160));
+Vue.component('f-watch-follow', __webpack_require__(163));
+Vue.component('f-watch-subscribe', __webpack_require__(166));
+Vue.component('f-watch-chat', __webpack_require__(169));
 
 // Tokens
-Vue.component('f-token-checkout', __webpack_require__(169));
+Vue.component('f-token-checkout', __webpack_require__(172));
 
 // Broadcasts
-Vue.component('f-broadcast-list', __webpack_require__(172));
-Vue.component('f-broadcast-tile', __webpack_require__(175));
+Vue.component('f-broadcast-list', __webpack_require__(175));
+Vue.component('f-broadcast-tile', __webpack_require__(178));
 
 // Settings
 Vue.component('f-settings', __webpack_require__(181));
@@ -16527,14 +16527,7 @@ window.formToObject = __webpack_require__(132);
 
 window.axios = __webpack_require__(133);
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-
-var token = document.head.querySelector('meta[name="csrf-token"]');
-
-if (token) {
-    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
-} else {
-    console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
-}
+window.axios.defaults.headers.common['X-CSRF-TOKEN'] = Foria.csrfToken;
 
 axios.interceptors.response.use(function (response) {
     Event.fire('f-form-submitting', false);
@@ -45625,6 +45618,18 @@ Vue.filter('datetime', function (value) {
     return moment(value).format('D/M/YYYY HH:mm');
 });
 
+Vue.filter('fromnow', function (value) {
+    return moment(value).fromNow();
+});
+
+Vue.filter('todate', function (value) {
+    return moment().to(value);
+});
+
+Vue.filter('capitalize', function (value) {
+    return _.capitalize(value);
+});
+
 /***/ }),
 /* 156 */
 /***/ (function(module, exports) {
@@ -50674,15 +50679,776 @@ window.Stream = function () {
 }();
 
 /***/ }),
-/* 160 */,
-/* 161 */,
-/* 162 */,
-/* 163 */,
-/* 164 */,
-/* 165 */,
-/* 166 */,
-/* 167 */,
-/* 168 */,
+/* 160 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(161),
+  /* template */
+  __webpack_require__(162),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Index.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Index.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-ae9e544e", Component.options)
+  } else {
+    hotAPI.reload("data-v-ae9e544e", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 161 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user', 'broadcast'],
+
+    data: function data() {
+        return {
+            online: this.broadcast ? this.broadcast.online : false,
+            editingTopic: false,
+            hasBroadcast: this.broadcast !== null,
+            subscriberMode: false,
+            topic: this.broadcast ? this.broadcast.topic : 'Untitled',
+            stream: null,
+            broadcaster: this.broadcast
+        };
+    },
+
+
+    methods: {
+        startOrStop: function startOrStop() {
+            var _this = this;
+
+            if (this.online) {
+                // Stop broadcast
+                axios.delete('/api/broadcast/stop').then(function (r) {
+                    _this.online = false;
+                    _this.broadcaster = null;
+                    _this.subscriberMode = false;
+                    _this.closeStream();
+                });
+            } else {
+                // Start broadcast
+                axios.post('/api/broadcast/start', {
+                    topic: this.topic,
+                    subscriberMode: this.subscriberMode
+                }).then(function (r) {
+                    _this.online = true;
+                    _this.broadcaster = r.data;
+                    _this.openStream();
+                });
+            }
+        },
+        openStream: function openStream() {
+            this.stream = new Stream(this.user.id, this.broadcast);
+            return this.stream;
+        },
+        closeStream: function closeStream() {
+            this.stream.close();
+        },
+        changeTopic: function changeTopic() {
+            this.editingTopic = true;
+        },
+        saveTopic: function saveTopic() {
+            var _this2 = this;
+
+            if (!this.broadcaster) {
+                this.editingTopic = false;
+                return;
+            }
+
+            axios.post('/api/broadcast/topic', { topic: this.topic }).then(function (r) {
+                _this2.editingTopic = false;
+            });
+        },
+        cancelTopic: function cancelTopic() {
+            this.editingTopic = false;
+            this.topic = this.broadcaster.topic;
+        }
+    },
+
+    created: function created() {
+        var _this3 = this;
+
+        this.openStream();
+
+        Echo.channel('watch-' + this.user.id).listen('TopicChanged', function (e) {
+            _this3.topic = e.topic;
+        });
+    }
+});
+
+/***/ }),
+/* 162 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "columns"
+  }, [_c('div', {
+    staticClass: "column is-9"
+  }, [_c('div', {
+    staticClass: "m-b-3"
+  }, [(_vm.editingTopic && _vm.user.is_mine) ? _c('div', [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.topic),
+      expression: "topic"
+    }],
+    attrs: {
+      "type": "text"
+    },
+    domProps: {
+      "value": (_vm.topic)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.topic = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('button', {
+    staticClass: "button",
+    on: {
+      "click": _vm.saveTopic
+    }
+  }, [_vm._v("Save")]), _vm._v(" "), _c('button', {
+    staticClass: "button",
+    on: {
+      "click": _vm.cancelTopic
+    }
+  }, [_vm._v("Cancel")])]) : _c('div', {
+    staticClass: "watch-header"
+  }, [_c('div', {
+    staticClass: "watch-title"
+  }, [_c('span', {
+    staticClass: "watch-topic"
+  }, [_vm._v(_vm._s(_vm.topic))]), _vm._v(" "), _c('span', {
+    staticClass: "watch-user"
+  }, [_vm._v(_vm._s(_vm.user.name))])]), _vm._v(" "), _c('div', {
+    staticClass: "watch-controls"
+  }, [(!_vm.user.is_mine) ? _c('f-watch-subscribe', {
+    staticClass: "is-pulled-right m-l-2",
+    attrs: {
+      "user": _vm.user
+    }
+  }) : _vm._e(), _vm._v(" "), (!_vm.user.is_mine) ? _c('f-watch-follow', {
+    staticClass: "is-pulled-right",
+    attrs: {
+      "user": _vm.user
+    }
+  }) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('b-dropdown', {
+    staticClass: "is-pulled-right",
+    attrs: {
+      "position": "is-bottom-left"
+    }
+  }, [_c('button', {
+    staticClass: "button",
+    slot: "trigger"
+  }, [_c('i', {
+    staticClass: "material-icons"
+  }, [_vm._v("settings")])]), _vm._v(" "), _c('b-dropdown-item', [_vm._v("Subscriber mode")]), _vm._v(" "), _c('b-dropdown-item', {
+    nativeOn: {
+      "click": function($event) {
+        _vm.changeTopic($event)
+      }
+    }
+  }, [_vm._v("Change topic")])], 1) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('button', {
+    staticClass: "button is-primary is-pulled-right has-icon m-r-1",
+    on: {
+      "click": _vm.startOrStop
+    }
+  }, [_c('i', {
+    staticClass: "material-icons m-r-2"
+  }, [_vm._v(_vm._s(_vm.online ? 'stop' : 'play_arrow'))]), _vm._v("\n                        " + _vm._s(_vm.online ? 'Stop' : 'Start') + " Broadcast\n                    ")]) : _vm._e()], 1)])]), _vm._v(" "), _c('div', {
+    staticClass: "watch-video-container",
+    attrs: {
+      "id": "stream-publisher"
+    }
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "column is-3"
+  }, [_c('div', {
+    staticClass: "watch-chat-container"
+  }, [_c('f-watch-chat', {
+    attrs: {
+      "user": _vm.user,
+      "broadcast": _vm.broadcast
+    }
+  })], 1)])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-ae9e544e", module.exports)
+  }
+}
+
+/***/ }),
+/* 163 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(164),
+  /* template */
+  __webpack_require__(165),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Follow.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Follow.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-6aa12f8c", Component.options)
+  } else {
+    hotAPI.reload("data-v-6aa12f8c", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 164 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user'],
+
+    data: function data() {
+        return {
+            state: null,
+            count: this.user.follower_count
+        };
+    },
+
+
+    computed: {
+        icon: function icon() {
+            return this.state ? 'favorite_border' : 'favorite';
+        },
+        text: function text() {
+            return this.state ? 'Unfollow' : 'Follow';
+        }
+    },
+
+    methods: {
+        handle: function handle() {
+            return axios[this.state ? 'delete' : 'post']('/follow/' + this.user.id).then(this.fetch);
+        },
+        fetch: function fetch() {
+            var _this = this;
+
+            axios.get('/follow/' + this.user.id).then(function (r) {
+                _this.state = r.data;
+            });
+        }
+    },
+
+    created: function created() {
+        var _this2 = this;
+
+        this.fetch();
+
+        Echo.channel('followed-' + this.user.id).listen('Followed', function (e) {
+            _this2.count = e.count;
+        }).listen('Unfollowed', function (e) {
+            _this2.count = e.count;
+        });
+    }
+});
+
+/***/ }),
+/* 165 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return (_vm.state != null) ? _c('button', {
+    staticClass: "button",
+    attrs: {
+      "title": _vm.text
+    },
+    on: {
+      "click": _vm.handle
+    }
+  }, [_c('i', {
+    staticClass: "material-icons m-r-2"
+  }, [_vm._v(_vm._s(_vm.icon))]), _vm._v("\n    " + _vm._s(_vm.count) + "\n")]) : _vm._e()
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-6aa12f8c", module.exports)
+  }
+}
+
+/***/ }),
+/* 166 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(167),
+  /* template */
+  __webpack_require__(168),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Subscribe.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Subscribe.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-24dd825e", Component.options)
+  } else {
+    hotAPI.reload("data-v-24dd825e", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 167 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user'],
+
+    data: function data() {
+        return {
+            auth: null,
+            loaded: false,
+            subscription: null,
+            isCancelling: false,
+            isCreating: false,
+            planId: 'bronze',
+            plans: []
+        };
+    },
+
+
+    computed: {
+        containerId: function containerId() {
+            if (!this.loaded) {
+                return '';
+            }
+
+            return this.auth.has_card_on_file && !this.subscribed ? 'subscription-checkout' : '';
+        },
+        icon: function icon() {
+            return this.subscribed ? 'close' : 'check';
+        },
+        text: function text() {
+            return this.subscribed ? 'Subscription' : 'Subscribe';
+        },
+        subscribed: function subscribed() {
+            return this.subscription !== null;
+        },
+        willCancel: function willCancel() {
+            return this.subscription.cancels_at !== null;
+        },
+        cancelClasses: function cancelClasses() {
+            return {
+                'button': true,
+                'is-loading': this.isCancelling
+            };
+        },
+        createClasses: function createClasses() {
+            return {
+                'button': true,
+                'is-primary': true,
+                'is-pulled-right': true,
+                'is-loading': this.isCreating
+            };
+        },
+        triggerClasses: function triggerClasses() {
+            return {
+                'button': true,
+                'is-primary': true,
+                'is-loading': !this.loaded
+            };
+        },
+        amount: function amount() {
+            var _this = this;
+
+            return !this.plans.length ? 0 : this.plans.find(function (p) {
+                return p.id == _this.planId;
+            }).amount;
+        },
+        createButtonDisabled: function createButtonDisabled() {
+            return this.isCreating;
+        }
+    },
+
+    methods: {
+        /**
+         * Formats the last four card numbers.
+         */
+        formatLastFour: function formatLastFour(value) {
+            return Util.formatLastFour(value);
+        },
+
+
+        /**
+         * Gets the classes for the given plan.
+         */
+        planClasses: function planClasses(plan) {
+            return {
+                'token-package': true,
+                'is-selected': this.planId == plan.id
+            };
+        },
+
+
+        /**
+         * Selects the given plan.
+         */
+        selectPlan: function selectPlan(plan) {
+            this.planId = plan.id;
+        },
+
+
+        /**
+         * Creates the subscription.
+         */
+        create: function create() {
+            var _this2 = this;
+
+            this.isCreating = true;
+
+            axios.post('/api/subscription', { user_id: this.user.id, plan: this.planId }).then(function (r) {
+                _this2.fetch();
+                _this2.isCreating = false;
+            });
+        },
+
+
+        /**
+         * Cancels the subscription.
+         */
+        cancel: function cancel() {
+            var _this3 = this;
+
+            this.isCancelling = true;
+
+            axios.delete('/api/subscription/' + this.user.id).then(function (r) {
+                _this3.fetch();
+                _this3.isCancelling = false;
+            });
+        },
+
+
+        /**
+         * Gets the subscription data.
+         */
+        fetch: function fetch() {
+            var _this4 = this;
+
+            axios.get('/api/subscription/' + this.user.id).then(function (r) {
+                _this4.subscription = r.data.subscription;
+                _this4.auth = r.data.user;
+                _this4.plans = r.data.plans;
+                _this4.loaded = true;
+            });
+        }
+    },
+
+    created: function created() {
+        this.fetch();
+    }
+});
+
+/***/ }),
+/* 168 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('b-dropdown', {
+    attrs: {
+      "position": "is-bottom-left",
+      "id": _vm.containerId
+    }
+  }, [_c('a', {
+    class: _vm.triggerClasses,
+    slot: "trigger"
+  }, [_c('span', [_vm._v(_vm._s(_vm.text))]), _vm._v(" "), _c('i', {
+    staticClass: "material-icons m-l-1"
+  }, [_vm._v("keyboard_arrow_down")])]), _vm._v(" "), (_vm.loaded) ? _c('b-dropdown-item', {
+    attrs: {
+      "custom": ""
+    }
+  }, [(_vm.auth.has_card_on_file) ? _c('div', [(_vm.subscribed) ? _c('div', {
+    staticClass: "subscription-content has-text-centered"
+  }, [_c('small', {
+    staticClass: "is-muted"
+  }, [_vm._v("\n                    " + _vm._s(_vm.willCancel ? 'Expires' : 'Renews') + " on " + _vm._s(_vm._f("datetime")(_vm.subscription.ends_at)) + "\n                ")]), _vm._v(" "), _c('span', {
+    staticClass: "subtitle"
+  }, [_vm._v("\n                    Your subscription " + _vm._s(_vm.willCancel ? 'expires' : 'renews') + " " + _vm._s(_vm._f("todate")(_vm.subscription.ends_at)) + "\n                ")]), _vm._v(" "), (!_vm.willCancel) ? _c('button', {
+    class: _vm.cancelClasses,
+    on: {
+      "click": _vm.cancel
+    }
+  }, [_vm._v("Cancel Subscription")]) : _vm._e()]) : _c('div', {
+    staticClass: "token-checkout"
+  }, [_vm._l((_vm.plans), function(plan, index) {
+    return _c('div', {
+      class: _vm.planClasses(plan)
+    }, [_c('span', {
+      staticClass: "token-package-title"
+    }, [_vm._v(_vm._s(plan.name))]), _vm._v(" "), _c('div', {
+      staticClass: "token-package-controls"
+    }, [_c('div', {
+      staticClass: "token-package-controls-group"
+    }, [_c('span', {
+      staticClass: "token-package-cost"
+    }, [_vm._v(_vm._s(_vm._f("currency")(plan.amount)) + " / " + _vm._s(_vm._f("capitalize")(plan.interval)))]), _vm._v(" "), _c('button', {
+      staticClass: "button token-package-button",
+      on: {
+        "click": function($event) {
+          $event.preventDefault();
+          _vm.selectPlan(plan)
+        }
+      }
+    }, [_vm._v("Choose")])])])])
+  }), _vm._v(" "), _c('div', {
+    staticClass: "block m-t-3"
+  }, [_c('span', {
+    staticClass: "token-checkout-subtitle"
+  }, [_vm._v("\n                        Using card on file\n                        "), _c('a', {
+    staticClass: "is-pulled-right",
+    attrs: {
+      "href": "/settings/#billing"
+    }
+  }, [_vm._v("Change")])]), _vm._v(" "), _c('span', {
+    staticClass: "token-checkout-card-brand"
+  }, [_vm._v(_vm._s(_vm.auth.card_brand))]), _vm._v(" "), _c('span', {
+    staticClass: "token-checkout-card-number",
+    domProps: {
+      "innerHTML": _vm._s(_vm.formatLastFour(_vm.auth.card_last_four))
+    }
+  }), _vm._v(" "), _c('div', {
+    staticClass: "block m-t-3"
+  }, [_c('div', {
+    staticClass: "columns"
+  }, [_c('div', {
+    staticClass: "column"
+  }, [_c('small', [_vm._v("\n                                    All purchases are final and cannot be refunded. "), _c('a', [_vm._v("Terms & Conditions")]), _vm._v(".\n                                ")])]), _vm._v(" "), _c('div', {
+    staticClass: "column"
+  }, [_c('button', {
+    class: _vm.createClasses,
+    attrs: {
+      "disabled": _vm.createButtonDisabled
+    },
+    on: {
+      "click": _vm.create
+    }
+  }, [_vm._v("\n                                    Subscribe for " + _vm._s(_vm._f("currency")(_vm.amount)) + "\n                                ")])])])])])], 2)]) : _c('div', {
+    staticClass: "subscription-content has-text-centered"
+  }, [_c('p', [_vm._v("Before you can subscribe, you need to add a card to your account. Click the button below.")]), _vm._v(" "), _c('a', {
+    staticClass: "button is-primary m-t-3 m-b-3",
+    attrs: {
+      "href": "/settings/#billing"
+    }
+  }, [_vm._v("Add a card")])])]) : _vm._e()], 1)
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-24dd825e", module.exports)
+  }
+}
+
+/***/ }),
 /* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -50692,6 +51458,190 @@ var Component = __webpack_require__(1)(
   __webpack_require__(170),
   /* template */
   __webpack_require__(171),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Chat.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Chat.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-22cc7ca1", Component.options)
+  } else {
+    hotAPI.reload("data-v-22cc7ca1", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 170 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user', 'broadcast'],
+
+    data: function data() {
+        return {
+            messages: [],
+            fetchCompleted: false,
+            form: {
+                text: '',
+                receiver: this.user,
+                broadcast: this.broadcast
+            }
+        };
+    },
+
+
+    computed: {
+        sortedMessages: function sortedMessages() {
+            return _.sortBy(this.messages, ['created_at']);
+        }
+    },
+
+    methods: {
+        send: function send() {
+            var _this = this;
+
+            axios.post('/api/chat', this.form).then(function (r) {
+                _this.form.text = '';
+            });
+        },
+        fetch: function fetch() {
+            var _this2 = this;
+
+            axios.get('/api/chat/past/' + this.user.id).then(function (r) {
+                _this2.messages = r.data;
+                _this2.fetchCompleted = true;
+            });
+        }
+    },
+
+    updated: function updated() {
+        var list = document.getElementById('f-chat-list');
+        list.scrollTop = list.scrollHeight;
+    },
+    mounted: function mounted() {
+        var _this3 = this;
+
+        this.fetch();
+
+        Echo.channel('watch-' + this.user.id).listen('ChatMessageSent', function (e) {
+            _this3.messages.push(e.message);
+        });
+    }
+});
+
+/***/ }),
+/* 171 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "chat"
+  }, [_c('div', {
+    staticClass: "chat-list",
+    attrs: {
+      "id": "f-chat-list"
+    }
+  }, _vm._l((_vm.sortedMessages), function(message, index) {
+    return _c('div', {
+      key: index,
+      staticClass: "chat-item"
+    }, [_c('span', {
+      staticClass: "chat-item-author"
+    }, [_vm._v(_vm._s(message.sender.name))]), _vm._v(" "), _c('span', {
+      staticClass: "chat-item-text"
+    }, [_vm._v(_vm._s(message.text))])])
+  })), _vm._v(" "), _c('div', {
+    staticClass: "chat-form"
+  }, [_c('form', {
+    attrs: {
+      "method": "post"
+    },
+    on: {
+      "submit": function($event) {
+        $event.preventDefault();
+        _vm.send($event)
+      }
+    }
+  }, [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.form.text),
+      expression: "form.text"
+    }],
+    staticClass: "input",
+    attrs: {
+      "name": "text",
+      "placeholder": "Type a message",
+      "disabled": !_vm.fetchCompleted
+    },
+    domProps: {
+      "value": (_vm.form.text)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.form.text = $event.target.value
+      }
+    }
+  })])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-22cc7ca1", module.exports)
+  }
+}
+
+/***/ }),
+/* 172 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(173),
+  /* template */
+  __webpack_require__(174),
   /* styles */
   null,
   /* scopeId */
@@ -50723,7 +51673,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 170 */
+/* 173 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -50852,7 +51802,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 171 */
+/* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -50962,15 +51912,15 @@ if (false) {
 }
 
 /***/ }),
-/* 172 */
+/* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(173),
+  __webpack_require__(176),
   /* template */
-  __webpack_require__(174),
+  __webpack_require__(177),
   /* styles */
   null,
   /* scopeId */
@@ -51002,7 +51952,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 173 */
+/* 176 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -51034,7 +51984,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 174 */
+/* 177 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -51056,15 +52006,15 @@ if (false) {
 }
 
 /***/ }),
-/* 175 */
+/* 178 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(176),
+  __webpack_require__(179),
   /* template */
-  __webpack_require__(177),
+  __webpack_require__(180),
   /* styles */
   null,
   /* scopeId */
@@ -51096,7 +52046,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 176 */
+/* 179 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -51125,7 +52075,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 177 */
+/* 180 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -51155,9 +52105,6 @@ if (false) {
 }
 
 /***/ }),
-/* 178 */,
-/* 179 */,
-/* 180 */,
 /* 181 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -52963,721 +53910,6 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 212 */,
-/* 213 */,
-/* 214 */,
-/* 215 */,
-/* 216 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(217),
-  /* template */
-  __webpack_require__(218),
-  /* styles */
-  null,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Index.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] Index.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-ae9e544e", Component.options)
-  } else {
-    hotAPI.reload("data-v-ae9e544e", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 217 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user', 'broadcast'],
-
-    data: function data() {
-        return {
-            online: this.broadcast ? this.broadcast.online : false,
-            editingTopic: false,
-            hasBroadcast: this.broadcast !== null,
-            subscriberMode: false,
-            topic: this.broadcast ? this.broadcast.topic : 'Untitled',
-            stream: null,
-            broadcaster: this.broadcast
-        };
-    },
-
-
-    methods: {
-        startOrStop: function startOrStop() {
-            var _this = this;
-
-            if (this.online) {
-                // Stop broadcast
-                axios.delete('/api/broadcast/stop').then(function (r) {
-                    _this.online = false;
-                    _this.broadcaster = null;
-                    _this.subscriberMode = false;
-                    _this.closeStream();
-                });
-            } else {
-                // Start broadcast
-                axios.post('/api/broadcast/start', {
-                    topic: this.topic,
-                    subscriberMode: this.subscriberMode
-                }).then(function (r) {
-                    _this.online = true;
-                    _this.broadcaster = r.data;
-                    _this.openStream();
-                });
-            }
-        },
-        openStream: function openStream() {
-            this.stream = new Stream(this.user.id, this.broadcast);
-            return this.stream;
-        },
-        closeStream: function closeStream() {
-            this.stream.close();
-        },
-        changeTopic: function changeTopic() {
-            this.editingTopic = true;
-        },
-        saveTopic: function saveTopic() {
-            var _this2 = this;
-
-            if (!this.broadcaster) {
-                this.editingTopic = false;
-                return;
-            }
-
-            axios.post('/api/broadcast/topic', { topic: this.topic }).then(function (r) {
-                _this2.editingTopic = false;
-            });
-        },
-        cancelTopic: function cancelTopic() {
-            this.editingTopic = false;
-            this.topic = this.broadcaster.topic;
-        }
-    },
-
-    created: function created() {
-        var _this3 = this;
-
-        this.openStream();
-
-        Echo.channel('watch-' + this.user.id).listen('TopicChanged', function (e) {
-            _this3.topic = e.topic;
-        });
-    }
-});
-
-/***/ }),
-/* 218 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "columns"
-  }, [_c('div', {
-    staticClass: "column is-9"
-  }, [_c('div', {
-    staticClass: "m-b-3"
-  }, [(_vm.editingTopic && _vm.user.is_mine) ? _c('div', [_c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.topic),
-      expression: "topic"
-    }],
-    attrs: {
-      "type": "text"
-    },
-    domProps: {
-      "value": (_vm.topic)
-    },
-    on: {
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.topic = $event.target.value
-      }
-    }
-  }), _vm._v(" "), _c('button', {
-    staticClass: "button",
-    on: {
-      "click": _vm.saveTopic
-    }
-  }, [_vm._v("Save")]), _vm._v(" "), _c('button', {
-    staticClass: "button",
-    on: {
-      "click": _vm.cancelTopic
-    }
-  }, [_vm._v("Cancel")])]) : _c('div', {
-    staticClass: "watch-header"
-  }, [_c('div', {
-    staticClass: "watch-title"
-  }, [_c('span', {
-    staticClass: "watch-topic"
-  }, [_vm._v(_vm._s(_vm.topic))]), _vm._v(" "), _c('span', {
-    staticClass: "watch-user"
-  }, [_vm._v(_vm._s(_vm.user.name))])]), _vm._v(" "), _c('div', {
-    staticClass: "watch-controls"
-  }, [(!_vm.user.is_mine) ? _c('f-watch-subscribe', {
-    staticClass: "is-pulled-right m-l-1",
-    attrs: {
-      "user": _vm.user
-    }
-  }) : _vm._e(), _vm._v(" "), (!_vm.user.is_mine) ? _c('f-watch-follow', {
-    staticClass: "is-pulled-right",
-    attrs: {
-      "user": _vm.user
-    }
-  }) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('b-dropdown', {
-    staticClass: "is-pulled-right",
-    attrs: {
-      "position": "is-bottom-left"
-    }
-  }, [_c('button', {
-    staticClass: "button",
-    slot: "trigger"
-  }, [_c('i', {
-    staticClass: "material-icons"
-  }, [_vm._v("settings")])]), _vm._v(" "), _c('b-dropdown-item', [_vm._v("Subscriber mode")]), _vm._v(" "), _c('b-dropdown-item', {
-    nativeOn: {
-      "click": function($event) {
-        _vm.changeTopic($event)
-      }
-    }
-  }, [_vm._v("Change topic")])], 1) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('button', {
-    staticClass: "button is-primary is-pulled-right has-icon m-r-1",
-    on: {
-      "click": _vm.startOrStop
-    }
-  }, [_c('i', {
-    staticClass: "material-icons m-r-2"
-  }, [_vm._v(_vm._s(_vm.online ? 'stop' : 'play_arrow'))]), _vm._v("\n                        " + _vm._s(_vm.online ? 'Stop' : 'Start') + " Broadcast\n                    ")]) : _vm._e()], 1)])]), _vm._v(" "), _c('div', {
-    staticClass: "watch-video-container",
-    attrs: {
-      "id": "stream-publisher"
-    }
-  })]), _vm._v(" "), _c('div', {
-    staticClass: "column is-3"
-  }, [_c('div', {
-    staticClass: "watch-chat-container"
-  }, [_c('f-watch-chat', {
-    attrs: {
-      "user": _vm.user,
-      "broadcast": _vm.broadcast
-    }
-  })], 1)])])
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-ae9e544e", module.exports)
-  }
-}
-
-/***/ }),
-/* 219 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(220),
-  /* template */
-  __webpack_require__(221),
-  /* styles */
-  null,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Follow.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] Follow.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-6aa12f8c", Component.options)
-  } else {
-    hotAPI.reload("data-v-6aa12f8c", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 220 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user'],
-
-    data: function data() {
-        return {
-            state: null,
-            count: this.user.follower_count
-        };
-    },
-
-
-    computed: {
-        icon: function icon() {
-            return this.state ? 'favorite_border' : 'favorite';
-        },
-        text: function text() {
-            return this.state ? 'Unfollow' : 'Follow';
-        }
-    },
-
-    methods: {
-        handle: function handle() {
-            return axios[this.state ? 'delete' : 'post']('/follow/' + this.user.id).then(this.fetch);
-        },
-        fetch: function fetch() {
-            var _this = this;
-
-            axios.get('/follow/' + this.user.id).then(function (r) {
-                _this.state = r.data;
-            });
-        }
-    },
-
-    created: function created() {
-        var _this2 = this;
-
-        this.fetch();
-
-        Echo.channel('followed-' + this.user.id).listen('Followed', function (e) {
-            _this2.count = e.count;
-        }).listen('Unfollowed', function (e) {
-            _this2.count = e.count;
-        });
-    }
-});
-
-/***/ }),
-/* 221 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return (_vm.state != null) ? _c('button', {
-    staticClass: "button",
-    attrs: {
-      "title": _vm.text
-    },
-    on: {
-      "click": _vm.handle
-    }
-  }, [_c('i', {
-    staticClass: "material-icons m-r-2"
-  }, [_vm._v(_vm._s(_vm.icon))]), _vm._v("\n    " + _vm._s(_vm.count) + "\n")]) : _vm._e()
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-6aa12f8c", module.exports)
-  }
-}
-
-/***/ }),
-/* 222 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(223),
-  /* template */
-  __webpack_require__(224),
-  /* styles */
-  null,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Subscribe.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] Subscribe.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-24dd825e", Component.options)
-  } else {
-    hotAPI.reload("data-v-24dd825e", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 223 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user'],
-
-    data: function data() {
-        return {
-            subscribed: false
-        };
-    },
-
-
-    computed: {
-        icon: function icon() {
-            return this.subscribed ? 'close' : 'check';
-        },
-        text: function text() {
-            return this.subscribed ? 'Subscription' : 'Subscribe';
-        }
-    },
-
-    methods: {
-        handle: function handle() {
-            if (this.subscribed) {
-                axios.delete('/api/subscription/' + this.user.id).then(function (r) {
-                    //
-                });
-            } else {
-                axios.post('/api/subscription', { user_id: this.user.id }).then(function (r) {
-                    //
-                });
-            }
-        },
-        fetch: function fetch() {
-            var _this = this;
-
-            axios.get('/api/subscription/' + this.user.id).then(function (r) {
-                _this.subscribed = r.data;
-            });
-        }
-    },
-
-    created: function created() {
-        this.fetch();
-    }
-});
-
-/***/ }),
-/* 224 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return (_vm.subscribed != null) ? _c('button', {
-    staticClass: "button is-primary",
-    on: {
-      "click": _vm.handle
-    }
-  }, [_c('i', {
-    staticClass: "material-icons m-r-2"
-  }, [_vm._v(_vm._s(_vm.icon))]), _vm._v("\n    " + _vm._s(_vm.text) + "\n")]) : _vm._e()
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-24dd825e", module.exports)
-  }
-}
-
-/***/ }),
-/* 225 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(226),
-  /* template */
-  __webpack_require__(227),
-  /* styles */
-  null,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Chat.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] Chat.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-22cc7ca1", Component.options)
-  } else {
-    hotAPI.reload("data-v-22cc7ca1", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 226 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user', 'broadcast'],
-
-    data: function data() {
-        return {
-            messages: [],
-            fetchCompleted: false,
-            form: {
-                text: '',
-                receiver: this.user,
-                broadcast: this.broadcast
-            }
-        };
-    },
-
-
-    computed: {
-        sortedMessages: function sortedMessages() {
-            return _.sortBy(this.messages, ['created_at']);
-        }
-    },
-
-    methods: {
-        send: function send() {
-            var _this = this;
-
-            axios.post('/api/chat', this.form).then(function (r) {
-                _this.form.text = '';
-            });
-        },
-        fetch: function fetch() {
-            var _this2 = this;
-
-            axios.get('/api/chat/past/' + this.user.id).then(function (r) {
-                _this2.messages = r.data;
-                _this2.fetchCompleted = true;
-            });
-        }
-    },
-
-    updated: function updated() {
-        var list = document.getElementById('f-chat-list');
-        list.scrollTop = list.scrollHeight;
-    },
-    mounted: function mounted() {
-        var _this3 = this;
-
-        this.fetch();
-
-        Echo.channel('watch-' + this.user.id).listen('ChatMessageSent', function (e) {
-            _this3.messages.push(e.message);
-        });
-    }
-});
-
-/***/ }),
-/* 227 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "chat"
-  }, [_c('div', {
-    staticClass: "chat-list",
-    attrs: {
-      "id": "f-chat-list"
-    }
-  }, _vm._l((_vm.sortedMessages), function(message, index) {
-    return _c('div', {
-      key: index,
-      staticClass: "chat-item"
-    }, [_c('span', {
-      staticClass: "chat-item-author"
-    }, [_vm._v(_vm._s(message.sender.name))]), _vm._v(" "), _c('span', {
-      staticClass: "chat-item-text"
-    }, [_vm._v(_vm._s(message.text))])])
-  })), _vm._v(" "), _c('div', {
-    staticClass: "chat-form"
-  }, [_c('form', {
-    attrs: {
-      "method": "post"
-    },
-    on: {
-      "submit": function($event) {
-        $event.preventDefault();
-        _vm.send($event)
-      }
-    }
-  }, [_c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.form.text),
-      expression: "form.text"
-    }],
-    staticClass: "input",
-    attrs: {
-      "name": "text",
-      "placeholder": "Type a message",
-      "disabled": !_vm.fetchCompleted
-    },
-    domProps: {
-      "value": (_vm.form.text)
-    },
-    on: {
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.form.text = $event.target.value
-      }
-    }
-  })])])])
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-22cc7ca1", module.exports)
-  }
-}
 
 /***/ })
 /******/ ]);

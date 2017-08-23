@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
@@ -45,7 +46,9 @@ class SubscriptionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = User::findOrFail($request->user_id);
+
+        auth()->user()->subscribeTo($user, $request->plan);
     }
 
     /**
@@ -54,11 +57,13 @@ class SubscriptionController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show(Request $request, User $user)
     {
-        return response()->json(
-            auth()->user()->isSubscribedToModel($user)
-        );
+        return response()->json([
+            'subscription' => auth()->user()->subscriptionTo($user),
+            'user' => auth()->user(),
+            'plans' => Subscription::plans()
+        ]);
     }
 
     /**
@@ -92,6 +97,10 @@ class SubscriptionController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        if (! auth()->user()->subscribedTo($user)) {
+            return abort(403, 'You are not subscribed');
+        }
+
+        auth()->user()->unsubscribeFrom($user);
     }
 }

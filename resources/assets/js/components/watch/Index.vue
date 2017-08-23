@@ -15,7 +15,7 @@
                     </div>
 
                     <div class="watch-controls">
-                        <f-watch-subscribe v-if="! user.is_mine" class="is-pulled-right m-l-1" :user="user"></f-watch-subscribe>
+                        <f-watch-subscribe v-if="! user.is_mine" class="is-pulled-right m-l-2" :user="user"></f-watch-subscribe>
                         <f-watch-follow v-if="! user.is_mine" class="is-pulled-right" :user="user"></f-watch-follow>
 
                         <b-dropdown v-if="user.is_mine" class="is-pulled-right" position="is-bottom-left">

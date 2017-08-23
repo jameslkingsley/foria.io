@@ -42,6 +42,18 @@ trait Billing
     }
 
     /**
+     * Cancels the Stripe subscription.
+     *
+     * @return mixed
+     */
+    public function cancelSubscription(string $id)
+    {
+        $subscription = StripeSubscription::retrieve($id);
+
+        return $subscription->cancel(['at_period_end' => true]);
+    }
+
+    /**
      * Make a "one off" charge on the customer for the given amount.
      *
      * @param  int  $amount

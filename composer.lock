@@ -725,12 +725,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "750afcfedba64c36a09e6970de68519efa937154"
+                "reference": "60860f3fdb277154606a1f3584104ed97d24d16a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/750afcfedba64c36a09e6970de68519efa937154",
-                "reference": "750afcfedba64c36a09e6970de68519efa937154",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/60860f3fdb277154606a1f3584104ed97d24d16a",
+                "reference": "60860f3fdb277154606a1f3584104ed97d24d16a",
                 "shasum": ""
             },
             "require": {
@@ -793,7 +793,7 @@
             "require-dev": {
                 "aws/aws-sdk-php": "~3.0",
                 "doctrine/dbal": "~2.5",
-                "filp/whoops": "~2.0",
+                "filp/whoops": "^2.1.4",
                 "mockery/mockery": "~0.9.4",
                 "orchestra/testbench-core": "3.5.*",
                 "pda/pheanstalk": "~3.0",
@@ -849,7 +849,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2017-08-17T18:35:35+00:00"
+            "time": "2017-08-23T13:02:52+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -3579,16 +3579,16 @@
         },
         {
             "name": "phpunit/php-token-stream",
-            "version": "2.0.0",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-token-stream.git",
-                "reference": "ecb0b2cdaa0add708fe6f329ef65ae0c5225130b"
+                "reference": "9a02332089ac48e704c70f6cefed30c224e3c0b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/ecb0b2cdaa0add708fe6f329ef65ae0c5225130b",
-                "reference": "ecb0b2cdaa0add708fe6f329ef65ae0c5225130b",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/9a02332089ac48e704c70f6cefed30c224e3c0b0",
+                "reference": "9a02332089ac48e704c70f6cefed30c224e3c0b0",
                 "shasum": ""
             },
             "require": {
@@ -3624,7 +3624,7 @@
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2017-08-03T14:17:41+00:00"
+            "time": "2017-08-20T05:47:52+00:00"
         },
         {
             "name": "phpunit/phpunit",

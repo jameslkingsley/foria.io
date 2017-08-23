@@ -33,6 +33,8 @@ Route::post('/follow/{to}', 'FollowController@store');
 Route::delete('/follow/{to}', 'FollowController@destroy');
 
 // Subscriptions
+Route::get('/api/subscription/{user}', 'SubscriptionController@show');
+Route::delete('/api/subscription/{user}', 'SubscriptionController@destroy');
 Route::resource('/api/subscription', 'SubscriptionController');
 
 // Settings

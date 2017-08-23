@@ -14,3 +14,15 @@ Vue.filter('lastFour', value => {
 Vue.filter('datetime', value => {
     return moment(value).format('D/M/YYYY HH:mm');
 });
+
+Vue.filter('fromnow', value => {
+    return moment(value).fromNow();
+});
+
+Vue.filter('todate', value => {
+    return moment().to(value);
+});
+
+Vue.filter('capitalize', value => {
+    return _.capitalize(value);
+});

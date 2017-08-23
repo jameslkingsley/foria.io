@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Stripe\Plan;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -32,5 +33,15 @@ class Subscription extends Model
     public function to()
     {
         return $this->hasOne(User::class, 'id', 'to_id');
+    }
+
+    /**
+     * Gets all Stripe subscription plans.
+     *
+     * @return Collection
+     */
+    public static function plans()
+    {
+        return collect(Plan::all()->data)->sortBy('amount')->values()->all();
     }
 }
