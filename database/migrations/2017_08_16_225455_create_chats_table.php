@@ -22,6 +22,8 @@ class CreateChatsTable extends Migration
             $table->unsignedInteger('broadcast_id')->nullable();
             $table->foreign('broadcast_id')->references('id')->on('broadcasts')->onDelete('cascade');
             $table->longText('text');
+            $table->json('options')->nullable();
+            $table->boolean('is_alert')->default(false);
             $table->timestamps();
         });
     }

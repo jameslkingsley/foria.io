@@ -1,6 +1,7 @@
 .input, .textarea, .StripeElement {
     border: 1px solid transparent;
     box-shadow: $shadow;
+    padding-bottom: calc(0.625em - 1px);
 
     &:hover {
         border: 1px solid transparent;

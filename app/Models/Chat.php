@@ -25,6 +25,15 @@ class Chat extends Model
     ];
 
     /**
+     * Attribute casts.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'options' => 'object'
+    ];
+
+    /**
      * Gets the sender user model.
      *
      * @return App\Models\User

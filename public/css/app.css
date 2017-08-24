@@ -12781,6 +12781,21 @@ label[for="card-element"] {
   font-size: 14px;
 }
 
+.chat .chat-list .chat-item.is-alert {
+  background: #555abf;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 16px !important;
+  -webkit-box-shadow: 0 7px 14px 0 rgba(50, 50, 93, 0.1), 0 3px 6px 0 rgba(0, 0, 0, 0.07);
+          box-shadow: 0 7px 14px 0 rgba(50, 50, 93, 0.1), 0 3px 6px 0 rgba(0, 0, 0, 0.07);
+}
+
+.chat .chat-list .chat-item.is-alert.is-subscription {
+  background: #4cc688;
+}
+
 .chat .chat-list .chat-item:last-of-type {
   margin-bottom: 0 !important;
 }
@@ -13062,6 +13077,7 @@ nav.navbar .navbar-link:focus {
   border: 1px solid transparent;
   -webkit-box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent;
           box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent;
+  padding-bottom: calc(0.625em - 1px);
 }
 
 .input:hover,

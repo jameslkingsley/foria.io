@@ -50848,6 +50848,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
         Echo.channel('watch-' + this.user.id).listen('TopicChanged', function (e) {
             _this3.topic = e.topic;
+        }).listen('NewSubscription', function (e) {
+            //
         });
     }
 });
@@ -51511,6 +51513,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user', 'broadcast'],
@@ -51535,6 +51543,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
 
     methods: {
+        messageClasses: function messageClasses(message) {
+            return {
+                'chat-item': true,
+                'is-alert': message.is_alert,
+                'is-subscription': message.options.is_subscription,
+                'is-token': message.options.is_token
+            };
+        },
         send: function send() {
             var _this = this;
 
@@ -51581,13 +51597,14 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, _vm._l((_vm.sortedMessages), function(message, index) {
     return _c('div', {
-      key: index,
-      staticClass: "chat-item"
-    }, [_c('span', {
+      class: _vm.messageClasses(message)
+    }, [(message.is_alert) ? _c('div', [_c('span', {
+      staticClass: "chat-item-alert"
+    }, [_vm._v(_vm._s(message.text))])]) : _c('div', [_c('span', {
       staticClass: "chat-item-author"
     }, [_vm._v(_vm._s(message.sender.name))]), _vm._v(" "), _c('span', {
       staticClass: "chat-item-text"
-    }, [_vm._v(_vm._s(message.text))])])
+    }, [_vm._v(_vm._s(message.text))])])])
   })), _vm._v(" "), _c('div', {
     staticClass: "chat-form"
   }, [_c('form', {
@@ -53090,9 +53107,68 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    //
+    props: ['user'],
+
+    data: function data() {
+        return {
+            loaded: false,
+            subscriptions: []
+        };
+    },
+
+
+    methods: {
+        fetch: function fetch() {
+            var _this = this;
+
+            axios.get('/api/subscription').then(function (r) {
+                _this.subscriptions = r.data;
+                _this.loaded = true;
+            });
+        }
+    },
+
+    mounted: function mounted() {
+        this.fetch();
+    }
 });
 
 /***/ }),
@@ -53100,8 +53176,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_vm._v("Subscriptions")])
-},staticRenderFns: []}
+  return (_vm.loaded) ? _c('div', [_c('h3', {
+    staticClass: "settings-title"
+  }, [_vm._v("Subscriptions")]), _vm._v(" "), _c('table', {
+    staticClass: "table"
+  }, [_vm._m(0), _vm._v(" "), _vm._l((_vm.subscriptions), function(sub) {
+    return _c('tr', [_c('td', [_vm._v(_vm._s(sub.to.name))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm._f("capitalize")(sub.stripe_plan)))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(sub.renewals))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm._f("datetime")(sub.created_at)))]), _vm._v(" "), (sub.cancels_at) ? _c('td', [_vm._v("\n                N/A\n            ")]) : _c('td', [_vm._v("\n                " + _vm._s(_vm._f("datetime")(sub.ends_at)) + "\n            ")]), _vm._v(" "), (sub.cancels_at) ? _c('td', [_vm._v("\n                " + _vm._s(_vm._f("datetime")(sub.cancels_at)) + "\n            ")]) : _c('td', [_vm._v("\n                N/A\n            ")])])
+  })], 2)]) : _vm._e()
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('tr', [_c('th', [_vm._v("Model")]), _vm._v(" "), _c('th', [_vm._v("Tier")]), _vm._v(" "), _c('th', [_vm._v("Renewals")]), _vm._v(" "), _c('th', [_vm._v("Started On")]), _vm._v(" "), _c('th', [_vm._v("Renews On")]), _vm._v(" "), _c('th', [_vm._v("Expires On")])])
+}]}
 module.exports.render._withStripped = true
 if (false) {
   module.hot.accept()

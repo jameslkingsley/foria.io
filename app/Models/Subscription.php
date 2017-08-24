@@ -16,6 +16,27 @@ class Subscription extends Model
     protected $guarded = [];
 
     /**
+     * Appended attributes.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'renewals'
+    ];
+
+    /**
+     * Date attributes.
+     *
+     * @var array
+     */
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'ends_at',
+        'cancels_at',
+    ];
+
+    /**
      * Gets the 'from' user model.
      *
      * @return App\Models\User
@@ -43,5 +64,18 @@ class Subscription extends Model
     public static function plans()
     {
         return collect(Plan::all()->data)->sortBy('amount')->values()->all();
+    }
+
+    /**
+     * Gets the number of renewals.
+     *
+     * @return mixed
+     */
+    public function getRenewalsAttribute()
+    {
+        $start = $this->created_at;
+        $end = $this->ends_at->subMonth();
+
+        return $start->diffInMonths($end);
     }
 }

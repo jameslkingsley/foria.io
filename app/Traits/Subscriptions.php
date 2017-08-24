@@ -2,9 +2,12 @@
 
 namespace App\Traits;
 
+use Stripe\Plan;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Support\Chat;
 use App\Models\Subscription;
+use App\Events\NewSubscription;
 use App\Exceptions\InvalidSubscriptionException;
 
 trait Subscriptions
@@ -44,17 +47,31 @@ trait Subscriptions
             return abort(403, 'Cannot subscribe to model');
         }
 
-        $stripeSubscription = $this->newSubscription($plan);
+        $plan = Plan::retrieve($plan);
+        $amountFormatted = '£'.($plan->amount / 100);
 
+        // Create the Stripe subscription
+        $stripeSubscription = $this->newSubscription($plan->id);
+
+        // Create our record of the subscription
         $subscription = Subscription::create([
             'from_id' => $this->id,
             'to_id' => $user->id,
             'stripe_id' => $stripeSubscription->id,
-            'stripe_plan' => $plan,
+            'stripe_plan' => $plan->id,
             'ends_at' => Carbon::now()->addMonth(),
         ]);
 
-        // event(new SubscriptionEvent($subscription));
+        // Raise the event for the broadcast
+        event(new NewSubscription($subscription));
+
+        // Create a purchase record for the user
+        $this->purchased("Subscription to {$user->name}", $plan->amount);
+
+        // Alert the broadcaster's chat of the subscription
+        (new Chat($user))->alert("{$this->name} subscribed for {$amountFormatted}", [
+            'is_subscription' => true
+        ]);
 
         return $subscription;
     }

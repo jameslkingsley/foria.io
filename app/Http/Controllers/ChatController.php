@@ -2,25 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Chat;
 use App\Models\User;
+use App\Support\Chat;
 use App\Models\Broadcast;
 use Illuminate\Http\Request;
 use App\Events\ChatMessageSent;
+use App\Models\Chat as ChatModel;
 use App\Http\Requests\ChatSendRequest;
 
 class ChatController extends Controller
 {
-    /**
-     * Constructor method.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -46,13 +37,20 @@ class ChatController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(ChatSendRequest $request)
+    public function store(Request $request)
     {
-        $chat = Chat::create($request->attributes());
+        if (auth()->guest()) {
+            return abort(403, 'Unauthorized');
+        }
 
-        event(new ChatMessageSent($chat));
+        $attributes = $request->validate([
+            'text' => 'required|string|min:1',
+            'receiver' => 'required'
+        ]);
 
-        return $chat;
+        $receiver = User::findOrFail($attributes['receiver']['id']);
+
+        (new Chat($receiver))->message($attributes['text']);
     }
 
     /**
@@ -62,7 +60,7 @@ class ChatController extends Controller
      */
     public function show(User $user)
     {
-        return Chat::where('receiver_id', $user->id)
+        return ChatModel::where('receiver_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->take(25)
             ->get();
@@ -74,7 +72,7 @@ class ChatController extends Controller
      * @param  \App\Models\Chat  $chat
      * @return \Illuminate\Http\Response
      */
-    public function edit(Chat $chat)
+    public function edit(ChatModel $chat)
     {
         //
     }
@@ -86,7 +84,7 @@ class ChatController extends Controller
      * @param  \App\Models\Chat  $chat
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Chat $chat)
+    public function update(Request $request, ChatModel $chat)
     {
         //
     }
@@ -97,7 +95,7 @@ class ChatController extends Controller
      * @param  \App\Models\Chat  $chat
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Chat $chat)
+    public function destroy(ChatModel $chat)
     {
         //
     }

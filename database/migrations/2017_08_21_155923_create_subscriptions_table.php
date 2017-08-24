@@ -23,7 +23,6 @@ class CreateSubscriptionsTable extends Migration
             $table->string('stripe_plan');
             $table->timestamp('ends_at')->nullable();
             $table->timestamp('cancels_at')->nullable();
-            $table->bigInteger('commitments')->default(1);
             $table->timestamps();
         });
     }

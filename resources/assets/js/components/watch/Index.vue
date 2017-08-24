@@ -121,6 +121,9 @@
             Echo.channel(`watch-${this.user.id}`)
                 .listen('TopicChanged', e => {
                     this.topic = e.topic;
+                })
+                .listen('NewSubscription', e => {
+                    //
                 });
         }
     }

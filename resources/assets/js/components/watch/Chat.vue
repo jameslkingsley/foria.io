@@ -1,9 +1,15 @@
 <template>
     <div class="chat">
         <div class="chat-list" id="f-chat-list">
-            <div class="chat-item" v-for="(message, index) in sortedMessages" :key="index">
-                <span class="chat-item-author">{{ message.sender.name }}</span>
-                <span class="chat-item-text">{{ message.text }}</span>
+            <div :class="messageClasses(message)" v-for="(message, index) in sortedMessages">
+                <div v-if="message.is_alert">
+                    <span class="chat-item-alert">{{ message.text }}</span>
+                </div>
+
+                <div v-else>
+                    <span class="chat-item-author">{{ message.sender.name }}</span>
+                    <span class="chat-item-text">{{ message.text }}</span>
+                </div>
             </div>
         </div>
 
@@ -38,6 +44,15 @@
         },
 
         methods: {
+            messageClasses(message) {
+                return {
+                    'chat-item': true,
+                    'is-alert': message.is_alert,
+                    'is-subscription': message.options.is_subscription,
+                    'is-token': message.options.is_token
+                };
+            },
+
             send() {
                 axios.post('/api/chat', this.form).then(r => {
                     this.form.text = '';

@@ -29,6 +29,20 @@
             margin-bottom: 0.5rem;
             font-size: 14px;
 
+            &.is-alert {
+                background: $primary;
+                color: white;
+                padding: 0.5rem 0.75rem;
+                border-radius: 4px;
+                font-weight: 600;
+                font-size: 16px !important;
+                box-shadow: $shadow-large;
+
+                &.is-subscription {
+                    background: #4cc688;
+                }
+            }
+
             &:last-of-type {
                 margin-bottom: 0 !important;
             }
