@@ -10,6 +10,12 @@ strong {
     width: 100%;
 }
 
+.w-auto {
+    width: auto !important;
+    max-width: auto !important;
+    min-width: auto !important;
+}
+
 [v-cloak] {
     display: none;
 }

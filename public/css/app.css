@@ -12508,6 +12508,12 @@ strong {
   width: 100%;
 }
 
+.w-auto {
+  width: auto !important;
+  max-width: auto !important;
+  min-width: auto !important;
+}
+
 [v-cloak] {
   display: none;
 }
@@ -13077,7 +13083,7 @@ nav.navbar .navbar-link:focus {
   border: 1px solid transparent;
   -webkit-box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent;
           box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent;
-  padding-bottom: calc(0.625em - 1px);
+  font-size: 15px;
 }
 
 .input:hover,

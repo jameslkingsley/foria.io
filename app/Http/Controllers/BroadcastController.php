@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use OpenTok\OpenTok;
 use OpenTok\MediaMode;
+use OpenTok\ArchiveMode;
 use App\Models\Broadcast;
 use App\Events\TopicChanged;
 use Illuminate\Http\Request;
@@ -17,7 +18,8 @@ class BroadcastController extends Controller
      * @var array
      */
     protected $sessionOptions = [
-        'mediaMode' => MediaMode::ROUTED
+        'mediaMode' => MediaMode::ROUTED,
+        'archiveMode' => ArchiveMode::ALWAYS
     ];
 
     /**

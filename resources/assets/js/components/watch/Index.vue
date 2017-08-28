@@ -3,8 +3,8 @@
         <div class="column is-9">
             <div class="m-b-3">
                 <div v-if="editingTopic && user.is_mine">
-                    <input type="text" v-model="topic">
-                    <button class="button" @click="saveTopic">Save</button>
+                    <input type="text" class="input is-pulled-left w-auto m-r-2" v-model="topic">
+                    <button class="button is-primary m-r-1" @click="saveTopic">Save</button>
                     <button class="button" @click="cancelTopic">Cancel</button>
                 </div>
 
@@ -53,7 +53,7 @@
         data() {
             return {
                 online: this.broadcast ? this.broadcast.online : false,
-                editingTopic: false,
+                editingTopic: true,
                 hasBroadcast: this.broadcast !== null,
                 subscriberMode: false,
                 topic: this.broadcast ? this.broadcast.topic : 'Untitled',
