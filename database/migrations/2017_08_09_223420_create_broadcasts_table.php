@@ -19,6 +19,7 @@ class CreateBroadcastsTable extends Migration
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('session_id')->nullable();
+            $table->string('archive_id')->nullable();
             $table->boolean('online')->default(false);
             $table->boolean('subscriber_only')->default(false);
             $table->timestamps();

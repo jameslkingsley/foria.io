@@ -124,9 +124,12 @@ class BroadcastController extends Controller
             ->createSession($this->sessionOptions)
             ->getSessionId();
 
+        $archive = $this->openTok->startArchive($sessionId);
+
         return Broadcast::start([
             'topic' => $request->topic,
-            'session_id' => $sessionId
+            'session_id' => $sessionId,
+            'archive_id' => $archive->id
         ]);
     }
 
@@ -137,11 +140,15 @@ class BroadcastController extends Controller
      */
     public function stop(BroadcastRequest $request)
     {
-        if (! $request->broadcast()) {
+        $broadcast = $request->broadcast();
+
+        if (! $broadcast) {
             return;
         }
 
-        $request->broadcast()->stop();
+        $broadcast->stop();
+
+        $this->openTok->stopArchive($broadcast->archive_id);
     }
 
     /**

@@ -53,7 +53,7 @@
         data() {
             return {
                 online: this.broadcast ? this.broadcast.online : false,
-                editingTopic: true,
+                editingTopic: false,
                 hasBroadcast: this.broadcast !== null,
                 subscriberMode: false,
                 topic: this.broadcast ? this.broadcast.topic : 'Untitled',
