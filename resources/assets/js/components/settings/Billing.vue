@@ -9,6 +9,8 @@
                         Credit or debit card
                     </span>
 
+                    <p class="m-b-3">Adding a card allows you to purchase tokens and subscribe to models seamlessly. And don't worry; your card information will never directly touch our servers.</p>
+
                     <div class="is-pulled-left w100" id="billing-card-element"></div>
                     <div class="is-pulled-left w100" id="billing-card-errors" role="alert"></div>
                 </f-form>

@@ -16,7 +16,8 @@ class UsersTableSeeder extends Seeder
             'name' => 'Kingsley',
             'email' => 'jlkingsley97@gmail.com',
             'password' => bcrypt('password'),
-            'remember_token' => str_random(10)
+            'remember_token' => str_random(10),
+            'is_model' => true
         ]);
 
         factory(User::class, 30)->create();

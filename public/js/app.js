@@ -16478,10 +16478,12 @@ Vue.component('f-settings-billing', __webpack_require__(187));
 Vue.component('f-settings-subscriptions', __webpack_require__(190));
 Vue.component('f-settings-notifications', __webpack_require__(193));
 Vue.component('f-settings-model', __webpack_require__(196));
+Vue.component('f-settings-stats', __webpack_require__(219));
 
 // Form
 Vue.component('f-form', __webpack_require__(199));
 Vue.component('f-form-button', __webpack_require__(202));
+Vue.component('f-form-image-upload', __webpack_require__(216));
 Vue.component('f-modal-form', __webpack_require__(205));
 
 // Modal
@@ -52195,7 +52197,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     data: function data() {
         return {
             activePanel: 0,
-            panels: [{ name: 'Account', icon: 'account_circle', component: 'f-settings-account' }, { name: 'Billing', icon: 'credit_card', component: 'f-settings-billing' }, { name: 'Subscriptions', icon: 'subscriptions', component: 'f-settings-subscriptions' }, { name: 'Notifications', icon: 'notifications', component: 'f-settings-notifications' }, { name: 'Model Status', icon: 'photo_camera', component: 'f-settings-model' }]
+            panels: [{ name: 'Account', icon: 'account_circle', component: 'f-settings-account' }, { name: 'Billing', icon: 'credit_card', component: 'f-settings-billing' }, { name: 'Subscriptions', icon: 'subscriptions', component: 'f-settings-subscriptions' }, { name: 'Notifications', icon: 'notifications', component: 'f-settings-notifications' }, { name: 'Model Profile', icon: 'photo_camera', component: 'f-settings-model' }, { name: 'Model Stats', icon: 'trending_up', component: 'f-settings-stats' }]
         };
     },
 
@@ -52742,6 +52744,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
@@ -52941,7 +52945,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "for": "billing-card-element"
     }
-  }, [_vm._v("\n                    Credit or debit card\n                ")]), _vm._v(" "), _c('div', {
+  }, [_vm._v("\n                    Credit or debit card\n                ")]), _vm._v(" "), _c('p', {
+    staticClass: "m-b-3"
+  }, [_vm._v("Adding a card allows you to purchase tokens and subscribe to models seamlessly. And don't worry; your card information will never directly touch our servers.")]), _vm._v(" "), _c('div', {
     staticClass: "is-pulled-left w100",
     attrs: {
       "id": "billing-card-element"
@@ -53143,6 +53149,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user'],
@@ -53179,10 +53187,23 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   return (_vm.loaded) ? _c('div', [_c('h3', {
     staticClass: "settings-title"
   }, [_vm._v("Subscriptions")]), _vm._v(" "), _c('table', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.subscriptions.length),
+      expression: "subscriptions.length"
+    }],
     staticClass: "table"
   }, [_vm._m(0), _vm._v(" "), _vm._l((_vm.subscriptions), function(sub) {
     return _c('tr', [_c('td', [_vm._v(_vm._s(sub.to.name))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm._f("capitalize")(sub.stripe_plan)))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(sub.renewals))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(_vm._f("datetime")(sub.created_at)))]), _vm._v(" "), (sub.cancels_at) ? _c('td', [_vm._v("\n                N/A\n            ")]) : _c('td', [_vm._v("\n                " + _vm._s(_vm._f("datetime")(sub.ends_at)) + "\n            ")]), _vm._v(" "), (sub.cancels_at) ? _c('td', [_vm._v("\n                " + _vm._s(_vm._f("datetime")(sub.cancels_at)) + "\n            ")]) : _c('td', [_vm._v("\n                N/A\n            ")])])
-  })], 2)]) : _vm._e()
+  })], 2), _vm._v(" "), _c('p', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.subscriptions.length),
+      expression: "! subscriptions.length"
+    }]
+  }, [_vm._v("You haven't subscribed to any models.")])]) : _vm._e()
 },staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('tr', [_c('th', [_vm._v("Model")]), _vm._v(" "), _c('th', [_vm._v("Tier")]), _vm._v(" "), _c('th', [_vm._v("Renewals")]), _vm._v(" "), _c('th', [_vm._v("Started On")]), _vm._v(" "), _c('th', [_vm._v("Renews On")]), _vm._v(" "), _c('th', [_vm._v("Expires On")])])
 }]}
@@ -53334,13 +53355,59 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user'],
 
+    data: function data() {
+        return {
+            avatar: this.user.avatar_url
+        };
+    },
+
+
     methods: {
         submitRequest: function submitRequest(data) {
             console.log(data);
+        },
+        uploadAvatar: function uploadAvatar(avatar) {
+            var _this = this;
+
+            this.avatar = avatar.src;
+
+            axios.post('/api/settings/avatar', avatar.form).then(function (r) {
+                _this.$toast.open({
+                    message: 'Avatar Uploaded',
+                    type: 'is-success',
+                    duration: 4000
+                });
+            });
+        },
+        fetch: function fetch() {
+            axios.get('/settings/model').then(function (r) {
+                //
+            });
+        }
+    },
+
+    mounted: function mounted() {
+        if (this.user.is_model) {
+            this.fetch();
         }
     }
 });
@@ -53352,7 +53419,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', [_c('h3', {
     staticClass: "settings-title"
-  }, [_vm._v("Model Status")]), _vm._v(" "), (!_vm.user.is_model) ? _c('div', [_c('p', [_vm._v("\n            You are not an approved model. You can fill out the form below to request to become a model. The information you submit is private and will be temporarily stored to verify your identity.\n        ")]), _vm._v(" "), _c('hr'), _vm._v(" "), _c('f-form', {
+  }, [_vm._v("Model Profile")]), _vm._v(" "), (!_vm.user.is_model) ? _c('div', [_c('p', [_vm._v("\n            You are not an approved model. You can fill out the form below to request to become a model. The information you submit is private and will be temporarily stored to verify your identity.\n        ")]), _vm._v(" "), _c('hr'), _vm._v(" "), _c('f-form', {
     attrs: {
       "confirm": "Submit Application",
       "submit": _vm.submitRequest
@@ -53374,7 +53441,23 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "type": "textarea",
       "name": "about"
     }
-  })], 1)], 1)], 1) : _vm._e()])
+  })], 1)], 1)], 1) : _c('div', [_c('h4', {
+    staticClass: "settings-subtitle"
+  }, [_vm._v("Avatar")]), _vm._v(" "), _c('img', {
+    staticClass: "image is-128x128 is-pulled-left m-r-3",
+    attrs: {
+      "src": _vm.avatar
+    }
+  }), _vm._v(" "), _c('form', [_c('b-field', {
+    staticClass: "is-pulled-left"
+  }, [_c('f-form-image-upload', {
+    attrs: {
+      "name": "avatar"
+    },
+    on: {
+      "loaded": _vm.uploadAvatar
+    }
+  })], 1)], 1)])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -53994,6 +54077,233 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 212 */,
+/* 213 */,
+/* 214 */,
+/* 215 */,
+/* 216 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(217),
+  /* template */
+  __webpack_require__(218),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\form\\ImageUpload.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] ImageUpload.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-54fa6e0c", Component.options)
+  } else {
+    hotAPI.reload("data-v-54fa6e0c", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 217 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    methods: {
+        onChange: function onChange(e) {
+            var _this = this;
+
+            if (!e.target.files.length) return;
+
+            var file = e.target.files[0];
+            var reader = new FileReader();
+
+            reader.readAsDataURL(file);
+
+            reader.onload = function (e) {
+                var src = e.target.result;
+                var form = new FormData();
+
+                form.append(_this.$el.getAttribute('name'), file);
+
+                _this.$emit('loaded', { src: src, file: file, form: form });
+            };
+        }
+    }
+});
+
+/***/ }),
+/* 218 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('input', {
+    attrs: {
+      "type": "file",
+      "accept": "image/*"
+    },
+    on: {
+      "change": _vm.onChange
+    }
+  })
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-54fa6e0c", module.exports)
+  }
+}
+
+/***/ }),
+/* 219 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(220),
+  /* template */
+  __webpack_require__(221),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\settings\\Stats.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Stats.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-2c94b97c", Component.options)
+  } else {
+    hotAPI.reload("data-v-2c94b97c", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 220 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    //
+});
+
+/***/ }),
+/* 221 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _vm._m(0)
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('nav', {
+    staticClass: "level"
+  }, [_c('div', {
+    staticClass: "level-item has-text-centered"
+  }, [_c('div', [_c('p', {
+    staticClass: "heading"
+  }, [_vm._v("Followers")]), _vm._v(" "), _c('p', {
+    staticClass: "title"
+  }, [_vm._v("23,456")])])]), _vm._v(" "), _c('div', {
+    staticClass: "level-item has-text-centered"
+  }, [_c('div', [_c('p', {
+    staticClass: "heading"
+  }, [_vm._v("Subscribers")]), _vm._v(" "), _c('p', {
+    staticClass: "title"
+  }, [_vm._v("851")])])]), _vm._v(" "), _c('div', {
+    staticClass: "level-item has-text-centered"
+  }, [_c('div', [_c('p', {
+    staticClass: "heading"
+  }, [_vm._v("Daily Viewers")]), _vm._v(" "), _c('p', {
+    staticClass: "title"
+  }, [_vm._v("1062")])])]), _vm._v(" "), _c('div', {
+    staticClass: "level-item has-text-centered"
+  }, [_c('div', [_c('p', {
+    staticClass: "heading"
+  }, [_vm._v("Monthly Revenue")]), _vm._v(" "), _c('p', {
+    staticClass: "title"
+  }, [_vm._v("£2127")])])])])])
+}]}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-2c94b97c", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

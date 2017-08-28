@@ -7,6 +7,7 @@ use App\Traits\Billing;
 use App\Traits\Follows;
 use App\Traits\Purchases;
 use App\Traits\Subscriptions;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -44,7 +45,8 @@ class User extends Authenticatable
         'is_mine',
         'follower_count',
         'watch_url',
-        'has_card_on_file'
+        'has_card_on_file',
+        'avatar_url'
     ];
 
     /**
@@ -64,6 +66,16 @@ class User extends Authenticatable
     public function getHasCardOnFileAttribute()
     {
         return $this->hasCardOnFile();
+    }
+
+    /**
+     * Gets the avatar attribute.
+     *
+     * @return string
+     */
+    public function getAvatarUrlAttribute()
+    {
+        return $this->avatar ? Storage::url($this->avatar) : url('images/placeholder.png');
     }
 
     /**

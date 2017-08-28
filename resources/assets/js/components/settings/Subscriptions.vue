@@ -2,7 +2,7 @@
     <div v-if="loaded">
         <h3 class="settings-title">Subscriptions</h3>
 
-        <table class="table">
+        <table class="table" v-show="subscriptions.length">
             <tr>
                 <th>Model</th>
                 <th>Tier</th>
@@ -35,6 +35,8 @@
                 </td>
             </tr>
         </table>
+
+        <p v-show="! subscriptions.length">You haven't subscribed to any models.</p>
     </div>
 </template>
 

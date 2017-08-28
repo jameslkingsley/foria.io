@@ -21,10 +21,12 @@ Vue.component('f-settings-billing', require('./components/settings/Billing.vue')
 Vue.component('f-settings-subscriptions', require('./components/settings/Subscriptions.vue'));
 Vue.component('f-settings-notifications', require('./components/settings/Notifications.vue'));
 Vue.component('f-settings-model', require('./components/settings/Model.vue'));
+Vue.component('f-settings-stats', require('./components/settings/Stats.vue'));
 
 // Form
 Vue.component('f-form', require('./components/form/Form.vue'));
 Vue.component('f-form-button', require('./components/form/Button.vue'));
+Vue.component('f-form-image-upload', require('./components/form/ImageUpload.vue'));
 Vue.component('f-modal-form', require('./components/form/ModalForm.vue'));
 
 // Modal

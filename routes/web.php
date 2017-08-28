@@ -42,5 +42,7 @@ Route::resource('/settings', 'SettingsController', [
     'except' => ['show']
 ]);
 
+Route::post('/api/settings/avatar', 'AvatarSettingsController@store');
 Route::resource('/settings/account', 'AccountSettingsController');
 Route::resource('/settings/billing', 'BillingSettingsController');
+Route::resource('/settings/model', 'ModelSettingsController');

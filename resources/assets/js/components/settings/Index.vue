@@ -31,7 +31,8 @@
                     { name: 'Billing', icon: 'credit_card', component: 'f-settings-billing' },
                     { name: 'Subscriptions', icon: 'subscriptions', component: 'f-settings-subscriptions' },
                     { name: 'Notifications', icon: 'notifications', component: 'f-settings-notifications' },
-                    { name: 'Model Status', icon: 'photo_camera', component: 'f-settings-model' }
+                    { name: 'Model Profile', icon: 'photo_camera', component: 'f-settings-model' },
+                    { name: 'Model Stats', icon: 'trending_up', component: 'f-settings-stats' }
                 ]
             };
         },
