@@ -3,6 +3,9 @@
 // Homepage
 Route::get('/', 'HomeController@index')->name('home');
 
+// Profile
+Route::get('/profile/{user}', 'ProfileController@index');
+
 // Watching
 Route::get('/watch/{name}', 'WatchController@index');
 Route::get('/watch/{user}/show', 'WatchController@show');
@@ -14,6 +17,12 @@ Route::post('/api/broadcast/topic', 'BroadcastController@topic');
 Route::post('/api/broadcast/start', 'BroadcastController@start');
 Route::delete('/api/broadcast/stop', 'BroadcastController@stop');
 Route::resource('/api/broadcast', 'BroadcastController');
+
+// Videos
+Route::get('/api/videos/list/{user}', 'VideoController@index');
+Route::post('/api/videos', 'VideoController@store');
+Route::post('/api/videos/processed', 'VideoTranscodingController@store');
+Route::get('/videos/{video}', 'VideoController@show');
 
 // Chat
 Route::get('/api/chat/past/{user}', 'ChatController@show');
@@ -46,3 +55,7 @@ Route::post('/api/settings/avatar', 'AvatarSettingsController@store');
 Route::resource('/settings/account', 'AccountSettingsController');
 Route::resource('/settings/billing', 'BillingSettingsController');
 Route::resource('/settings/model', 'ModelSettingsController');
+
+Route::get('/stream', function () {
+    return vue('f-stream-test');
+});

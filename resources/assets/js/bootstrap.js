@@ -1,6 +1,7 @@
 window._ = require('lodash');
 
 require('./utils');
+window.videojs = require('video.js/dist/video');
 
 window.moment = require('moment');
 
@@ -11,10 +12,10 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 window.axios.defaults.headers.common['X-CSRF-TOKEN'] = Foria.csrfToken;
 
 axios.interceptors.response.use(response => {
-    Event.fire('f-form-submitting', false);
+    ForiaEvent.fire('f-form-submitting', false);
     return response;
 }, error => {
-    Event.fire('f-form-submitting', false);
+    ForiaEvent.fire('f-form-submitting', false);
     return Promise.reject(error);
 });
 

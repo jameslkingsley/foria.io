@@ -40,12 +40,14 @@
             handle() {
                 this.submitting = true;
 
+                this.$emit('submit', formToObject(this.$el));
+
                 this.submit(formToObject(this.$el));
             }
         },
 
         created() {
-            Event.listen('f-form-submitting', state => this.submitting = state);
+            ForiaEvent.listen('f-form-submitting', state => this.submitting = state);
         }
     }
 </script>

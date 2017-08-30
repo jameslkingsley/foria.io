@@ -36,4 +36,15 @@ return [
         'currency' => 'gbp',
     ],
 
+    'cloudfront' => [
+        'private_key' => base_path('pk-cloudfront.pem'),
+        'key' => env('AWS_KEY'),
+        'secret' => env('AWS_SECRET'),
+        'protocol' => env('AWS_CLOUDFRONT_PROTOCOL'),
+        'domain' => env('AWS_CLOUDFRONT_DOMAIN'),
+        'access_key' => env('AWS_CLOUDFRONT_ACCESS_KEY'),
+        'region' => env('AWS_CLOUDFRONT_REGION'),
+        'url' => env('AWS_CLOUDFRONT_PROTOCOL').'://'.env('AWS_CLOUDFRONT_DOMAIN')
+    ],
+
 ];

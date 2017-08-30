@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Stripe\Customer;
+use App\Traits\Videos;
 use App\Traits\Billing;
 use App\Traits\Follows;
 use App\Traits\Purchases;
@@ -17,7 +18,8 @@ class User extends Authenticatable
         Notifiable,
         Purchases,
         Billing,
-        Follows;
+        Follows,
+        Videos;
 
     /**
      * Guarded attributes.
@@ -57,6 +59,16 @@ class User extends Authenticatable
     protected $casts = [
         'is_model' => 'boolean'
     ];
+
+    /**
+     * Get the route key name for Laravel.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'name';
+    }
 
     /**
      * Checks whether the user has a card on file.

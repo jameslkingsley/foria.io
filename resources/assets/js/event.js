@@ -1,4 +1,4 @@
-window.Event = new class {
+window.ForiaEvent = new class {
     constructor() {
         this.vue = new Vue();
     }

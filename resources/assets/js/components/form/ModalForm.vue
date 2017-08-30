@@ -89,7 +89,7 @@
         },
 
         created() {
-            Event.listen('f-form-submitting', state => this.submitting = state);
+            ForiaEvent.listen('f-form-submitting', state => this.submitting = state);
         }
     }
 </script>

@@ -1,6 +1,16 @@
 require('./bootstrap');
 require('./stream');
 
+require('webrtc-adapter');
+import Broadcaster from './broadcaster/index';
+window.Broadcaster = Broadcaster;
+
+// Profile
+Vue.component('f-profile', require('./components/profile/Index.vue'));
+
+// Videos
+Vue.component('f-video', require('./components/video/Index.vue'));
+
 // Watch
 Vue.component('f-watch', require('./components/watch/Index.vue'));
 Vue.component('f-watch-follow', require('./components/watch/Follow.vue'));
@@ -27,10 +37,14 @@ Vue.component('f-settings-stats', require('./components/settings/Stats.vue'));
 Vue.component('f-form', require('./components/form/Form.vue'));
 Vue.component('f-form-button', require('./components/form/Button.vue'));
 Vue.component('f-form-image-upload', require('./components/form/ImageUpload.vue'));
+Vue.component('f-form-video-upload', require('./components/form/VideoUpload.vue'));
 Vue.component('f-modal-form', require('./components/form/ModalForm.vue'));
 
 // Modal
 Vue.component('f-modal', require('./components/Modal.vue'));
+
+// Stream Testing
+Vue.component('f-stream-test', require('./components/StreamTest.vue'));
 
 const app = new Vue({
     el: '#app',

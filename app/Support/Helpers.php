@@ -5,7 +5,7 @@
  *
  * @return mixed
  */
-function vue(string $name, array $attributes)
+function vue(string $name, array $attributes = [])
 {
     $data = [
         'componentAttributes' => $attributes,
