@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Aws\S3\MultipartUploader;
+use App\Jobs\TranscoderStatus;
 use Aws\CloudFront\CloudFrontClient;
 use Illuminate\Support\Facades\Storage;
 use Aws\Exception\MultipartUploadException;
@@ -30,7 +31,7 @@ class VideoController extends Controller
      */
     public function create()
     {
-        //
+        return vue('f-video-upload');
     }
 
     /**
@@ -64,7 +65,7 @@ class VideoController extends Controller
                 $result = $uploader->upload();
                 $transcodedPath = 'videos/transcoded/'.$name.'.mp4';
 
-                // Start transcoder service (convert to MP4)
+                // Create the transcoder job (convert to MP4)
                 $transcode = $transcoder->createJob([
                     'PipelineId' => '1504112665437-qnedrs',
                     'Input' => ['Key' => $destination],
@@ -84,6 +85,12 @@ class VideoController extends Controller
                     'width' => 0,
                     'height' => 0,
                 ]);
+
+                // Dispatch the status job to update the processing
+                // status once the transcoder has completed
+                TranscoderStatus::dispatch($video);
+
+                return $video;
             } catch (MultipartUploadException $e) {
                 rewind($source);
 
@@ -100,21 +107,9 @@ class VideoController extends Controller
      * @param  \App\Models\Video  $video
      * @return \Illuminate\Http\Response
      */
-    public function show(Video $video/*, CloudFrontClient $cloudFront*/)
+    public function show(Video $video)
     {
-        // $url = config('services.cloudfront.url');
-
-        // $signedUrlCannedPolicy = $cloudFront->getSignedUrl([
-        //     'url' => "{$url}/{$video->path}",
-        //     'expires' => time() + 300,
-        //     'private_key' => config('services.cloudfront.private_key'),
-        //     'key_pair_id' => config('services.cloudfront.access_key')
-        // ]);
-
-        // $manifestUrl = "";// "{$url}/cfx/st/&mp4:{$signedUrlCannedPolicy}";
-        $videoUrl = Storage::url($video->path);
-
-        return vue('f-video', compact('video', 'videoUrl'));
+        return vue('f-video', compact('video'));
     }
 
     /**
@@ -125,7 +120,7 @@ class VideoController extends Controller
      */
     public function edit(Video $video)
     {
-        //
+        return vue('f-video-edit', compact('video'));
     }
 
     /**
@@ -137,7 +132,16 @@ class VideoController extends Controller
      */
     public function update(Request $request, Video $video)
     {
-        //
+        $attributes = $request->validate([
+            'name' => ['required', 'string', 'min:1'],
+            'token_price' => ['required', 'numeric']
+        ]);
+
+        $attributes['subscriber_only'] = $request->subscriber_only ? true : false;
+
+        $video->update($attributes);
+
+        return response('', 204);
     }
 
     /**

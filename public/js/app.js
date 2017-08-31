@@ -16674,6 +16674,8 @@ Vue.component('f-profile', __webpack_require__(175));
 
 // Videos
 Vue.component('f-video', __webpack_require__(178));
+Vue.component('f-video-upload', __webpack_require__(250));
+Vue.component('f-video-edit', __webpack_require__(253));
 
 // Watch
 Vue.component('f-watch', __webpack_require__(181));
@@ -16726,6 +16728,12 @@ var app = new Vue({
 
         Echo.private('App.User.' + Foria.user.id).listen('TokensAdded', function (e) {
             _this.user.tokens = e.total;
+        }).listen('TranscodeCompleted', function (e) {
+            _this.$toast.open({
+                message: 'Video Processing Complete',
+                type: 'is-success',
+                duration: 4000
+            });
         });
     }
 });
@@ -79717,26 +79725,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user'],
 
     data: function data() {
         return {
-            videos: [],
-            showUploadModal: false
+            videos: []
         };
     },
 
@@ -79744,12 +79739,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     computed: {
         chunkedVideos: function chunkedVideos() {
             return _.chunk(this.videos, 4);
-        },
-        uploadModalClasses: function uploadModalClasses() {
-            return {
-                'modal': true,
-                'is-active': this.showUploadModal
-            };
         }
     },
 
@@ -79759,16 +79748,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             axios.get('/api/videos/list/' + this.user.name).then(function (r) {
                 return _this.videos = r.data;
-            });
-        },
-        uploadVideo: function uploadVideo(video) {
-            console.log(video.form);
-
-            axios.post('/api/videos', video.form, {
-                onUploadProgress: function onUploadProgress(e) {
-                    // let percent = Math.floor((e.loaded * 100) / e.total);
-                    console.log(e);
-                }
             });
         }
     },
@@ -79785,48 +79764,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "card p-3"
-  }, [_c('div', {
-    class: _vm.uploadModalClasses
-  }, [_c('div', {
-    staticClass: "modal-background",
-    on: {
-      "click": function($event) {
-        _vm.showUploadModal = false
-      }
-    }
-  }), _vm._v(" "), _c('div', {
-    staticClass: "modal-content card p-4"
-  }, [_c('f-form', {
-    attrs: {
-      "confirm": "Start Upload"
-    }
-  }, [_c('f-form-video-upload', {
-    attrs: {
-      "name": "video"
-    },
-    on: {
-      "loaded": _vm.uploadVideo
-    }
-  })], 1)], 1), _vm._v(" "), _c('button', {
-    staticClass: "modal-close is-large",
-    attrs: {
-      "aria-label": "close"
-    },
-    on: {
-      "click": function($event) {
-        _vm.showUploadModal = false
-      }
-    }
-  })]), _vm._v(" "), _c('h3', {
-    staticClass: "subtitle"
-  }, [_vm._v("\n        Videos\n        "), _c('button', {
-    staticClass: "button is-primary is-pulled-right",
-    on: {
-      "click": function($event) {
-        _vm.showUploadModal = true
-      }
-    }
-  }, [_vm._v("Upload Video")])]), _vm._v(" "), _vm._l((_vm.chunkedVideos), function(videos) {
+  }, [_vm._m(0), _vm._v(" "), _vm._l((_vm.chunkedVideos), function(videos) {
     return _c('div', {
       staticClass: "columns"
     }, _vm._l((videos), function(video) {
@@ -79839,7 +79777,16 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }, [_vm._v(_vm._s(video.name))])])
     }))
   })], 2)
-},staticRenderFns: []}
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('h3', {
+    staticClass: "subtitle"
+  }, [_vm._v("\n        Videos\n        "), _c('a', {
+    staticClass: "button is-primary is-pulled-right",
+    attrs: {
+      "href": "/videos/new"
+    }
+  }, [_vm._v("Upload Video")])])
+}]}
 module.exports.render._withStripped = true
 if (false) {
   module.hot.accept()
@@ -79904,13 +79851,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['video', 'videoUrl'],
-
-    created: function created() {
-        console.log(this.videoUrl);
-    }
+    props: ['video']
 });
 
 /***/ }),
@@ -79922,7 +79868,12 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "card p-3"
   }, [_c('h1', {
     staticClass: "title"
-  }, [_vm._v(_vm._s(_vm.video.name))]), _vm._v(" "), _c('video', {
+  }, [_vm._v("\n        " + _vm._s(_vm.video.name) + "\n        "), (_vm.video.is_mine) ? _c('a', {
+    staticClass: "button is-pulled-right",
+    attrs: {
+      "href": _vm.video.edit_url
+    }
+  }, [_vm._v("Edit")]) : _vm._e()]), _vm._v(" "), _c('video', {
     staticClass: "video-js",
     attrs: {
       "controls": "",
@@ -79933,7 +79884,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_c('source', {
     attrs: {
-      "src": _vm.videoUrl,
+      "src": _vm.video.stream_url,
       "type": "video/mp4"
     }
   })])])
@@ -83239,11 +83190,63 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+    props: {
+        uploaded: {
+            type: Boolean,
+            default: false
+        }
+    },
+
+    data: function data() {
+        return {
+            uploadedInternal: this.uploaded,
+            hasPickedFile: false
+        };
+    },
+
+
+    watch: {
+        uploaded: function uploaded(value) {
+            this.uploadedInternal = value;
+        }
+    },
+
+    computed: {
+        isUploading: function isUploading() {
+            return this.hasPickedFile && !this.uploadedInternal;
+        },
+        buttonClasses: function buttonClasses() {
+            return {
+                'button': true,
+                'is-primary': true,
+                'is-loading': this.isUploading
+            };
+        }
+    },
+
     methods: {
         onChange: function onChange(e) {
             if (!e.target.files.length) return;
+
+            this.hasPickedFile = true;
 
             var file = e.target.files[0];
             var form = new FormData();
@@ -83251,6 +83254,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             form.append(this.$el.getAttribute('name'), file);
 
             this.$emit('loaded', { file: file, form: form });
+        },
+        openFinder: function openFinder() {
+            this.$refs.input.click();
         }
     }
 });
@@ -83260,7 +83266,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('input', {
+  return _c('div', {
+    staticClass: "w100 has-text-centered p-5"
+  }, [_c('input', {
+    ref: "input",
+    staticStyle: {
+      "display": "none"
+    },
     attrs: {
       "type": "file",
       "accept": "video/*"
@@ -83268,7 +83280,31 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "change": _vm.onChange
     }
-  })
+  }), _vm._v(" "), _c('p', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.isUploading),
+      expression: "isUploading"
+    }],
+    staticClass: "m-b-3"
+  }, [_vm._v("\n        Your video is being uploaded.\n        "), _c('br'), _vm._v("\n        Do not close your browser.\n    ")]), _vm._v(" "), _c('p', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.isUploading),
+      expression: "! isUploading"
+    }],
+    staticClass: "m-b-3"
+  }, [_vm._v("\n        You must own the copyright to the video.\n        "), _c('br'), _vm._v("\n        By uploading a video you agree to our terms of use.\n    ")]), _vm._v(" "), _c('button', {
+    class: _vm.buttonClasses,
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.openFinder($event)
+      }
+    }
+  }, [_vm._v("Choose Video")])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -83750,6 +83786,278 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 245 */,
+/* 246 */,
+/* 247 */,
+/* 248 */,
+/* 249 */,
+/* 250 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(251),
+  /* template */
+  __webpack_require__(252),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\video\\Upload.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Upload.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1752ff5e", Component.options)
+  } else {
+    hotAPI.reload("data-v-1752ff5e", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 251 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    data: function data() {
+        return {
+            uploaded: false
+        };
+    },
+
+
+    methods: {
+        uploadVideo: function uploadVideo(video) {
+            var _this = this;
+
+            axios.post("/api/videos", video.form).then(function (r) {
+                _this.uploaded = true;
+                window.location.href = r.data.edit_url;
+            });
+        }
+    }
+});
+
+/***/ }),
+/* 252 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "card p-3"
+  }, [_c('form', {
+    attrs: {
+      "enctype": "multipart/form-data"
+    }
+  }, [_c('f-form-video-upload', {
+    attrs: {
+      "name": "video",
+      "uploaded": _vm.uploaded
+    },
+    on: {
+      "update:uploaded": function($event) {
+        _vm.uploaded = $event
+      },
+      "loaded": _vm.uploadVideo
+    }
+  })], 1)])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-1752ff5e", module.exports)
+  }
+}
+
+/***/ }),
+/* 253 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(254),
+  /* template */
+  __webpack_require__(255),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\video\\Edit.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Edit.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1b884027", Component.options)
+  } else {
+    hotAPI.reload("data-v-1b884027", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 254 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['video'],
+
+    data: function data() {
+        return {
+            subscriberOnlyChecked: this.video.subscriber_only
+        };
+    },
+
+
+    methods: {
+        submit: function submit(data) {
+            axios.post('/api/videos/' + this.video.id, data).then(function (r) {
+                alert('Changes Saved');
+            });
+        }
+    }
+});
+
+/***/ }),
+/* 255 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "columns"
+  }, [_c('div', {
+    staticClass: "column is-sidebar settings-nav"
+  }), _vm._v(" "), _c('div', {
+    staticClass: "column settings-content card"
+  }, [_c('h3', {
+    staticClass: "settings-title"
+  }, [_vm._v("\n            Edit Video\n        ")]), _vm._v(" "), _c('f-form', {
+    attrs: {
+      "confirm": "Save Changes & Publish"
+    },
+    on: {
+      "submit": _vm.submit
+    }
+  }, [_c('b-field', {
+    attrs: {
+      "label": "Name"
+    }
+  }, [_c('b-input', {
+    attrs: {
+      "name": "name",
+      "value": _vm.video.name
+    }
+  })], 1), _vm._v(" "), _c('b-field', {
+    attrs: {
+      "label": "Token Price"
+    }
+  }, [_c('b-input', {
+    attrs: {
+      "name": "token_price",
+      "type": "number",
+      "value": _vm.video.token_price
+    }
+  })], 1), _vm._v(" "), _c('div', {
+    staticClass: "field"
+  }, [_c('b-checkbox', {
+    attrs: {
+      "name": "subscriber_only"
+    },
+    model: {
+      value: (_vm.subscriberOnlyChecked),
+      callback: function($$v) {
+        _vm.subscriberOnlyChecked = $$v
+      },
+      expression: "subscriberOnlyChecked"
+    }
+  }, [_vm._v("Subscriber Only")])], 1)], 1)], 1)])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-1b884027", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

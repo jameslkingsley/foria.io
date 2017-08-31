@@ -10,6 +10,8 @@ Vue.component('f-profile', require('./components/profile/Index.vue'));
 
 // Videos
 Vue.component('f-video', require('./components/video/Index.vue'));
+Vue.component('f-video-upload', require('./components/video/Upload.vue'));
+Vue.component('f-video-edit', require('./components/video/Edit.vue'));
 
 // Watch
 Vue.component('f-watch', require('./components/watch/Index.vue'));
@@ -61,6 +63,13 @@ const app = new Vue({
         Echo.private(`App.User.${Foria.user.id}`)
             .listen('TokensAdded', e => {
                 this.user.tokens = e.total;
+            })
+            .listen('TranscodeCompleted', e => {
+                this.$toast.open({
+                    message: 'Video Processing Complete',
+                    type: 'is-success',
+                    duration: 4000
+                });
             });
     }
 });

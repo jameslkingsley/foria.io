@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\BelongsToUser;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Video extends Model
 {
@@ -22,7 +23,19 @@ class Video extends Model
      * @var array
      */
     protected $appends = [
-        'url'
+        'url',
+        'stream_url',
+        'edit_url',
+        'is_mine'
+    ];
+
+    /**
+     * Casted attributes.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'subscriber_only' => 'boolean'
     ];
 
     /**
@@ -33,5 +46,43 @@ class Video extends Model
     public function getUrlAttribute()
     {
         return url("/videos/{$this->id}");
+    }
+
+    /**
+     * Determines if the video belongs to the authenticated user.
+     *
+     * @return boolean
+     */
+    public function getIsMineAttribute()
+    {
+        if (auth()->guest()) {
+            return false;
+        }
+
+        return $this->user_id == auth()->user()->id;
+    }
+
+    /**
+     * Gets the edit URL for this video.
+     *
+     * @return string
+     */
+    public function getEditUrlAttribute()
+    {
+        return url("/videos/edit/{$this->id}");
+    }
+
+    /**
+     * Gets the stream URL for this video.
+     *
+     * @return string
+     */
+    public function getStreamUrlAttribute()
+    {
+        if (! is_null($this->path)) {
+            return Storage::url($this->path);
+        }
+
+        return null;
     }
 }
