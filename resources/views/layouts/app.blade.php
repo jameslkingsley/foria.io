@@ -38,7 +38,7 @@
         <div id="app" v-cloak>
             @include('layouts.nav')
 
-            <section class="section">
+            <section class="section main-site-content">
                 <div class="container">
                     @yield('content')
                 </div>

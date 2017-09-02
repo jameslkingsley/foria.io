@@ -14,7 +14,7 @@
             By uploading a video you agree to our terms of use.
         </p>
 
-        <button :class="buttonClasses" @click.prevent="openFinder">Choose Video</button>
+        <button :class="buttonClasses" :disabled="isUploading" @click.prevent="openFinder">Choose Video</button>
     </div>
 </template>
 

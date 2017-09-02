@@ -11,19 +11,19 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class TokensAdded implements ShouldBroadcast
+class UploadProgress implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * Number of tokens that were added.
+     * Progress made so far.
      *
      * @var integer
      */
-    public $tokens;
+    public $progress;
 
     /**
-     * News total token count.
+     * Total amount to upload.
      *
      * @var integer
      */
@@ -41,17 +41,17 @@ class TokensAdded implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(User $user, int $tokens)
+    public function __construct(User $user, $progress, $total)
     {
         $this->user = $user;
-        $this->tokens = $tokens;
-        $this->total = $user->tokens;
+        $this->progress = $progress;
+        $this->total = $total;
     }
 
     /**
      * Get the channels the event should broadcast on.
      *
-     * @return Channel|array
+     * @return \Illuminate\Broadcasting\Channel|array
      */
     public function broadcastOn()
     {

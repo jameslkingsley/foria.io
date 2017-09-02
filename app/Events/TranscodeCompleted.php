@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\User;
 use App\Models\Video;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
@@ -23,13 +24,21 @@ class TranscodeCompleted implements ShouldBroadcast
     public $video;
 
     /**
+     * User instance.
+     *
+     * @var App\Models\User
+     */
+    protected $user;
+
+    /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Video $video)
+    public function __construct(User $user, Video $video)
     {
         $this->video = $video;
+        $this->user = $user;
     }
 
     /**
@@ -39,6 +48,6 @@ class TranscodeCompleted implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('App.User.'.auth()->user()->id);
+        return new PrivateChannel('App.User.'.$this->user->id);
     }
 }

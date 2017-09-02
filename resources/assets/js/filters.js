@@ -26,3 +26,9 @@ Vue.filter('todate', value => {
 Vue.filter('capitalize', value => {
     return _.capitalize(value);
 });
+
+Vue.filter('duration', value => {
+    return moment
+        .duration(value, 'seconds')
+        .format('hh:mm:ss', { trim: false });
+});

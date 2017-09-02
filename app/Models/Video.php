@@ -26,7 +26,9 @@ class Video extends Model
         'url',
         'stream_url',
         'edit_url',
-        'is_mine'
+        'is_mine',
+        'thumbnails',
+        'thumbnail'
     ];
 
     /**
@@ -37,6 +39,46 @@ class Video extends Model
     protected $casts = [
         'subscriber_only' => 'boolean'
     ];
+
+    /**
+     * Gets the bucket directory path for the video.
+     *
+     * @return string
+     */
+    public function getPath(string $uri = '')
+    {
+        return "videos/{$this->key}/$uri";
+    }
+
+    /**
+     * Gets all thumbnails for this video.
+     *
+     * @return array
+     */
+    public function getThumbnailsAttribute()
+    {
+        $files = Storage::files($this->getPath('thumbnails'));
+
+        return collect($files)->sort()->transform(function ($file) {
+            return Storage::url($file);
+        });
+    }
+
+    /**
+     * Gets the thumbnail for this video.
+     *
+     * @return string
+     */
+    public function getThumbnailAttribute()
+    {
+        $count = $this->thumbnails->count();
+
+        if ($count <= 1) {
+            return $this->thumbnails->first();
+        }
+
+        return $this->thumbnails[floor($count / 2)];
+    }
 
     /**
      * Gets the watch URL for this video.
@@ -73,12 +115,34 @@ class Video extends Model
     }
 
     /**
+     * Determines if the video can be viewed by the authenticated user.
+     *
+     * @return boolean
+     */
+    public function viewable()
+    {
+        if ($this->subscriber_only) {
+            if (auth()->guest() || ! auth()->user()->subscribedTo($this->user)) {
+                return false;
+            }
+        }
+
+        // TODO Handle token purchases
+
+        return true;
+    }
+
+    /**
      * Gets the stream URL for this video.
      *
      * @return string
      */
     public function getStreamUrlAttribute()
     {
+        if (! $this->viewable()) {
+            return null;
+        }
+
         if (! is_null($this->path)) {
             return Storage::url($this->path);
         }

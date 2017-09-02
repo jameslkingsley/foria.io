@@ -4,6 +4,7 @@ require('./utils');
 window.videojs = require('video.js/dist/video');
 
 window.moment = require('moment');
+require('moment-duration-format');
 
 window.formToObject = require('form_to_object');
 
@@ -21,13 +22,18 @@ axios.interceptors.response.use(response => {
 
 window.Vue = require('vue');
 
+let VueResource = require('vue-resource');
+Vue.use(VueResource);
+
+Vue.http.headers.common['X-CSRF-TOKEN'] = Foria.csrfToken;
+
 import Buefy from 'buefy';
 Vue.use(Buefy);
 
 require('./filters');
 require('./event');
 
-import Echo from 'laravel-echo'
+import Echo from 'laravel-echo';
 window.Pusher = require('pusher-js');
 
 window.Echo = new Echo({

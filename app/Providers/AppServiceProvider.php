@@ -35,14 +35,14 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $awsCredentials = new Credentials(
-            config('services.cloudfront.key'),
-            config('services.cloudfront.secret')
+            config('services.aws.cloudfront.key'),
+            config('services.aws.cloudfront.secret')
         );
 
         $this->app->bind('Aws\CloudFront\CloudFrontClient', function ($app) use ($awsCredentials) {
             return CloudFrontClient::factory([
                 'credentials' => $awsCredentials,
-                'region' => config('services.cloudfront.region'),
+                'region' => config('services.aws.cloudfront.region'),
                 'version' => '2017-03-25',
             ]);
         });
@@ -50,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('Aws\ElasticTranscoder\ElasticTranscoderClient', function ($app) use ($awsCredentials) {
             return ElasticTranscoderClient::factory([
                 'credentials' => $awsCredentials,
-                'region' => config('services.cloudfront.region'),
+                'region' => config('services.aws.ets.region'),
                 'version' => 'latest',
             ]);
         });

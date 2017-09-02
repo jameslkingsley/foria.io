@@ -1,5 +1,5 @@
 <template>
-    <div class="columns">
+    <div class="main-page-columns columns">
         <div class="column is-sidebar settings-nav">
             <a
                 :class="navItemClasses(index)"

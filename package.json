@@ -24,6 +24,9 @@
     "moment": "~2.18.1",
     "webrtc-adapter": "~4.2.2",
     "video.js": "~6.2.5",
-    "videojs-vtt.js": "~0.12.4"
+    "videojs-vtt.js": "~0.12.4",
+    "videojs-persistvolume": "~0.1.3-p1",
+    "moment-duration-format": "~1.3.0",
+    "vue-resource": "~1.3.4"
   }
 }

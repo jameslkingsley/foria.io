@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Aws\Command;
 use App\Models\User;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Aws\S3\MultipartUploader;
+use App\Events\UploadProgress;
 use App\Jobs\TranscoderStatus;
 use Aws\CloudFront\CloudFrontClient;
 use Illuminate\Support\Facades\Storage;
@@ -51,54 +53,56 @@ class VideoController extends Controller
         $file = $request->file('video');
         $source = fopen($file->getRealPath(), 'r+');
         $name = md5(microtime());
-        $destination = 'videos/'.$name.'.'.$file->guessClientExtension();
+        $destination = "videos/$name/$name.{$file->guessClientExtension()}";
 
-        $client = Storage::disk('s3')->getDriver()->getAdapter()->getClient();
+        $client = Storage::cloud()->getDriver()->getAdapter()->getClient();
 
-        $uploader = new MultipartUploader($client, $source, [
-            'bucket' => config('filesystems.disks.s3.bucket'),
-            'key' => $destination,
+        $client->putObject([
+            'Bucket' => config('filesystems.disks.s3.bucket'),
+            'Key' => $destination,
+            'SourceFile' => $file,
+            '@http' => [
+                'progress' => function ($downloadTotalSize, $downloadSizeSoFar, $uploadTotalSize, $uploadSizeSoFar) {
+                    $lastEmit = session('lastUploadProgressTime', null);
+
+                    if (is_null($lastEmit) || (time() - $lastEmit) >= 1) {
+                        // Emit progress data
+                        event(new UploadProgress(auth()->user(), $uploadSizeSoFar, $uploadTotalSize));
+
+                        // Store emit time in session
+                        session(['lastUploadProgressTime' => time()]);
+                    }
+                }
+            ]
         ]);
 
-        do {
-            try {
-                $result = $uploader->upload();
-                $transcodedPath = 'videos/transcoded/'.$name.'.mp4';
+        $transcodedPath = "videos/$name/transcoded/$name.mp4";
 
-                // Create the transcoder job (convert to MP4)
-                $transcode = $transcoder->createJob([
-                    'PipelineId' => '1504112665437-qnedrs',
-                    'Input' => ['Key' => $destination],
-                    'Output' => [
-                        'Key' => $transcodedPath,
-                        'PresetId' => '1351620000001-000001'
-                    ]
-                ])->toArray();
+        // Create the transcoder job (convert to MP4)
+        $transcode = $transcoder->createJob([
+            'PipelineId' => config('services.aws.ets.pipeline_id'),
+            'Input' => ['Key' => $destination],
+            'Output' => [
+                'Key' => $transcodedPath,
+                'PresetId' => config('services.aws.ets.preset_id'),
+                'ThumbnailPattern' => "videos/$name/thumbnails/{count}"
+            ]
+        ])->toArray();
 
-                // Create video record
-                $video = Video::create([
-                    'user_id' => auth()->user()->id,
-                    'name' => $file->getClientOriginalName(),
-                    'path' => $transcodedPath,
-                    'transcoder_id' => $transcode['Job']['Id'],
-                    'length' => 0,
-                    'width' => 0,
-                    'height' => 0,
-                ]);
+        // Create video record
+        $video = Video::create([
+            'user_id' => auth()->user()->id,
+            'name' => $file->getClientOriginalName(),
+            'key' => $name,
+            'path' => $transcodedPath,
+            'transcoder_id' => $transcode['Job']['Id']
+        ]);
 
-                // Dispatch the status job to update the processing
-                // status once the transcoder has completed
-                TranscoderStatus::dispatch($video);
+        // Dispatch the status job to update the processing
+        // status once the transcoder has completed
+        TranscoderStatus::dispatch(auth()->user(), $video);
 
-                return $video;
-            } catch (MultipartUploadException $e) {
-                rewind($source);
-
-                $uploader = new MultipartUploader($client, $source, [
-                    'state' => $e->getState(),
-                ]);
-            }
-        } while (! isset($result));
+        return $video;
     }
 
     /**
@@ -109,6 +113,8 @@ class VideoController extends Controller
      */
     public function show(Video $video)
     {
+        $video->load('user');
+
         return vue('f-video', compact('video'));
     }
 

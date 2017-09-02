@@ -18,11 +18,13 @@ class CreateVideosTable extends Migration
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('name');
+            $table->longText('key');
             $table->longText('path');
             $table->longText('transcoder_id');
-            $table->bigInteger('length');
-            $table->integer('width');
-            $table->integer('height');
+            $table->bigInteger('duration')->nullable();
+            $table->integer('width')->nullable();
+            $table->integer('height')->nullable();
+            $table->integer('frame_rate')->nullable();
             $table->boolean('subscriber_only')->default(false);
             $table->bigInteger('token_price')->default(0);
             $table->boolean('has_processed')->default(false);

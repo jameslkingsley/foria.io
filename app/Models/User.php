@@ -48,7 +48,8 @@ class User extends Authenticatable
         'follower_count',
         'watch_url',
         'has_card_on_file',
-        'avatar_url'
+        'avatar_url',
+        'profile_url',
     ];
 
     /**
@@ -81,7 +82,17 @@ class User extends Authenticatable
     }
 
     /**
-     * Gets the avatar attribute.
+     * Gets the profile URL attribute.
+     *
+     * @return string
+     */
+    public function getProfileUrlAttribute()
+    {
+        return url("/profile/{$this->name}");
+    }
+
+    /**
+     * Gets the avatar URL attribute.
      *
      * @return string
      */

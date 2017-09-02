@@ -1,0 +1,150 @@
+.video-list {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 16rem;
+
+    .video-item {
+        flex-grow: 1;
+        flex-basis: 125px;
+        max-width: calc(25% - 15px);
+        margin: 10px;
+
+        &:first-of-type {
+            margin-left: 0;
+        }
+
+        &:last-of-type {
+            margin-right: 0;
+        }
+
+        .video {
+            height: 100%;
+            width: 100%;
+            display: inline-block;
+            color: $primary !important;
+            text-decoration: none;
+
+            &:hover {
+                .video-name {
+                    text-decoration: underline;
+                }
+            }
+
+            .video-thumbnail {
+                width: 100%;
+                height: 17.813em;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+                position: relative;
+
+                .video-hd, .video-duration {
+                    position: absolute;
+                    top: 5px;
+                    background: rgba(0, 0, 0, 0.66);
+                    color: white;
+                    font-weight: 400;
+                    padding: 1px 5px;
+                    font-size: 12px;
+                }
+
+                .video-hd {
+                    right: 5px;
+                }
+
+                .video-duration {
+                    left: 5px;
+                }
+            }
+
+            .video-name {
+                float: left;
+                width: 100%;
+                font-size: 14px;
+                font-weight: 500;
+                margin-top: 10px;
+                overflow: hidden;
+                line-height: 16px;
+            }
+
+            .video-meta {
+                font-size: 12px;
+                color: black;
+                opacity: .75;
+            }
+        }
+    }
+}
+
+.video-title {
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 32px;
+}
+
+$primary-foreground-color: #fff;
+$primary-background-color: #2B333F;
+$center-big-play-button: true;
+
+.video-js {
+    font-size: 14px;
+    color: $primary-foreground-color;
+
+    outline: 0 !important;
+
+    * {
+        outline: 0 !important;
+    }
+}
+
+.vjs-default-skin .vjs-big-play-button {
+    font-size: 3em;
+    $big-play-width: 1.5em;
+    $big-play-height: 1.5em;
+    line-height: $big-play-height;
+    height: $big-play-height;
+    width: $big-play-width;
+    background-color: $primary !important;
+    border: none !important;
+    border-radius: 100%;
+
+    @if $center-big-play-button {
+        left: 50%;
+        top: 50%;
+        margin-left: -($big-play-width / 2);
+        margin-top: -($big-play-height / 2);
+    } @else {
+        left: 0.5em;
+        top: 0.5em;
+    }
+}
+
+.video-js .vjs-control-bar,
+.video-js .vjs-big-play-button,
+.video-js .vjs-menu-button .vjs-menu-content {
+    background-color: $primary-background-color;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+$slider-bg-color: #FFF;
+
+.video-js .vjs-slider {
+    background-color: $slider-bg-color;
+    background-color: rgba($slider-bg-color, 0.25);
+}
+
+.video-js .vjs-volume-level,
+.video-js .vjs-play-progress,
+.video-js .vjs-slider-bar {
+    background: $primary;
+}
+
+.video-js .vjs-load-progress {
+    background: lighten($slider-bg-color, 25%);
+    background: rgba($slider-bg-color, 0.5);
+}
+
+.video-js .vjs-load-progress div {
+    background: lighten($slider-bg-color, 50%);
+    background: rgba($slider-bg-color, 0.75);
+}
