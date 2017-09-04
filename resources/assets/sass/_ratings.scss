@@ -1,0 +1,32 @@
+.rating {
+    float: right;
+    border: none;
+    background: none;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 0;
+    margin-left: 1rem;
+    cursor: pointer;
+    outline: 0;
+    color: rgba(0, 0, 0, 0.66);
+
+    &:hover {
+        color: rgba(0, 0, 0, 0.75);
+    }
+
+    &.is-active, &:active {
+        color: $primary;
+    }
+
+    &.rating-dislike {
+        &.is-active {
+            color: black;
+        }
+    }
+
+    .material-icons {
+        font-size: 18px;
+        margin: 2px 5px 0 0;
+        float: left;
+    }
+}

@@ -20,6 +20,8 @@ axios.interceptors.response.use(response => {
     return Promise.reject(error);
 });
 
+window.ajax = window.axios;
+
 window.Vue = require('vue');
 
 let VueResource = require('vue-resource');

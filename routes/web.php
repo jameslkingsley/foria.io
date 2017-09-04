@@ -26,6 +26,14 @@ Route::get('/videos/new', 'VideoController@create');
 Route::get('/videos/edit/{video}', 'VideoController@edit');
 Route::get('/videos/{video}', 'VideoController@show');
 
+// Ratings
+Route::get('/api/ratings/{type}/{id}', 'RatingController@show');
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/api/ratings', 'RatingController@store');
+    Route::delete('/api/ratings/{type}/{id}', 'RatingController@destroy');
+});
+
 // Chat
 Route::get('/api/chat/past/{user}', 'ChatController@show');
 Route::resource('/api/chat', 'ChatController');

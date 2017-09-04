@@ -17,4 +17,14 @@ trait Videos
             ->orderBy('created_at', 'desc')
             ->get();
     }
+
+    /**
+     * Determines if the user purchased the given video.
+     *
+     * @return boolean
+     */
+    public function purchasedVideo(Video $video)
+    {
+        return true; // TODO
+    }
 }

@@ -14,6 +14,9 @@ Vue.component('f-video-upload', require('./components/video/Upload.vue'));
 Vue.component('f-video-edit', require('./components/video/Edit.vue'));
 Vue.component('f-video-list', require('./components/video/List.vue'));
 
+// Ratings
+Vue.component('f-rating', require('./components/Rating.vue'));
+
 // Watch
 Vue.component('f-watch', require('./components/watch/Index.vue'));
 Vue.component('f-watch-follow', require('./components/watch/Follow.vue'));

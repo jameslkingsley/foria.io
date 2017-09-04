@@ -14,10 +14,8 @@
         <div class="card p-3 m-t-3">
             <h2 class="video-title">
                 {{ video.name }}
-                <a :href="video.edit_url" class="button is-primary is-pulled-right" v-if="video.is_mine">
-                    <i class="material-icons m-r-2">settings</i>
-                    Manage Video
-                </a>
+
+                <f-rating type="video" :id="video.id" class="is-pulled-right"></f-rating>
             </h2>
 
             <span class="video-meta">
@@ -25,6 +23,13 @@
                 &middot;
                 {{ video.created_at | fromnow }}
             </span>
+        </div>
+
+        <div class="card p-3 m-t-3" v-if="video.is_mine">
+            <a :href="video.edit_url" class="button is-primary">
+                <i class="material-icons m-r-2">settings</i>
+                Manage Video
+            </a>
         </div>
 
         <div class="card p-3 m-t-3">

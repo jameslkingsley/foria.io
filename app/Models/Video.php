@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\Rateable;
 use App\Traits\BelongsToUser;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class Video extends Model
 {
-    use BelongsToUser;
+    use Rateable,
+        BelongsToUser;
 
     /**
      * Guarded attributes.
