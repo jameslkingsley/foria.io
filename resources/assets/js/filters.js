@@ -1,10 +1,5 @@
 Vue.filter('currency', value => {
-    let langage = (navigator.language || navigator.browserLanguage).split('-')[0];
-
-    return (value / 100).toLocaleString(langage, {
-        style: 'currency',
-        currency: 'gbp'
-    });
+    return Util.formatAsCurrency(value);
 });
 
 Vue.filter('lastFour', value => {

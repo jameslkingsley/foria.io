@@ -5,6 +5,7 @@ namespace App\Traits;
 use Exception;
 use App\Models\User;
 use App\Support\Card;
+use App\Models\Purchase;
 use InvalidArgumentException;
 use Stripe\Card as StripeCard;
 use Stripe\Token as StripeToken;
@@ -225,5 +226,15 @@ trait Billing
     public static function getStripeKey()
     {
         return config('services.stripe.secret');
+    }
+
+    /**
+     * Gets the user's purchases.
+     *
+     * @return Collection
+     */
+    public function purchases()
+    {
+        return $this->hasMany(Purchase::class);
     }
 }

@@ -54,7 +54,7 @@
 
             <tr v-for="purchase in filteredPurchases">
                 <td width="200">{{ purchase.created_at | datetime }}</td>
-                <td>{{ purchase.description }}</td>
+                <td>{{ purchase.name }}</td>
                 <td width="100" align="right">{{ purchase.amount | currency }}</td>
             </tr>
 

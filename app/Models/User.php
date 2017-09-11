@@ -6,7 +6,6 @@ use Stripe\Customer;
 use App\Traits\Videos;
 use App\Traits\Billing;
 use App\Traits\Follows;
-use App\Traits\Purchases;
 use App\Traits\Subscriptions;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
@@ -16,7 +15,6 @@ class User extends Authenticatable
 {
     use Subscriptions,
         Notifiable,
-        Purchases,
         Billing,
         Follows,
         Videos;
@@ -123,31 +121,5 @@ class User extends Authenticatable
     public function getWatchUrlAttribute()
     {
         return url("/watch/{$this->name}");
-    }
-
-    /**
-     * Gets the Stripe customer for the user.
-     *
-     * @return Stripe\Customer
-     */
-    public function stripeCustomer($token = null)
-    {
-        if (! $this->stripe_id) {
-            if ($token) {
-                $customer = Customer::create([
-                    'email' => $this->email,
-                    'source' => $token
-                ]);
-
-                $this->stripe_id = $customer->id;
-                $this->save();
-
-                return $this->stripeCustomer();
-            }
-
-            return null;
-        }
-
-        return Customer::retrieve($this->stripe_id);
     }
 }

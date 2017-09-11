@@ -16,10 +16,13 @@ class CreatePurchasesTable extends Migration
         Schema::create('purchases', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->longText('description');
-            $table->bigInteger('amount');
+            $table->morphs('model');
+            $table->string('name');
+            $table->bigInteger('amount')->unsigned()->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unique(['user_id', 'model_id', 'model_type']);
         });
     }
 

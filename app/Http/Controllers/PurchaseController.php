@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Stripe\Customer;
 use Illuminate\Http\Request;
 use App\Exceptions\NoCustomerException;
+use Illuminate\Auth\AuthenticationException;
 
-class BillingSettingsController extends Controller
+class PurchaseController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,12 +15,7 @@ class BillingSettingsController extends Controller
      */
     public function index()
     {
-        return [
-            'card_brand' => auth()->user()->card_brand,
-            'card_last_four' => auth()->user()->card_last_four,
-            'has_card_on_file' => auth()->user()->has_card_on_file,
-            'purchases' => auth()->user()->purchases
-        ];
+        //
     }
 
     /**
@@ -39,18 +34,26 @@ class BillingSettingsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, string $type, int $id)
     {
         try {
-            // Create Stripe customer if none available
-            if (! auth()->user()->stripe_id) {
-                auth()->user()->createAsStripeCustomer($request->stripeToken);
+            $model = 'App\\Models\\'.studly_case($type);
+
+            if (! class_exists($model)) {
+                throw new InvalidArgumentException;
             }
 
-            // Update card details
-            auth()->user()->updateCard($request->stripeToken);
+            $model = $model::findOrFail($id);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $model->purchase()
+            ]);
         } catch (\Exception $e) {
-            return abort(500, $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'data' => $e->getMessage()
+            ]);
         }
     }
 
@@ -60,9 +63,19 @@ class BillingSettingsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, string $type, int $id)
     {
-        //
+        $model = 'App\\Models\\'.studly_case($type);
+
+        if (! class_exists($model)) {
+            throw new InvalidArgumentException;
+        }
+
+        $model = $model::findOrFail($id);
+
+        return response()->json([
+            'purchase' => $model->purchases->first()
+        ]);
     }
 
     /**
@@ -94,15 +107,8 @@ class BillingSettingsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy()
+    public function destroy($id)
     {
-        auth()->user()->cards()->each(function ($card) {
-            $card->delete();
-        });
-
-        auth()->user()->update([
-            'card_brand' => null,
-            'card_last_four' => null,
-        ]);
+        //
     }
 }

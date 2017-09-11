@@ -103,6 +103,13 @@
                         duration: 4000
                     });
 
+                    Foria.user.tokens = r.data.total;
+
+                    ForiaEvent.fire('TokensPurchased', {
+                        amount: r.data.amount,
+                        total: r.data.total
+                    });
+
                     this.buttonState = false;
                 });
             }

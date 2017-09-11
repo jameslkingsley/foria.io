@@ -15,13 +15,17 @@
             <h2 class="video-title">
                 {{ video.name }}
 
-                <f-rating type="video" :id="video.id" class="is-pulled-right"></f-rating>
+                <f-purchase :amount="500" type="video" :id="video.id" class="is-pulled-right" @success="purchaseSuccess"></f-purchase>
             </h2>
 
             <span class="video-meta">
                 <a :href="video.user.profile_url">{{ video.user.name }}</a>
                 &middot;
                 {{ video.created_at | fromnow }}
+            </span>
+
+            <span class="video-meta">
+                <f-rating type="video" :id="video.id" class="is-pulled-left"></f-rating>
             </span>
         </div>
 
@@ -62,6 +66,16 @@
 
             videoSetupJson() {
                 return JSON.stringify(this.videoSetup);
+            }
+        },
+
+        methods: {
+            purchaseSuccess() {
+                this.$toast.open({
+                    message: 'Video Purchased',
+                    type: 'is-success',
+                    duration: 4000
+                });
             }
         }
     }

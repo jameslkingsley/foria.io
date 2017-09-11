@@ -46,13 +46,13 @@ class TokenRequest extends FormRequest
         auth()->user()->tokens += $package->token_count;
         auth()->user()->save();
 
-        auth()->user()->purchased("{$package->token_count} Tokens", $package->cost);
-
         event(new TokensAdded(auth()->user(), $package->token_count));
 
         return [
             'message' => "{$package->token_count} tokens added to your account",
-            'style' => 'success'
+            'style' => 'success',
+            'amount' => $package->token_count,
+            'total' => auth()->user()->tokens
         ];
     }
 }

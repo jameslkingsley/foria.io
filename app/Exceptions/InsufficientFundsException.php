@@ -4,14 +4,14 @@ namespace App\Exceptions;
 
 use Illuminate\Contracts\Support\Responsable;
 
-class NoCustomerException extends \Exception implements Responsable
+class InsufficientFundsException extends \Exception implements Responsable
 {
     /**
      * The exception message.
      *
      * @var string
      */
-    protected $message = 'Could not find the Stripe customer.';
+    protected $message = 'You do not have enough tokens.';
 
     /**
      * Returns the response.

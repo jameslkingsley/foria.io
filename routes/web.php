@@ -34,6 +34,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/api/ratings/{type}/{id}', 'RatingController@destroy');
 });
 
+// Purchases
+Route::get('/api/purchase/{type}/{id}', 'PurchaseController@show');
+Route::post('/api/purchase/{type}/{id}', 'PurchaseController@store');
+
 // Chat
 Route::get('/api/chat/past/{user}', 'ChatController@show');
 Route::resource('/api/chat', 'ChatController');

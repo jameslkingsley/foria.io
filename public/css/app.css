@@ -14473,6 +14473,11 @@ hr {
   opacity: 0.75;
 }
 
+.is-solid {
+  opacity: 1 !important;
+  cursor: default !important;
+}
+
 .watch-video-container {
   height: 640px;
   background: #fff;
@@ -14934,6 +14939,33 @@ nav.navbar .navbar-link:focus {
   font-size: 16px;
 }
 
+.button-tag {
+  float: left;
+  font-size: 14px;
+  background: #000;
+  padding: 0 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  line-height: 28px;
+  color: white;
+  position: relative;
+  margin-right: 10px;
+}
+
+.button-tag::after {
+  content: '';
+  height: 12px;
+  width: 12px;
+  border: 1px solid #000;
+  border-width: 1px 1px 0 0;
+  -webkit-transform: rotate(45deg);
+          transform: rotate(45deg);
+  background: #000;
+  position: absolute;
+  right: -5px;
+  top: 8px;
+}
+
 .table {
   width: 100%;
   font-size: 14px;
@@ -15134,6 +15166,12 @@ nav.navbar .navbar-link:focus {
   line-height: 32px;
 }
 
+.video-meta {
+  width: 100%;
+  display: inline-block;
+  margin-top: 5px;
+}
+
 .video-js {
   font-size: 14px;
   color: #fff;
@@ -15193,7 +15231,8 @@ nav.navbar .navbar-link:focus {
   font-size: 14px;
   font-weight: 600;
   padding: 0;
-  margin-left: 1rem;
+  margin-top: 5px;
+  margin-right: 1rem;
   cursor: pointer;
   outline: 0;
   color: rgba(0, 0, 0, 0.66);

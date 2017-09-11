@@ -3,13 +3,16 @@
 namespace App\Models;
 
 use App\Traits\Rateable;
+use App\Contracts\Purchase;
+use App\Traits\Purchasable;
 use App\Traits\BelongsToUser;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class Video extends Model
+class Video extends Model implements Purchase
 {
     use Rateable,
+        Purchasable,
         BelongsToUser;
 
     /**
@@ -41,6 +44,19 @@ class Video extends Model
     protected $casts = [
         'subscriber_only' => 'boolean'
     ];
+
+    /**
+     * Gets the purchasable details.
+     *
+     * @return array
+     */
+    public function getPurchaseDetails()
+    {
+        return [
+            'name' => $this->name,
+            'amount' => 500
+        ];
+    }
 
     /**
      * Gets the bucket directory path for the video.
