@@ -17,18 +17,18 @@
 
                 <f-subscribe
                     v-if="! video.is_mine && video.required_subscription"
-                    tag="You need to be a subscriber"
                     class="is-pulled-right"
+                    :tag="subscribeTag"
                     :user="video.user"
                     :plan="video.required_subscription">
                 </f-subscribe>
 
                 <f-purchase
                     v-if="! video.is_mine && video.token_price"
-                    :amount="video.token_price"
-                    type="video"
-                    :id="video.id"
                     class="is-pulled-right m-r-2"
+                    type="video"
+                    :amount="video.token_price"
+                    :id="video.id"
                     @success="purchaseSuccess">
                 </f-purchase>
             </h2>
@@ -81,6 +81,10 @@
 
             videoSetupJson() {
                 return JSON.stringify(this.videoSetup);
+            },
+
+            subscribeTag() {
+                return `You need to be a subscriber (${this.video.required_subscription} or higher)`;
             }
         },
 

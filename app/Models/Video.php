@@ -165,13 +165,15 @@ class Video extends Model implements Purchase
      */
     public function viewable()
     {
-        if ($this->subscriber_only) {
+        if ($this->required_subscription) {
             if (auth()->guest() || ! auth()->user()->subscribedTo($this->user)) {
                 return false;
             }
         }
 
-        // TODO Handle token purchases
+        if ($this->token_price) {
+            return $this->purchased();
+        }
 
         return true;
     }

@@ -65,9 +65,6 @@ trait Subscriptions
         // Raise the event for the broadcast
         event(new NewSubscription($subscription));
 
-        // Create a purchase record for the user
-        $this->purchased("Subscription to {$user->name}", $plan->amount);
-
         // Alert the broadcaster's chat of the subscription
         (new Chat($user))->alert("{$this->name} subscribed for {$amountFormatted}", [
             'is_subscription' => true

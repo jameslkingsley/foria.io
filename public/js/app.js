@@ -82064,6 +82064,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         videoSetupJson: function videoSetupJson() {
             return JSON.stringify(this.videoSetup);
+        },
+        subscribeTag: function subscribeTag() {
+            return 'You need to be a subscriber (' + this.video.required_subscription + ' or higher)';
         }
     },
 
@@ -82105,15 +82108,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_vm._v("\n            " + _vm._s(_vm.video.name) + "\n\n            "), (!_vm.video.is_mine && _vm.video.required_subscription) ? _c('f-subscribe', {
     staticClass: "is-pulled-right",
     attrs: {
-      "tag": "You need to be a subscriber",
+      "tag": _vm.subscribeTag,
       "user": _vm.video.user,
       "plan": _vm.video.required_subscription
     }
   }) : _vm._e(), _vm._v(" "), (!_vm.video.is_mine && _vm.video.token_price) ? _c('f-purchase', {
     staticClass: "is-pulled-right m-r-2",
     attrs: {
-      "amount": _vm.video.token_price,
       "type": "video",
+      "amount": _vm.video.token_price,
       "id": _vm.video.id
     },
     on: {
@@ -83133,7 +83136,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             isCancelling: false,
             isCreating: false,
             planId: this.plan || 'bronze',
-            plans: []
+            plans: [],
+            planMap: {
+                bronze: 1,
+                silver: 2,
+                gold: 3
+            }
         };
     },
 
@@ -83238,7 +83246,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
                 if (_this4.plan) {
                     _this4.plans = _.map(_this4.plans, function (plan) {
-                        plan.disabled = plan.id != _this4.plan;
+                        plan.disabled = _this4.planMap[plan.id] < _this4.planMap[_this4.plan];
                         return plan;
                     });
                 }

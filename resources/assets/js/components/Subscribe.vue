@@ -87,7 +87,12 @@
                 isCancelling: false,
                 isCreating: false,
                 planId: this.plan || 'bronze',
-                plans: []
+                plans: [],
+                planMap: {
+                    bronze: 1,
+                    silver: 2,
+                    gold: 3
+                }
             };
         },
 
@@ -199,7 +204,7 @@
 
                     if (this.plan) {
                         this.plans = _.map(this.plans, plan => {
-                            plan.disabled = plan.id != this.plan;
+                            plan.disabled = this.planMap[plan.id] < this.planMap[this.plan];
                             return plan;
                         });
                     }
