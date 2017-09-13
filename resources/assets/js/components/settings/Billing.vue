@@ -47,20 +47,20 @@
 
         <table v-if="user.purchases.length > 0" class="table">
             <tr>
-                <th width="200">Timestamp</th>
-                <th>Description</th>
-                <th width="100" align="right">Amount</th>
+                <td width="200"><strong>Timestamp</strong></td>
+                <td><strong>Description</strong></td>
+                <td width="100" align="right"><strong>Amount</strong></td>
             </tr>
 
             <tr v-for="purchase in filteredPurchases">
                 <td width="200">{{ purchase.created_at | datetime }}</td>
                 <td>{{ purchase.name }}</td>
-                <td width="100" align="right">{{ purchase.amount | currency }}</td>
+                <td width="100" align="right">{{ purchase.amount }} Tokens</td>
             </tr>
 
             <tr>
-                <th colspan="2" align="right">Total</th>
-                <th align="right">{{ purchasesTotal | currency }}</th>
+                <td colspan="2" align="right"><strong>Total</strong></td>
+                <td align="right"><strong>{{ purchasesTotal }} Tokens</strong></td>
             </tr>
         </table>
     </div>

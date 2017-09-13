@@ -16681,13 +16681,13 @@ Vue.component('f-video-list', __webpack_require__(190));
 // Ratings
 Vue.component('f-rating', __webpack_require__(193));
 
-// Purchase
+// Purchases & Subscriptions
 Vue.component('f-purchase', __webpack_require__(196));
+Vue.component('f-subscribe', __webpack_require__(199));
 
 // Watch
-Vue.component('f-watch', __webpack_require__(199));
-Vue.component('f-watch-follow', __webpack_require__(202));
-Vue.component('f-watch-subscribe', __webpack_require__(205));
+Vue.component('f-watch', __webpack_require__(202));
+Vue.component('f-watch-follow', __webpack_require__(205));
 Vue.component('f-watch-chat', __webpack_require__(208));
 
 // Tokens
@@ -82025,6 +82025,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['video'],
@@ -82078,7 +82093,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "poster": _vm.video.thumbnail,
       "data-setup": _vm.videoSetupJson
     }
-  }, [(_vm.video.stream_url) ? _c('source', {
+  }, [(_vm.video.stream_url && _vm.video.unlocked) ? _c('source', {
     attrs: {
       "src": _vm.video.stream_url,
       "type": "video/mp4"
@@ -82087,17 +82102,24 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "card p-3 m-t-3"
   }, [_c('h2', {
     staticClass: "video-title"
-  }, [_vm._v("\n            " + _vm._s(_vm.video.name) + "\n\n            "), _c('f-purchase', {
+  }, [_vm._v("\n            " + _vm._s(_vm.video.name) + "\n\n            "), (!_vm.video.is_mine && _vm.video.required_subscription) ? _c('f-subscribe', {
     staticClass: "is-pulled-right",
     attrs: {
-      "amount": 500,
+      "tag": "You need to be a subscriber",
+      "user": _vm.video.user,
+      "plan": _vm.video.required_subscription
+    }
+  }) : _vm._e(), _vm._v(" "), (!_vm.video.is_mine && _vm.video.token_price) ? _c('f-purchase', {
+    staticClass: "is-pulled-right m-r-2",
+    attrs: {
+      "amount": _vm.video.token_price,
       "type": "video",
       "id": _vm.video.id
     },
     on: {
       "success": _vm.purchaseSuccess
     }
-  })], 1), _vm._v(" "), _c('span', {
+  }) : _vm._e()], 1), _vm._v(" "), _c('span', {
     staticClass: "video-meta"
   }, [_c('a', {
     attrs: {
@@ -82966,7 +82988,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_c('i', {
     staticClass: "material-icons"
-  }, [_vm._v("local_play")])]), _vm._v(" "), (_vm.purchased) ? _c('span', [_vm._v("\n            Purchased\n        ")]) : _vm._e(), _vm._v(" "), (!_vm.purchased) ? _c('span', [_vm._v("\n            " + _vm._s(_vm.amount) + " Tokens\n        ")]) : _vm._e()])]) : _vm._e()
+  }, [_vm._v("local_play")])]), _vm._v(" "), (_vm.purchased) ? _c('span', [_vm._v("\n            Purchased\n        ")]) : _c('span', [_vm._v("\n            " + _vm._s(_vm.amount) + " Tokens\n        ")])])]) : _vm._e()
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -82986,6 +83008,368 @@ var Component = __webpack_require__(1)(
   __webpack_require__(200),
   /* template */
   __webpack_require__(201),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\Subscribe.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Subscribe.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-6325195e", Component.options)
+  } else {
+    hotAPI.reload("data-v-6325195e", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 200 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: {
+        user: { type: Object },
+        plan: { default: null },
+        tag: { type: String, default: '' }
+    },
+
+    data: function data() {
+        return {
+            auth: null,
+            loaded: false,
+            subscription: null,
+            isCancelling: false,
+            isCreating: false,
+            planId: this.plan || 'bronze',
+            plans: []
+        };
+    },
+
+
+    computed: {
+        containerId: function containerId() {
+            if (!this.loaded) {
+                return '';
+            }
+
+            return this.auth.has_card_on_file && !this.subscribed ? 'subscription-checkout' : '';
+        },
+        icon: function icon() {
+            return this.subscribed ? 'close' : 'check';
+        },
+        text: function text() {
+            return this.subscribed ? 'Subscription' : 'Subscribe';
+        },
+        subscribed: function subscribed() {
+            return this.subscription !== null;
+        },
+        willCancel: function willCancel() {
+            return this.subscription.cancels_at !== null;
+        },
+        cancelClasses: function cancelClasses() {
+            return {
+                'button': true,
+                'is-loading': this.isCancelling
+            };
+        },
+        createClasses: function createClasses() {
+            return {
+                'button': true,
+                'is-primary': true,
+                'is-pulled-right': true,
+                'is-loading': this.isCreating
+            };
+        },
+        triggerClasses: function triggerClasses() {
+            return {
+                'button': true,
+                'is-primary': true,
+                'is-loading': !this.loaded
+            };
+        },
+        amount: function amount() {
+            var _this = this;
+
+            return !this.plans.length ? 0 : this.plans.find(function (p) {
+                return p.id == _this.planId;
+            }).amount;
+        },
+        createButtonDisabled: function createButtonDisabled() {
+            return this.isCreating;
+        }
+    },
+
+    methods: {
+        formatLastFour: function formatLastFour(value) {
+            return Util.formatLastFour(value);
+        },
+        planClasses: function planClasses(plan) {
+            return {
+                'token-package': true,
+                'is-selected': this.planId == plan.id,
+                'is-disabled': plan.disabled
+            };
+        },
+        selectPlan: function selectPlan(plan) {
+            if (plan.disabled) return;
+
+            this.planId = plan.id;
+        },
+        create: function create() {
+            var _this2 = this;
+
+            this.isCreating = true;
+
+            axios.post('/api/subscription', { user_id: this.user.id, plan: this.planId }).then(function (r) {
+                _this2.fetch();
+                _this2.isCreating = false;
+            });
+        },
+        cancel: function cancel() {
+            var _this3 = this;
+
+            this.isCancelling = true;
+
+            axios.delete('/api/subscription/' + this.user.name).then(function (r) {
+                _this3.fetch();
+                _this3.isCancelling = false;
+            });
+        },
+        fetch: function fetch() {
+            var _this4 = this;
+
+            axios.get('/api/subscription/' + this.user.name).then(function (r) {
+                _this4.subscription = r.data.subscription;
+                _this4.auth = r.data.user;
+                _this4.plans = r.data.plans;
+                _this4.loaded = true;
+
+                if (_this4.plan) {
+                    _this4.plans = _.map(_this4.plans, function (plan) {
+                        plan.disabled = plan.id != _this4.plan;
+                        return plan;
+                    });
+                }
+            });
+        }
+    },
+
+    created: function created() {
+        this.fetch();
+    }
+});
+
+/***/ }),
+/* 201 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [(_vm.tag) ? _c('span', {
+    staticClass: "button-tag",
+    domProps: {
+      "textContent": _vm._s(_vm.tag)
+    }
+  }) : _vm._e(), _vm._v(" "), _c('b-dropdown', {
+    attrs: {
+      "position": "is-bottom-left",
+      "id": _vm.containerId
+    }
+  }, [_c('a', {
+    class: _vm.triggerClasses,
+    slot: "trigger"
+  }, [_c('span', [_vm._v(_vm._s(_vm.text))]), _vm._v(" "), _c('i', {
+    staticClass: "material-icons m-l-1"
+  }, [_vm._v("keyboard_arrow_down")])]), _vm._v(" "), (_vm.loaded) ? _c('b-dropdown-item', {
+    attrs: {
+      "custom": ""
+    }
+  }, [(_vm.auth.has_card_on_file) ? _c('div', [(_vm.subscribed) ? _c('div', {
+    staticClass: "subscription-content has-text-centered"
+  }, [_c('small', {
+    staticClass: "is-muted"
+  }, [_vm._v("\n                        " + _vm._s(_vm.willCancel ? 'Expires' : 'Renews') + " on " + _vm._s(_vm._f("datetime")(_vm.subscription.ends_at)) + "\n                    ")]), _vm._v(" "), _c('span', {
+    staticClass: "subtitle"
+  }, [_vm._v("\n                        Your subscription " + _vm._s(_vm.willCancel ? 'expires' : 'renews') + " " + _vm._s(_vm._f("todate")(_vm.subscription.ends_at)) + "\n                    ")]), _vm._v(" "), (!_vm.willCancel) ? _c('button', {
+    class: _vm.cancelClasses,
+    on: {
+      "click": _vm.cancel
+    }
+  }, [_vm._v("Cancel Subscription")]) : _vm._e()]) : _c('div', {
+    staticClass: "token-checkout"
+  }, [_vm._l((_vm.plans), function(plan, index) {
+    return _c('div', {
+      class: _vm.planClasses(plan)
+    }, [_c('span', {
+      staticClass: "token-package-title"
+    }, [_vm._v(_vm._s(plan.name))]), _vm._v(" "), _c('div', {
+      staticClass: "token-package-controls"
+    }, [_c('div', {
+      staticClass: "token-package-controls-group"
+    }, [_c('span', {
+      staticClass: "token-package-cost"
+    }, [_vm._v(_vm._s(_vm._f("currency")(plan.amount)) + " / " + _vm._s(_vm._f("capitalize")(plan.interval)))]), _vm._v(" "), _c('button', {
+      staticClass: "button token-package-button",
+      attrs: {
+        "disabled": plan.disabled
+      },
+      on: {
+        "click": function($event) {
+          $event.preventDefault();
+          _vm.selectPlan(plan)
+        }
+      }
+    }, [_vm._v("Choose")])])])])
+  }), _vm._v(" "), _c('div', {
+    staticClass: "block m-t-3"
+  }, [_c('span', {
+    staticClass: "token-checkout-subtitle"
+  }, [_vm._v("\n                            Using card on file\n                            "), _c('a', {
+    staticClass: "is-pulled-right",
+    attrs: {
+      "href": "/settings/#billing"
+    }
+  }, [_vm._v("Change")])]), _vm._v(" "), _c('span', {
+    staticClass: "token-checkout-card-brand"
+  }, [_vm._v(_vm._s(_vm.auth.card_brand))]), _vm._v(" "), _c('span', {
+    staticClass: "token-checkout-card-number",
+    domProps: {
+      "innerHTML": _vm._s(_vm.formatLastFour(_vm.auth.card_last_four))
+    }
+  }), _vm._v(" "), _c('div', {
+    staticClass: "block m-t-3"
+  }, [_c('div', {
+    staticClass: "columns"
+  }, [_c('div', {
+    staticClass: "column"
+  }, [_c('small', [_vm._v("\n                                        All purchases are final and cannot be refunded. "), _c('a', [_vm._v("Terms & Conditions")]), _vm._v(".\n                                    ")])]), _vm._v(" "), _c('div', {
+    staticClass: "column"
+  }, [_c('button', {
+    class: _vm.createClasses,
+    attrs: {
+      "disabled": _vm.createButtonDisabled
+    },
+    on: {
+      "click": _vm.create
+    }
+  }, [_vm._v("\n                                        Subscribe for " + _vm._s(_vm._f("currency")(_vm.amount)) + "\n                                    ")])])])])])], 2)]) : _c('div', {
+    staticClass: "subscription-content has-text-centered"
+  }, [_c('p', [_vm._v("Before you can subscribe, you need to add a card to your account. Click the button below.")]), _vm._v(" "), _c('a', {
+    staticClass: "button is-primary m-t-3 m-b-3",
+    attrs: {
+      "href": "/settings/#billing"
+    }
+  }, [_vm._v("Add a card")])])]) : _vm._e()], 1)], 1)
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-6325195e", module.exports)
+  }
+}
+
+/***/ }),
+/* 202 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(203),
+  /* template */
+  __webpack_require__(204),
   /* styles */
   null,
   /* scopeId */
@@ -83017,7 +83401,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 200 */
+/* 203 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -83153,7 +83537,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 201 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -83203,7 +83587,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "watch-user"
   }, [_vm._v(_vm._s(_vm.user.name))])]), _vm._v(" "), _c('div', {
     staticClass: "watch-controls"
-  }, [(!_vm.user.is_mine) ? _c('f-watch-subscribe', {
+  }, [(!_vm.user.is_mine) ? _c('f-subscribe', {
     staticClass: "is-pulled-right m-l-2",
     attrs: {
       "user": _vm.user
@@ -83261,15 +83645,15 @@ if (false) {
 }
 
 /***/ }),
-/* 202 */
+/* 205 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(203),
+  __webpack_require__(206),
   /* template */
-  __webpack_require__(204),
+  __webpack_require__(207),
   /* styles */
   null,
   /* scopeId */
@@ -83301,7 +83685,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 203 */
+/* 206 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -83361,7 +83745,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 204 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -83382,370 +83766,6 @@ if (false) {
   module.hot.accept()
   if (module.hot.data) {
      require("vue-hot-reload-api").rerender("data-v-6aa12f8c", module.exports)
-  }
-}
-
-/***/ }),
-/* 205 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(206),
-  /* template */
-  __webpack_require__(207),
-  /* styles */
-  null,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Subscribe.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] Subscribe.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-24dd825e", Component.options)
-  } else {
-    hotAPI.reload("data-v-24dd825e", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 206 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user'],
-
-    data: function data() {
-        return {
-            auth: null,
-            loaded: false,
-            subscription: null,
-            isCancelling: false,
-            isCreating: false,
-            planId: 'bronze',
-            plans: []
-        };
-    },
-
-
-    computed: {
-        containerId: function containerId() {
-            if (!this.loaded) {
-                return '';
-            }
-
-            return this.auth.has_card_on_file && !this.subscribed ? 'subscription-checkout' : '';
-        },
-        icon: function icon() {
-            return this.subscribed ? 'close' : 'check';
-        },
-        text: function text() {
-            return this.subscribed ? 'Subscription' : 'Subscribe';
-        },
-        subscribed: function subscribed() {
-            return this.subscription !== null;
-        },
-        willCancel: function willCancel() {
-            return this.subscription.cancels_at !== null;
-        },
-        cancelClasses: function cancelClasses() {
-            return {
-                'button': true,
-                'is-loading': this.isCancelling
-            };
-        },
-        createClasses: function createClasses() {
-            return {
-                'button': true,
-                'is-primary': true,
-                'is-pulled-right': true,
-                'is-loading': this.isCreating
-            };
-        },
-        triggerClasses: function triggerClasses() {
-            return {
-                'button': true,
-                'is-primary': true,
-                'is-loading': !this.loaded
-            };
-        },
-        amount: function amount() {
-            var _this = this;
-
-            return !this.plans.length ? 0 : this.plans.find(function (p) {
-                return p.id == _this.planId;
-            }).amount;
-        },
-        createButtonDisabled: function createButtonDisabled() {
-            return this.isCreating;
-        }
-    },
-
-    methods: {
-        /**
-         * Formats the last four card numbers.
-         */
-        formatLastFour: function formatLastFour(value) {
-            return Util.formatLastFour(value);
-        },
-
-
-        /**
-         * Gets the classes for the given plan.
-         */
-        planClasses: function planClasses(plan) {
-            return {
-                'token-package': true,
-                'is-selected': this.planId == plan.id
-            };
-        },
-
-
-        /**
-         * Selects the given plan.
-         */
-        selectPlan: function selectPlan(plan) {
-            this.planId = plan.id;
-        },
-
-
-        /**
-         * Creates the subscription.
-         */
-        create: function create() {
-            var _this2 = this;
-
-            this.isCreating = true;
-
-            axios.post('/api/subscription', { user_id: this.user.id, plan: this.planId }).then(function (r) {
-                _this2.fetch();
-                _this2.isCreating = false;
-            });
-        },
-
-
-        /**
-         * Cancels the subscription.
-         */
-        cancel: function cancel() {
-            var _this3 = this;
-
-            this.isCancelling = true;
-
-            axios.delete('/api/subscription/' + this.user.id).then(function (r) {
-                _this3.fetch();
-                _this3.isCancelling = false;
-            });
-        },
-
-
-        /**
-         * Gets the subscription data.
-         */
-        fetch: function fetch() {
-            var _this4 = this;
-
-            axios.get('/api/subscription/' + this.user.id).then(function (r) {
-                _this4.subscription = r.data.subscription;
-                _this4.auth = r.data.user;
-                _this4.plans = r.data.plans;
-                _this4.loaded = true;
-            });
-        }
-    },
-
-    created: function created() {
-        this.fetch();
-    }
-});
-
-/***/ }),
-/* 207 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('b-dropdown', {
-    attrs: {
-      "position": "is-bottom-left",
-      "id": _vm.containerId
-    }
-  }, [_c('a', {
-    class: _vm.triggerClasses,
-    slot: "trigger"
-  }, [_c('span', [_vm._v(_vm._s(_vm.text))]), _vm._v(" "), _c('i', {
-    staticClass: "material-icons m-l-1"
-  }, [_vm._v("keyboard_arrow_down")])]), _vm._v(" "), (_vm.loaded) ? _c('b-dropdown-item', {
-    attrs: {
-      "custom": ""
-    }
-  }, [(_vm.auth.has_card_on_file) ? _c('div', [(_vm.subscribed) ? _c('div', {
-    staticClass: "subscription-content has-text-centered"
-  }, [_c('small', {
-    staticClass: "is-muted"
-  }, [_vm._v("\n                    " + _vm._s(_vm.willCancel ? 'Expires' : 'Renews') + " on " + _vm._s(_vm._f("datetime")(_vm.subscription.ends_at)) + "\n                ")]), _vm._v(" "), _c('span', {
-    staticClass: "subtitle"
-  }, [_vm._v("\n                    Your subscription " + _vm._s(_vm.willCancel ? 'expires' : 'renews') + " " + _vm._s(_vm._f("todate")(_vm.subscription.ends_at)) + "\n                ")]), _vm._v(" "), (!_vm.willCancel) ? _c('button', {
-    class: _vm.cancelClasses,
-    on: {
-      "click": _vm.cancel
-    }
-  }, [_vm._v("Cancel Subscription")]) : _vm._e()]) : _c('div', {
-    staticClass: "token-checkout"
-  }, [_vm._l((_vm.plans), function(plan, index) {
-    return _c('div', {
-      class: _vm.planClasses(plan)
-    }, [_c('span', {
-      staticClass: "token-package-title"
-    }, [_vm._v(_vm._s(plan.name))]), _vm._v(" "), _c('div', {
-      staticClass: "token-package-controls"
-    }, [_c('div', {
-      staticClass: "token-package-controls-group"
-    }, [_c('span', {
-      staticClass: "token-package-cost"
-    }, [_vm._v(_vm._s(_vm._f("currency")(plan.amount)) + " / " + _vm._s(_vm._f("capitalize")(plan.interval)))]), _vm._v(" "), _c('button', {
-      staticClass: "button token-package-button",
-      on: {
-        "click": function($event) {
-          $event.preventDefault();
-          _vm.selectPlan(plan)
-        }
-      }
-    }, [_vm._v("Choose")])])])])
-  }), _vm._v(" "), _c('div', {
-    staticClass: "block m-t-3"
-  }, [_c('span', {
-    staticClass: "token-checkout-subtitle"
-  }, [_vm._v("\n                        Using card on file\n                        "), _c('a', {
-    staticClass: "is-pulled-right",
-    attrs: {
-      "href": "/settings/#billing"
-    }
-  }, [_vm._v("Change")])]), _vm._v(" "), _c('span', {
-    staticClass: "token-checkout-card-brand"
-  }, [_vm._v(_vm._s(_vm.auth.card_brand))]), _vm._v(" "), _c('span', {
-    staticClass: "token-checkout-card-number",
-    domProps: {
-      "innerHTML": _vm._s(_vm.formatLastFour(_vm.auth.card_last_four))
-    }
-  }), _vm._v(" "), _c('div', {
-    staticClass: "block m-t-3"
-  }, [_c('div', {
-    staticClass: "columns"
-  }, [_c('div', {
-    staticClass: "column"
-  }, [_c('small', [_vm._v("\n                                    All purchases are final and cannot be refunded. "), _c('a', [_vm._v("Terms & Conditions")]), _vm._v(".\n                                ")])]), _vm._v(" "), _c('div', {
-    staticClass: "column"
-  }, [_c('button', {
-    class: _vm.createClasses,
-    attrs: {
-      "disabled": _vm.createButtonDisabled
-    },
-    on: {
-      "click": _vm.create
-    }
-  }, [_vm._v("\n                                    Subscribe for " + _vm._s(_vm._f("currency")(_vm.amount)) + "\n                                ")])])])])])], 2)]) : _c('div', {
-    staticClass: "subscription-content has-text-centered"
-  }, [_c('p', [_vm._v("Before you can subscribe, you need to add a card to your account. Click the button below.")]), _vm._v(" "), _c('a', {
-    staticClass: "button is-primary m-t-3 m-b-3",
-    attrs: {
-      "href": "/settings/#billing"
-    }
-  }, [_vm._v("Add a card")])])]) : _vm._e()], 1)
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-24dd825e", module.exports)
   }
 }
 
@@ -85336,28 +85356,30 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         "width": "100",
         "align": "right"
       }
-    }, [_vm._v(_vm._s(_vm._f("currency")(purchase.amount)))])])
-  }), _vm._v(" "), _c('tr', [_c('th', {
-    attrs: {
-      "colspan": "2",
-      "align": "right"
-    }
-  }, [_vm._v("Total")]), _vm._v(" "), _c('th', {
+    }, [_vm._v(_vm._s(purchase.amount) + " Tokens")])])
+  }), _vm._v(" "), _c('tr', [_vm._m(1), _vm._v(" "), _c('td', {
     attrs: {
       "align": "right"
     }
-  }, [_vm._v(_vm._s(_vm._f("currency")(_vm.purchasesTotal)))])])], 2) : _vm._e()]) : _vm._e()
+  }, [_c('strong', [_vm._v(_vm._s(_vm.purchasesTotal) + " Tokens")])])])], 2) : _vm._e()]) : _vm._e()
 },staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('tr', [_c('th', {
+  return _c('tr', [_c('td', {
     attrs: {
       "width": "200"
     }
-  }, [_vm._v("Timestamp")]), _vm._v(" "), _c('th', [_vm._v("Description")]), _vm._v(" "), _c('th', {
+  }, [_c('strong', [_vm._v("Timestamp")])]), _vm._v(" "), _c('td', [_c('strong', [_vm._v("Description")])]), _vm._v(" "), _c('td', {
     attrs: {
       "width": "100",
       "align": "right"
     }
-  }, [_vm._v("Amount")])])
+  }, [_c('strong', [_vm._v("Amount")])])])
+},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('td', {
+    attrs: {
+      "colspan": "2",
+      "align": "right"
+    }
+  }, [_c('strong', [_vm._v("Total")])])
 }]}
 module.exports.render._withStripped = true
 if (false) {

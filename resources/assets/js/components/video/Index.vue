@@ -1,21 +1,36 @@
 <template>
     <div>
         <video
-            :class="videoClasses"
             controls
             preload="auto"
             width="100%"
             height="540"
+            :class="videoClasses"
             :poster="video.thumbnail"
             :data-setup="videoSetupJson">
-            <source :src="video.stream_url" type="video/mp4" v-if="video.stream_url">
+            <source :src="video.stream_url" type="video/mp4" v-if="video.stream_url && video.unlocked">
         </video>
 
         <div class="card p-3 m-t-3">
             <h2 class="video-title">
                 {{ video.name }}
 
-                <f-purchase :amount="500" type="video" :id="video.id" class="is-pulled-right" @success="purchaseSuccess"></f-purchase>
+                <f-subscribe
+                    v-if="! video.is_mine && video.required_subscription"
+                    tag="You need to be a subscriber"
+                    class="is-pulled-right"
+                    :user="video.user"
+                    :plan="video.required_subscription">
+                </f-subscribe>
+
+                <f-purchase
+                    v-if="! video.is_mine && video.token_price"
+                    :amount="video.token_price"
+                    type="video"
+                    :id="video.id"
+                    class="is-pulled-right m-r-2"
+                    @success="purchaseSuccess">
+                </f-purchase>
             </h2>
 
             <span class="video-meta">

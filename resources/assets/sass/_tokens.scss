@@ -21,6 +21,11 @@
             box-shadow: $shadow;
         }
 
+        &.is-disabled {
+            opacity: .5;
+            filter: blur(2px);
+        }
+
         .token-package-title {
             width: 50%;
             float: left;

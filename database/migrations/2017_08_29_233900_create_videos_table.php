@@ -25,8 +25,8 @@ class CreateVideosTable extends Migration
             $table->integer('width')->nullable();
             $table->integer('height')->nullable();
             $table->integer('frame_rate')->nullable();
-            $table->boolean('subscriber_only')->default(false);
-            $table->bigInteger('token_price')->default(0);
+            $table->enum('required_subscription', ['bronze', 'silver', 'gold'])->nullable()->index();
+            $table->bigInteger('token_price')->nullable();
             $table->boolean('has_processed')->default(false);
             $table->timestamps();
         });

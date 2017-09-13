@@ -33,7 +33,9 @@ class Video extends Model implements Purchase
         'edit_url',
         'is_mine',
         'thumbnails',
-        'thumbnail'
+        'thumbnail',
+        'unlocked',
+        'locked',
     ];
 
     /**
@@ -56,6 +58,30 @@ class Video extends Model implements Purchase
             'name' => $this->name,
             'amount' => 500
         ];
+    }
+
+    /**
+     * Determines if the video is locked to the authenticated user.
+     *
+     * @return boolean
+     */
+    public function getLockedAttribute()
+    {
+        if (auth()->guest()) {
+            return true;
+        }
+
+        return ! $this->purchased();
+    }
+
+    /**
+     * Determines if the video is unlocked to the authenticated user.
+     *
+     * @return boolean
+     */
+    public function getUnlockedAttribute()
+    {
+        return ! $this->locked;
     }
 
     /**

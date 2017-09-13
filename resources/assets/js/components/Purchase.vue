@@ -21,7 +21,7 @@
                 Purchased
             </span>
 
-            <span v-if="! purchased">
+            <span v-else>
                 {{ amount }} Tokens
             </span>
         </button>
