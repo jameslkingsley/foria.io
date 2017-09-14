@@ -82040,12 +82040,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['video'],
 
     data: function data() {
         return {
+            media: this.video,
             videoSetup: {
                 fluid: true
             }
@@ -82077,7 +82081,23 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 type: 'is-success',
                 duration: 4000
             });
+
+            this.fetch();
+        },
+        subscribeSuccess: function subscribeSuccess() {
+            this.fetch();
+        },
+        fetch: function fetch() {
+            var _this = this;
+
+            return ajax.get('/api/videos/' + this.media.id).then(function (r) {
+                return _this.media = r.data;
+            });
         }
+    },
+
+    created: function created() {
+        this.fetch();
     }
 });
 
@@ -82089,35 +82109,40 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   return _c('div', [_c('video', {
     class: _vm.videoClasses,
     attrs: {
+      "loop": "",
       "controls": "",
+      "autoplay": "",
       "preload": "auto",
       "width": "100%",
       "height": "540",
-      "poster": _vm.video.thumbnail,
+      "poster": _vm.media.thumbnail,
       "data-setup": _vm.videoSetupJson
     }
-  }, [(_vm.video.stream_url && _vm.video.unlocked) ? _c('source', {
+  }, [(_vm.media.stream_url && _vm.media.unlocked) ? _c('source', {
     attrs: {
-      "src": _vm.video.stream_url,
+      "src": _vm.media.stream_url,
       "type": "video/mp4"
     }
   }) : _vm._e()]), _vm._v(" "), _c('div', {
     staticClass: "card p-3 m-t-3"
   }, [_c('h2', {
     staticClass: "video-title"
-  }, [_vm._v("\n            " + _vm._s(_vm.video.name) + "\n\n            "), (!_vm.video.is_mine && _vm.video.required_subscription) ? _c('f-subscribe', {
+  }, [_vm._v("\n            " + _vm._s(_vm.media.name) + "\n\n            "), (!_vm.media.is_mine && _vm.media.required_subscription) ? _c('f-subscribe', {
     staticClass: "is-pulled-right",
     attrs: {
       "tag": _vm.subscribeTag,
-      "user": _vm.video.user,
-      "plan": _vm.video.required_subscription
+      "user": _vm.media.user,
+      "plan": _vm.media.required_subscription
+    },
+    on: {
+      "success": _vm.subscribeSuccess
     }
-  }) : _vm._e(), _vm._v(" "), (!_vm.video.is_mine && _vm.video.token_price) ? _c('f-purchase', {
-    staticClass: "is-pulled-right m-r-2",
+  }) : _vm._e(), _vm._v(" "), (!_vm.media.is_mine && _vm.media.token_price) ? _c('f-purchase', {
+    staticClass: "is-pulled-right",
     attrs: {
       "type": "video",
-      "amount": _vm.video.token_price,
-      "id": _vm.video.id
+      "amount": _vm.media.token_price,
+      "id": _vm.media.id
     },
     on: {
       "success": _vm.purchaseSuccess
@@ -82126,22 +82151,22 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "video-meta"
   }, [_c('a', {
     attrs: {
-      "href": _vm.video.user.profile_url
+      "href": _vm.media.user.profile_url
     }
-  }, [_vm._v(_vm._s(_vm.video.user.name))]), _vm._v("\n            ·\n            " + _vm._s(_vm._f("fromnow")(_vm.video.created_at)) + "\n        ")]), _vm._v(" "), _c('span', {
+  }, [_vm._v(_vm._s(_vm.media.user.name))]), _vm._v("\n            ·\n            " + _vm._s(_vm._f("fromnow")(_vm.media.created_at)) + "\n        ")]), _vm._v(" "), _c('span', {
     staticClass: "video-meta"
   }, [_c('f-rating', {
     staticClass: "is-pulled-left",
     attrs: {
       "type": "video",
-      "id": _vm.video.id
+      "id": _vm.media.id
     }
-  })], 1)]), _vm._v(" "), (_vm.video.is_mine) ? _c('div', {
+  })], 1)]), _vm._v(" "), (_vm.media.is_mine) ? _c('div', {
     staticClass: "card p-3 m-t-3"
   }, [_c('a', {
     staticClass: "button is-primary",
     attrs: {
-      "href": _vm.video.edit_url
+      "href": _vm.media.edit_url
     }
   }, [_c('i', {
     staticClass: "material-icons m-r-2"
@@ -83223,6 +83248,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             axios.post('/api/subscription', { user_id: this.user.id, plan: this.planId }).then(function (r) {
                 _this2.fetch();
                 _this2.isCreating = false;
+                _this2.$emit('success');
             });
         },
         cancel: function cancel() {
@@ -83264,7 +83290,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [(_vm.tag) ? _c('span', {
+  return _c('div', [(_vm.loaded && _vm.tag && !_vm.subscribed) ? _c('span', {
     staticClass: "button-tag",
     domProps: {
       "textContent": _vm._s(_vm.tag)

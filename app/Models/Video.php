@@ -56,7 +56,7 @@ class Video extends Model implements Purchase
     {
         return [
             'name' => $this->name,
-            'amount' => 500
+            'amount' => $this->token_price
         ];
     }
 
@@ -69,6 +69,10 @@ class Video extends Model implements Purchase
     {
         if (auth()->guest()) {
             return true;
+        }
+
+        if ($this->required_subscription) {
+            return ! auth()->user()->subscribedTo($this->user);
         }
 
         return ! $this->purchased();
@@ -190,7 +194,11 @@ class Video extends Model implements Purchase
         }
 
         if (! is_null($this->path)) {
-            return Storage::url($this->path);
+            if (starts_with($this->path, 'http')) {
+                return $this->path;
+            } else {
+                return Storage::url($this->path);
+            }
         }
 
         return null;

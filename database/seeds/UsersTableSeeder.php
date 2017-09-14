@@ -17,7 +17,10 @@ class UsersTableSeeder extends Seeder
             'email' => 'jlkingsley97@gmail.com',
             'password' => bcrypt('password'),
             'remember_token' => str_random(10),
-            'is_model' => true
+            'is_model' => true,
+            'stripe_id' => 'cus_BOXtJ54MeJrMvy',
+            'card_brand' => 'Visa',
+            'card_last_four' => '4242',
         ]);
 
         factory(User::class, 30)->create();

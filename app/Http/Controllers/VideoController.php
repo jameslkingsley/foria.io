@@ -119,6 +119,19 @@ class VideoController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Video  $video
+     * @return \Illuminate\Http\Response
+     */
+    public function showJson(Video $video)
+    {
+        $video->load('user');
+
+        return $video;
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\Video  $video

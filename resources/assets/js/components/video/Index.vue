@@ -1,51 +1,54 @@
 <template>
     <div>
         <video
+            loop
             controls
+            autoplay
             preload="auto"
             width="100%"
             height="540"
             :class="videoClasses"
-            :poster="video.thumbnail"
+            :poster="media.thumbnail"
             :data-setup="videoSetupJson">
-            <source :src="video.stream_url" type="video/mp4" v-if="video.stream_url && video.unlocked">
+            <source :src="media.stream_url" type="video/mp4" v-if="media.stream_url && media.unlocked">
         </video>
 
         <div class="card p-3 m-t-3">
             <h2 class="video-title">
-                {{ video.name }}
+                {{ media.name }}
 
                 <f-subscribe
-                    v-if="! video.is_mine && video.required_subscription"
+                    v-if="! media.is_mine && media.required_subscription"
                     class="is-pulled-right"
                     :tag="subscribeTag"
-                    :user="video.user"
-                    :plan="video.required_subscription">
+                    :user="media.user"
+                    :plan="media.required_subscription"
+                    @success="subscribeSuccess">
                 </f-subscribe>
 
                 <f-purchase
-                    v-if="! video.is_mine && video.token_price"
-                    class="is-pulled-right m-r-2"
+                    v-if="! media.is_mine && media.token_price"
+                    class="is-pulled-right"
                     type="video"
-                    :amount="video.token_price"
-                    :id="video.id"
+                    :amount="media.token_price"
+                    :id="media.id"
                     @success="purchaseSuccess">
                 </f-purchase>
             </h2>
 
             <span class="video-meta">
-                <a :href="video.user.profile_url">{{ video.user.name }}</a>
+                <a :href="media.user.profile_url">{{ media.user.name }}</a>
                 &middot;
-                {{ video.created_at | fromnow }}
+                {{ media.created_at | fromnow }}
             </span>
 
             <span class="video-meta">
-                <f-rating type="video" :id="video.id" class="is-pulled-left"></f-rating>
+                <f-rating type="video" :id="media.id" class="is-pulled-left"></f-rating>
             </span>
         </div>
 
-        <div class="card p-3 m-t-3" v-if="video.is_mine">
-            <a :href="video.edit_url" class="button is-primary">
+        <div class="card p-3 m-t-3" v-if="media.is_mine">
+            <a :href="media.edit_url" class="button is-primary">
                 <i class="material-icons m-r-2">settings</i>
                 Manage Video
             </a>
@@ -63,6 +66,7 @@
 
         data() {
             return {
+                media: this.video,
                 videoSetup: {
                     fluid: true
                 }
@@ -95,7 +99,22 @@
                     type: 'is-success',
                     duration: 4000
                 });
+
+                this.fetch();
+            },
+
+            subscribeSuccess() {
+                this.fetch();
+            },
+
+            fetch() {
+                return ajax.get(`/api/videos/${this.media.id}`)
+                    .then(r => this.media = r.data);
             }
+        },
+
+        created() {
+            this.fetch();
         }
     }
 </script>

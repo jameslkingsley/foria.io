@@ -1,6 +1,6 @@
 <template>
     <div>
-        <span class="button-tag" v-if="tag" v-text="tag"></span>
+        <span class="button-tag" v-if="loaded && tag && ! subscribed" v-text="tag"></span>
 
         <b-dropdown position="is-bottom-left" :id="containerId">
             <a :class="triggerClasses" slot="trigger">
@@ -183,6 +183,7 @@
                 axios.post('/api/subscription', { user_id: this.user.id, plan: this.planId }).then(r => {
                     this.fetch();
                     this.isCreating = false;
+                    this.$emit('success');
                 });
             },
 

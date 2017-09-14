@@ -20,6 +20,7 @@ Route::resource('/api/broadcast', 'BroadcastController');
 
 // Videos
 Route::get('/api/videos/list/{user}', 'VideoController@index');
+Route::get('/api/videos/{video}', 'VideoController@showJson');
 Route::post('/api/videos', 'VideoController@store');
 Route::post('/api/videos/{video}', 'VideoController@update');
 Route::get('/videos/new', 'VideoController@create');
