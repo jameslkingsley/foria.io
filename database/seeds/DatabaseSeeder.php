@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Comment;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UsersTableSeeder::class);
         $this->call(TokenPackageSeeder::class);
         $this->call(VideoSeeder::class);
-        // $this->call(BroadcastSeeder::class);
+
+        factory(Comment::class, 50)->create();
     }
 }

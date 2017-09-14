@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\Rateable;
 use App\Contracts\Purchase;
+use App\Traits\Commentable;
 use App\Traits\Purchasable;
 use App\Traits\BelongsToUser;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,7 @@ class Video extends Model implements Purchase
 {
     use Rateable,
         Purchasable,
+        Commentable,
         BelongsToUser;
 
     /**
@@ -169,6 +171,10 @@ class Video extends Model implements Purchase
      */
     public function viewable()
     {
+        if ($this->is_mine) {
+            return true;
+        }
+
         if ($this->required_subscription) {
             if (auth()->guest() || ! auth()->user()->subscribedTo($this->user)) {
                 return false;

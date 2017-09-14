@@ -113,7 +113,10 @@ class VideoController extends Controller
      */
     public function show(Video $video)
     {
-        $video->load('user');
+        $video->load('user')
+            ->load('comments');
+
+        $video->comments->load('user');
 
         return vue('f-video', compact('video'));
     }

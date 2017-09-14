@@ -1,0 +1,33 @@
+.comments {
+    .comment {
+        float: inherit;
+        width: inherit;
+        margin-bottom: 1rem;
+        font-size: 14px;
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .comment-details {
+            float: inherit;
+            width: inherit;
+            color: $primary;
+
+            .comment-author {
+                float: inherit;
+                font-weight: 600;
+            }
+
+            .comment-timestamp {
+                color: black;
+                opacity: 0.66;
+            }
+        }
+
+        .comment-body {
+            float: inherit;
+            width: inherit;
+        }
+    }
+}

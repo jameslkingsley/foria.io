@@ -54,8 +54,18 @@
             </a>
         </div>
 
-        <div class="card p-3 m-t-3">
-            Comments
+        <div class="columns">
+            <div class="column is-9">
+                <div class="card p-3 m-t-3">
+                    <f-video-comments :preload="video.comments" type="video" :id="media.id"></f-video-comments>
+                </div>
+            </div>
+
+            <div class="column is-3">
+                <div class="card p-3 m-t-3">
+                    <h1 class="subtitle">Recommended videos</h1>
+                </div>
+            </div>
         </div>
     </div>
 </template>

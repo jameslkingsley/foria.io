@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Purchase;
+use App\Events\TokensAdded;
 use App\Exceptions\NoCustomerException;
 use Illuminate\Auth\AuthenticationException;
 use App\Exceptions\InsufficientFundsException;
@@ -28,6 +29,8 @@ trait Purchasable
 
         auth()->user()->tokens -= (int) $details->amount;
         auth()->user()->save();
+
+        event(new TokensAdded(auth()->user(), -(int) $details->amount));
 
         return $this->purchases()->save(
             new Purchase([

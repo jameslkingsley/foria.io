@@ -16677,6 +16677,7 @@ Vue.component('f-video', __webpack_require__(181));
 Vue.component('f-video-upload', __webpack_require__(184));
 Vue.component('f-video-edit', __webpack_require__(187));
 Vue.component('f-video-list', __webpack_require__(190));
+Vue.component('f-video-comments', __webpack_require__(268));
 
 // Ratings
 Vue.component('f-rating', __webpack_require__(193));
@@ -82043,6 +82044,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['video'],
@@ -82171,9 +82182,27 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('i', {
     staticClass: "material-icons m-r-2"
   }, [_vm._v("settings")]), _vm._v("\n            Manage Video\n        ")])]) : _vm._e(), _vm._v(" "), _c('div', {
+    staticClass: "columns"
+  }, [_c('div', {
+    staticClass: "column is-9"
+  }, [_c('div', {
     staticClass: "card p-3 m-t-3"
-  }, [_vm._v("\n        Comments\n    ")])])
-},staticRenderFns: []}
+  }, [_c('f-video-comments', {
+    attrs: {
+      "preload": _vm.video.comments,
+      "type": "video",
+      "id": _vm.media.id
+    }
+  })], 1)]), _vm._v(" "), _vm._m(0)])])
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "column is-3"
+  }, [_c('div', {
+    staticClass: "card p-3 m-t-3"
+  }, [_c('h1', {
+    staticClass: "subtitle"
+  }, [_vm._v("Recommended videos")])])])
+}]}
 module.exports.render._withStripped = true
 if (false) {
   module.hot.accept()
@@ -86931,6 +86960,196 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */,
+/* 267 */,
+/* 268 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(269),
+  /* template */
+  __webpack_require__(270),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\video\\Comments.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Comments.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-629ae091", Component.options)
+  } else {
+    hotAPI.reload("data-v-629ae091", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 269 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: {
+        type: { type: String },
+        id: { type: Number },
+        preload: { type: Array, default: null }
+    },
+
+    data: function data() {
+        return {
+            loaded: this.preload !== null,
+            comments: this.preload,
+            body: ''
+        };
+    },
+
+
+    methods: {
+        post: function post() {
+            var _this = this;
+
+            return ajax.post('/api/comments/' + this.type + '/' + this.id, { body: this.body }).then(function (r) {
+                _this.body = '';
+                _this.comments.unshift(r.data);
+            });
+        },
+        fetch: function fetch() {
+            var _this2 = this;
+
+            return ajax.get('/api/comments/' + this.type + '/' + this.id).then(function (r) {
+                _this2.loaded = true;
+                _this2.comments = r.data;
+            });
+        }
+    },
+
+    created: function created() {
+        if (this.preload === null) {
+            this.fetch();
+        }
+    }
+});
+
+/***/ }),
+/* 270 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('h1', {
+    staticClass: "subtitle m-b-3"
+  }, [_vm._v("Comments")]), _vm._v(" "), _c('form', {
+    attrs: {
+      "method": "post"
+    },
+    on: {
+      "submit": function($event) {
+        $event.preventDefault();
+        _vm.post($event)
+      }
+    }
+  }, [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.body),
+      expression: "body"
+    }],
+    staticClass: "input",
+    attrs: {
+      "name": "body",
+      "placeholder": "Type a comment..."
+    },
+    domProps: {
+      "value": (_vm.body)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.body = $event.target.value
+      }
+    }
+  })]), _vm._v(" "), (!_vm.loaded) ? _c('p', {
+    staticClass: "m-t-3"
+  }, [_vm._v("Loading...")]) : _vm._e(), _vm._v(" "), (_vm.loaded) ? _c('ul', {
+    staticClass: "comments m-t-3"
+  }, _vm._l((_vm.comments), function(comment) {
+    return _c('li', {
+      staticClass: "comment"
+    }, [_c('div', {
+      staticClass: "comment-details"
+    }, [_c('span', {
+      staticClass: "comment-author"
+    }, [_vm._v("\n                    " + _vm._s(comment.user.name) + "\n                ")]), _vm._v("\n\n                ·\n\n                "), _c('span', {
+      staticClass: "comment-timestamp"
+    }, [_vm._v("\n                    " + _vm._s(_vm._f("fromnow")(comment.created_at)) + "\n                ")])]), _vm._v(" "), _c('div', {
+      staticClass: "comment-body"
+    }, [_vm._v("\n                " + _vm._s(comment.body) + "\n            ")])])
+  })) : _vm._e()])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-629ae091", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

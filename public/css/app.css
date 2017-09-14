@@ -15268,3 +15268,35 @@ nav.navbar .navbar-link:focus {
   float: left;
 }
 
+.comments .comment {
+  float: inherit;
+  width: inherit;
+  margin-bottom: 1rem;
+  font-size: 14px;
+}
+
+.comments .comment:last-of-type {
+  margin-bottom: 0;
+}
+
+.comments .comment .comment-details {
+  float: inherit;
+  width: inherit;
+  color: #555abf;
+}
+
+.comments .comment .comment-details .comment-author {
+  float: inherit;
+  font-weight: 600;
+}
+
+.comments .comment .comment-details .comment-timestamp {
+  color: black;
+  opacity: 0.66;
+}
+
+.comments .comment .comment-body {
+  float: inherit;
+  width: inherit;
+}
+

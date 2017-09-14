@@ -27,6 +27,10 @@ Route::get('/videos/new', 'VideoController@create');
 Route::get('/videos/edit/{video}', 'VideoController@edit');
 Route::get('/videos/{video}', 'VideoController@show');
 
+// Comments
+Route::get('/api/comments/{type}/{id}', 'CommentController@index');
+Route::post('/api/comments/{type}/{id}', 'CommentController@store');
+
 // Ratings
 Route::get('/api/ratings/{type}/{id}', 'RatingController@show');
 

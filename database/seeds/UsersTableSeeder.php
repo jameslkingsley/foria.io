@@ -21,6 +21,7 @@ class UsersTableSeeder extends Seeder
             'stripe_id' => 'cus_BOXtJ54MeJrMvy',
             'card_brand' => 'Visa',
             'card_last_four' => '4242',
+            'tokens' => 1000000
         ]);
 
         factory(User::class, 30)->create();
