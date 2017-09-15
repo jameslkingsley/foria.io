@@ -2,7 +2,9 @@
     <form :method="method" @submit.prevent="handle">
         <slot></slot>
 
-        <f-form-button class="is-pulled-right m-t-3 m-l-2" :submitting="submitting">{{ confirm }}</f-form-button>
+        <b-field class="has-text-right">
+            <f-form-button class="m-t-3 m-l-2" :submitting="submitting">{{ confirm }}</f-form-button>
+        </b-field>
     </form>
 </template>
 
