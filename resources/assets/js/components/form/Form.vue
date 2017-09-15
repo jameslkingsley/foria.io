@@ -2,8 +2,9 @@
     <form :method="method" @submit.prevent="handle">
         <slot></slot>
 
-        <b-field class="has-text-right">
-            <f-form-button class="m-t-3 m-l-2" :submitting="submitting">{{ confirm }}</f-form-button>
+        <b-field class="has-text-right" :style="footerStyle">
+            <slot name="footer"></slot>
+            <f-form-button class="m-t-3 m-l-2" :style="submitStyle" :submitting="submitting">{{ confirm }}</f-form-button>
         </b-field>
     </form>
 </template>
@@ -29,6 +30,16 @@
             submit: {
                 type: Function,
                 default() {}
+            },
+
+            footerStyle: {
+                type: Object,
+                default: {}
+            },
+
+            submitStyle: {
+                type: Object,
+                default: {}
             }
         },
 

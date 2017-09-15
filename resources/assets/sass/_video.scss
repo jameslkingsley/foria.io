@@ -154,3 +154,53 @@ $slider-bg-color: #FFF;
     background: lighten($slider-bg-color, 50%);
     background: rgba($slider-bg-color, 0.75);
 }
+
+.video-edit-access-option {
+    float: left;
+    width: 100%;
+    margin: 2rem 0;
+
+    .veao-description {
+        text-align: center;
+        font-size: 14px;
+        margin-bottom: 0.5rem;
+    }
+
+    .veao-field {
+        width: 50%;
+        margin: 0 auto;
+    }
+
+    .veao-plan {
+        float: left;
+        width: 100%;
+        padding: 0.5rem 1rem;
+        font-size: 18px;
+        border-radius: $radius;
+        cursor: pointer;
+
+        &.is-active {
+            background: $primary;
+            color: white;
+            box-shadow: $shadow;
+        }
+
+        .veaop-title {
+            float: left;
+            width: 50%;
+        }
+
+        .veaop-price {
+            float: right;
+            width: 50%;
+            text-align: right;
+            font-size: inherit;
+        }
+    }
+}
+
+.veao-separator {
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+}

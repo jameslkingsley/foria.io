@@ -82448,6 +82448,39 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['video'],
@@ -82456,11 +82489,46 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         return {
             accessOption: 'tokens',
             selectedPlan: null,
-            tokenPrice: 0,
-            plans: [{ id: 'bronze', title: 'Bronze', price: '£4.99/month' }, { id: 'silver', title: 'Silver', price: '£9.99/month' }, { id: 'gold', title: 'Gold', price: '£24.99/month' }]
+            tokenPrice: null,
+            privacy: 'Public',
+            plans: [{ id: 'bronze', title: 'Bronze', price: 499 }, { id: 'silver', title: 'Silver', price: 999 }, { id: 'gold', title: 'Gold', price: 2499 }],
+            footerStyle: {
+                'float': 'left',
+                'width': '100%',
+                'display': 'block',
+                'margin-top': '2rem'
+            },
+            submitStyle: {
+                'margin-top': '0 !important'
+            }
         };
     },
 
+
+    computed: {
+        tokenPriceNet: function tokenPriceNet() {
+            var pence = this.tokenPrice * 0.1 * 100;
+
+            return 0.7 * pence;
+        },
+        selectedPlanNet: function selectedPlanNet() {
+            var plan = _.find(this.plans, ['id', this.selectedPlan]);
+
+            if (plan) {
+                return plan.price * 0.6;
+            }
+
+            return 0;
+        }
+    },
+
+    watch: {
+        tokenPrice: function tokenPrice() {
+            if (this.tokenPrice > 0) {
+                this.selectedPlan = null;
+            }
+        }
+    },
 
     methods: {
         submit: function submit(data) {
@@ -82476,6 +82544,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         choosePlan: function choosePlan(plan) {
             this.selectedPlan = plan.id;
+            this.tokenPrice = null;
+        },
+        planClasses: function planClasses(plan) {
+            return {
+                'veao-plan': true,
+                'is-active': plan.id === this.selectedPlan && this.tokenPrice === null
+            };
         }
     }
 });
@@ -82489,51 +82564,71 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "card p-3"
   }, [_c('h3', {
     staticClass: "settings-title m-b-3"
-  }, [_vm._v("\n        Edit Video\n    ")]), _vm._v(" "), _c('f-form', {
+  }, [_vm._v("\n        Edit Video\n    ")]), _vm._v(" "), _c('div', {
+    staticClass: "columns"
+  }, [_c('div', {
+    staticClass: "column is-4 is-offset-4"
+  }, [_c('f-form', {
     attrs: {
-      "confirm": "Save Changes & Publish"
+      "confirm": "Save Changes",
+      "footer-style": _vm.footerStyle,
+      "submit-style": _vm.submitStyle
     },
     on: {
       "submit": _vm.submit
     }
-  }, [_c('b-field', [_c('b-input', {
+  }, [_c('b-field', {
+    attrs: {
+      "label": "Title"
+    }
+  }, [_c('b-input', {
     attrs: {
       "name": "name",
       "value": _vm.video.name
     }
-  })], 1), _vm._v(" "), _c('b-field', [_c('p', [_vm._v("How do you want people to access this video?")]), _vm._v(" "), _c('div', {
+  })], 1), _vm._v(" "), _c('hr'), _vm._v(" "), _c('p', {
+    staticClass: "has-text-centered subtitle m-0"
+  }, [_vm._v("Video Access")]), _vm._v(" "), _c('div', {
     staticClass: "video-edit-access-option"
-  }, [_c('input', {
+  }, [_c('p', {
+    staticClass: "veao-description"
+  }, [_vm._v("\n                        Require users to pay with tokens.\n                        "), _c('br'), _vm._v(" "), _c('strong', {
     directives: [{
-      name: "model",
-      rawName: "v-model",
+      name: "show",
+      rawName: "v-show",
       value: (_vm.tokenPrice),
       expression: "tokenPrice"
-    }],
+    }]
+  }, [_vm._v("You will receive " + _vm._s(_vm._f("currency")(_vm.tokenPriceNet)))])]), _vm._v(" "), _c('b-input', {
     staticClass: "veao-field",
     attrs: {
-      "type": "number"
+      "placeholder": "Amount",
+      "type": "number",
+      "icon": "local_play"
     },
-    domProps: {
-      "value": (_vm.tokenPrice)
-    },
-    on: {
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.tokenPrice = $event.target.value
-      }
+    model: {
+      value: (_vm.tokenPrice),
+      callback: function($$v) {
+        _vm.tokenPrice = $$v
+      },
+      expression: "tokenPrice"
     }
-  }), _vm._v(" "), _c('span', {
-    staticClass: "veao-label"
-  }, [_vm._v("Tokens")]), _vm._v(" "), _c('small', {
-    staticClass: "veao-subtext"
-  })]), _vm._v(" "), _c('p', {
+  })], 1), _vm._v(" "), _c('p', {
     staticClass: "veao-separator"
   }, [_vm._v("OR")]), _vm._v(" "), _c('div', {
     staticClass: "video-edit-access-option"
-  }, _vm._l((_vm.plans), function(plan) {
+  }, [_c('p', {
+    staticClass: "veao-description"
+  }, [_vm._v("\n                        Require users to be subscribed with the selected plan (or higher). You're guaranteed the first month's subscription.\n\n                        "), _c('br'), _c('br'), _vm._v(" "), _c('strong', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.selectedPlan),
+      expression: "selectedPlan"
+    }]
+  }, [_vm._v("\n                            You will receive " + _vm._s(_vm._f("currency")(_vm.selectedPlanNet)) + " each month (providing the user continues the subscription after the first month)\n                        ")])]), _vm._v(" "), _vm._l((_vm.plans), function(plan) {
     return _c('div', {
-      staticClass: "veao-plan",
+      class: _vm.planClasses(plan),
       on: {
         "click": function($event) {
           $event.preventDefault();
@@ -82542,10 +82637,24 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }, [_c('span', {
       staticClass: "veaop-title"
-    }, [_vm._v(_vm._s(plan.title))]), _vm._v(" "), _c('small', {
+    }, [_vm._v(_vm._s(plan.title))]), _vm._v(" "), _c('span', {
       staticClass: "veaop-price"
-    }, [_vm._v(_vm._s(plan.price))])])
-  }))])], 1)], 1)
+    }, [_vm._v(_vm._s(_vm._f("currency")(plan.price)) + "/month")])])
+  })], 2), _vm._v(" "), _c('hr'), _vm._v(" "), _c('b-switch', {
+    staticClass: "is-pulled-left",
+    attrs: {
+      "true-value": "Public",
+      "false-value": "Private"
+    },
+    slot: "footer",
+    model: {
+      value: (_vm.privacy),
+      callback: function($$v) {
+        _vm.privacy = $$v
+      },
+      expression: "privacy"
+    }
+  }, [_vm._v("\n                    " + _vm._s(_vm.privacy) + "\n                ")])], 1)], 1)])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -86252,6 +86361,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: {
@@ -86273,6 +86383,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         submit: {
             type: Function,
             default: function _default() {}
+        },
+
+        footerStyle: {
+            type: Object,
+            default: {}
+        },
+
+        submitStyle: {
+            type: Object,
+            default: {}
         }
     },
 
@@ -86318,13 +86438,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }
   }, [_vm._t("default"), _vm._v(" "), _c('b-field', {
-    staticClass: "has-text-right"
-  }, [_c('f-form-button', {
+    staticClass: "has-text-right",
+    style: (_vm.footerStyle)
+  }, [_vm._t("footer"), _vm._v(" "), _c('f-form-button', {
     staticClass: "m-t-3 m-l-2",
+    style: (_vm.submitStyle),
     attrs: {
       "submitting": _vm.submitting
     }
-  }, [_vm._v(_vm._s(_vm.confirm))])], 1)], 2)
+  }, [_vm._v(_vm._s(_vm.confirm))])], 2)], 2)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {

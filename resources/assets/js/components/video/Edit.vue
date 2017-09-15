@@ -4,30 +4,63 @@
             Edit Video
         </h3>
 
-        <f-form confirm="Save Changes &amp; Publish" @submit="submit">
-            <b-field>
-                <b-input name="name" :value="video.name"></b-input>
-            </b-field>
+        <div class="columns">
+            <div class="column is-4 is-offset-4">
+                <f-form confirm="Save Changes" @submit="submit" :footer-style="footerStyle" :submit-style="submitStyle">
+                    <b-field label="Title">
+                        <b-input name="name" :value="video.name"></b-input>
+                    </b-field>
 
-            <b-field>
-                <p>How do you want people to access this video?</p>
+                    <hr />
 
-                <div class="video-edit-access-option">
-                    <input class="veao-field" type="number" v-model="tokenPrice">
-                    <span class="veao-label">Tokens</span>
-                    <small class="veao-subtext"></small>
-                </div>
+                    <p class="has-text-centered subtitle m-0">Video Access</p>
 
-                <p class="veao-separator">OR</p>
+                    <div class="video-edit-access-option">
+                        <p class="veao-description">
+                            Require users to pay with tokens.
+                            <br />
+                            <strong v-show="tokenPrice">You will receive {{ tokenPriceNet | currency }}</strong>
+                        </p>
 
-                <div class="video-edit-access-option">
-                    <div class="veao-plan" v-for="plan in plans" @click.prevent="choosePlan(plan)">
-                        <span class="veaop-title">{{ plan.title }}</span>
-                        <small class="veaop-price">{{ plan.price }}</small>
+                        <b-input placeholder="Amount"
+                            type="number"
+                            v-model="tokenPrice"
+                            class="veao-field"
+                            icon="local_play">
+                        </b-input>
                     </div>
-                </div>
-            </b-field>
-        </f-form>
+
+                    <p class="veao-separator">OR</p>
+
+                    <div class="video-edit-access-option">
+                        <p class="veao-description">
+                            Require users to be subscribed with the selected plan (or higher). You're guaranteed the first month's subscription.
+
+                            <br /><br />
+
+                            <strong v-show="selectedPlan">
+                                You will receive {{ selectedPlanNet | currency }} each month (providing the user continues the subscription after the first month)
+                            </strong>
+                        </p>
+
+                        <div v-for="plan in plans" :class="planClasses(plan)" @click.prevent="choosePlan(plan)">
+                            <span class="veaop-title">{{ plan.title }}</span>
+                            <span class="veaop-price">{{ plan.price | currency }}/month</span>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <b-switch slot="footer"
+                        v-model="privacy"
+                        true-value="Public"
+                        false-value="Private"
+                        class="is-pulled-left">
+                        {{ privacy }}
+                    </b-switch>
+                </f-form>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -39,13 +72,49 @@
             return {
                 accessOption: 'tokens',
                 selectedPlan: null,
-                tokenPrice: 0,
+                tokenPrice: null,
+                privacy: 'Public',
                 plans: [
-                    { id: 'bronze', title: 'Bronze', price: '£4.99/month' },
-                    { id: 'silver', title: 'Silver', price: '£9.99/month' },
-                    { id: 'gold', title: 'Gold', price: '£24.99/month' }
-                ]
+                    { id: 'bronze', title: 'Bronze', price: 499 },
+                    { id: 'silver', title: 'Silver', price: 999 },
+                    { id: 'gold', title: 'Gold', price: 2499 }
+                ],
+                footerStyle: {
+                    'float': 'left',
+                    'width': '100%',
+                    'display': 'block',
+                    'margin-top': '2rem'
+                },
+                submitStyle: {
+                    'margin-top': '0 !important'
+                }
             };
+        },
+
+        computed: {
+            tokenPriceNet() {
+                let pence = (this.tokenPrice * 0.1) * 100;
+
+                return 0.7 * pence;
+            },
+
+            selectedPlanNet() {
+                let plan = _.find(this.plans, ['id', this.selectedPlan]);
+
+                if (plan) {
+                    return plan.price * 0.6;
+                }
+
+                return 0;
+            }
+        },
+
+        watch: {
+            tokenPrice() {
+                if (this.tokenPrice > 0) {
+                    this.selectedPlan = null;
+                }
+            }
         },
 
         methods: {
@@ -62,6 +131,14 @@
 
             choosePlan(plan) {
                 this.selectedPlan = plan.id;
+                this.tokenPrice = null;
+            },
+
+            planClasses(plan) {
+                return {
+                    'veao-plan': true,
+                    'is-active': plan.id === this.selectedPlan && this.tokenPrice === null
+                };
             }
         }
     }
