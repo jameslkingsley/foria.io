@@ -118,7 +118,7 @@
             },
 
             fetch() {
-                return ajax.get(`/api/videos/${this.media.id}`)
+                return ajax.get(`/api/videos/${this.media.permalink}`)
                     .then(r => this.media = r.data);
             }
         },

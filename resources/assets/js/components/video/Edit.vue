@@ -8,7 +8,7 @@
             <div class="column is-4 is-offset-4">
                 <f-form confirm="Save Changes" @submit="submit" :footer-style="footerStyle" :submit-style="submitStyle">
                     <b-field label="Title">
-                        <b-input name="name" :value="video.name"></b-input>
+                        <b-input name="name" v-model="title"></b-input>
                     </b-field>
 
                     <hr />
@@ -53,10 +53,10 @@
 
                     <b-switch slot="footer"
                         v-model="privacy"
-                        true-value="Public"
-                        false-value="Private"
+                        true-value="public"
+                        false-value="private"
                         class="is-pulled-left">
-                        {{ privacy }}
+                        {{ privacy | capitalize }}
                     </b-switch>
                 </f-form>
             </div>
@@ -71,9 +71,11 @@
         data() {
             return {
                 accessOption: 'tokens',
-                selectedPlan: null,
-                tokenPrice: null,
-                privacy: 'Public',
+                selectedPlan: this.video.required_subscription,
+                tokenPrice: this.video.token_price,
+                privacy: this.video.privacy,
+                title: this.video.name,
+                url: this.video.url,
                 plans: [
                     { id: 'bronze', title: 'Bronze', price: 499 },
                     { id: 'silver', title: 'Silver', price: 999 },
@@ -119,14 +121,18 @@
 
         methods: {
             submit(data) {
-                ajax.post(`/api/videos/${this.video.id}`, data)
-                    .then(r => {
-                        this.$toast.open({
-                            message: 'Changes Saved',
-                            type: 'is-success',
-                            duration: 4000
-                        });
+                ajax.post(`/api/videos/${this.video.permalink}`, {
+                    name: this.title,
+                    privacy: this.privacy.toLowerCase(),
+                    required_subscription: this.selectedPlan,
+                    token_price: this.tokenPrice
+                }).then(r => {
+                    this.$toast.open({
+                        message: 'Changes Saved',
+                        type: 'is-success',
+                        duration: 4000
                     });
+                });
             },
 
             choosePlan(plan) {

@@ -82101,7 +82101,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         fetch: function fetch() {
             var _this = this;
 
-            return ajax.get('/api/videos/' + this.media.id).then(function (r) {
+            return ajax.get('/api/videos/' + this.media.permalink).then(function (r) {
                 return _this.media = r.data;
             });
         }
@@ -82488,9 +82488,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     data: function data() {
         return {
             accessOption: 'tokens',
-            selectedPlan: null,
-            tokenPrice: null,
-            privacy: 'Public',
+            selectedPlan: this.video.required_subscription,
+            tokenPrice: this.video.token_price,
+            privacy: this.video.privacy,
+            title: this.video.name,
+            url: this.video.url,
             plans: [{ id: 'bronze', title: 'Bronze', price: 499 }, { id: 'silver', title: 'Silver', price: 999 }, { id: 'gold', title: 'Gold', price: 2499 }],
             footerStyle: {
                 'float': 'left',
@@ -82534,7 +82536,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         submit: function submit(data) {
             var _this = this;
 
-            ajax.post('/api/videos/' + this.video.id, data).then(function (r) {
+            ajax.post('/api/videos/' + this.video.permalink, {
+                name: this.title,
+                privacy: this.privacy.toLowerCase(),
+                required_subscription: this.selectedPlan,
+                token_price: this.tokenPrice
+            }).then(function (r) {
                 _this.$toast.open({
                     message: 'Changes Saved',
                     type: 'is-success',
@@ -82583,8 +82590,14 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_c('b-input', {
     attrs: {
-      "name": "name",
-      "value": _vm.video.name
+      "name": "name"
+    },
+    model: {
+      value: (_vm.title),
+      callback: function($$v) {
+        _vm.title = $$v
+      },
+      expression: "title"
     }
   })], 1), _vm._v(" "), _c('hr'), _vm._v(" "), _c('p', {
     staticClass: "has-text-centered subtitle m-0"
@@ -82643,8 +82656,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   })], 2), _vm._v(" "), _c('hr'), _vm._v(" "), _c('b-switch', {
     staticClass: "is-pulled-left",
     attrs: {
-      "true-value": "Public",
-      "false-value": "Private"
+      "true-value": "public",
+      "false-value": "private"
     },
     slot: "footer",
     model: {
@@ -82654,7 +82667,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       },
       expression: "privacy"
     }
-  }, [_vm._v("\n                    " + _vm._s(_vm.privacy) + "\n                ")])], 1)], 1)])])
+  }, [_vm._v("\n                    " + _vm._s(_vm._f("capitalize")(_vm.privacy)) + "\n                ")])], 1)], 1)])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {

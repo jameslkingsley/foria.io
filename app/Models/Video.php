@@ -50,6 +50,16 @@ class Video extends Model implements Purchase
     ];
 
     /**
+     * Get the route key name for Laravel.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'permalink';
+    }
+
+    /**
      * Gets the purchasable details.
      *
      * @return array
@@ -137,7 +147,7 @@ class Video extends Model implements Purchase
      */
     public function getUrlAttribute()
     {
-        return url("/videos/{$this->id}");
+        return url("/videos/{$this->permalink}");
     }
 
     /**
@@ -161,7 +171,7 @@ class Video extends Model implements Purchase
      */
     public function getEditUrlAttribute()
     {
-        return url("/videos/edit/{$this->id}");
+        return url("/videos/edit/{$this->permalink}");
     }
 
     /**
@@ -173,6 +183,10 @@ class Video extends Model implements Purchase
     {
         if ($this->is_mine) {
             return true;
+        }
+
+        if ($this->privacy == 'private') {
+            return false;
         }
 
         if ($this->required_subscription) {

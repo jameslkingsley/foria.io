@@ -156,10 +156,10 @@ class VideoController extends Controller
     {
         $attributes = $request->validate([
             'name' => ['required', 'string', 'min:1'],
-            'token_price' => ['required', 'numeric']
+            'privacy' => ['required', 'string', 'in:public,private'],
+            'token_price' => ['nullable', 'numeric'],
+            'required_subscription' => ['nullable', 'string', 'in:bronze,silver,gold'],
         ]);
-
-        $attributes['subscriber_only'] = $request->subscriber_only ? true : false;
 
         $video->update($attributes);
 
