@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 
-class CommentController extends Controller
+class ReportController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, Model $model)
+    public function index()
     {
-        return $model->comments()->with('user')->get();
+        //
     }
 
     /**
@@ -35,18 +36,18 @@ class CommentController extends Controller
      */
     public function store(Request $request, Model $model)
     {
-        $request->validate(['body' => 'required|string|min:1']);
+        $request->validate(['reason' => 'required|string|min:1']);
 
-        return $model->comment($request->body)->load('user');
+        return $model->report($request->reason);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\Report  $report
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Report $report)
     {
         //
     }
@@ -54,10 +55,10 @@ class CommentController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\Report  $report
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Report $report)
     {
         //
     }
@@ -66,10 +67,10 @@ class CommentController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Models\Report  $report
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Report $report)
     {
         //
     }
@@ -77,10 +78,10 @@ class CommentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Models\Report  $report
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Report $report)
     {
         //
     }

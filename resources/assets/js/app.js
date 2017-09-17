@@ -18,6 +18,9 @@ Vue.component('f-video-comments', require('./components/video/Comments.vue'));
 // Ratings
 Vue.component('f-rating', require('./components/Rating.vue'));
 
+// Reporting
+Vue.component('f-report', require('./components/Report.vue'));
+
 // Purchases & Subscriptions
 Vue.component('f-purchase', require('./components/Purchase.vue'));
 Vue.component('f-subscribe', require('./components/Subscribe.vue'));

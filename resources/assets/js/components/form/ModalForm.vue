@@ -84,6 +84,8 @@
             handle() {
                 this.submitting = true;
 
+                this.$emit('submit', formToObject(this.$refs.form));
+
                 this.submit(formToObject(this.$refs.form));
             }
         },

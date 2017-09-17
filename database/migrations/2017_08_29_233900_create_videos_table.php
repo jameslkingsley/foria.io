@@ -18,7 +18,6 @@ class CreateVideosTable extends Migration
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('name');
-            $table->string('permalink');
             $table->longText('key');
             $table->longText('path')->nullable();
             $table->longText('transcoder_id')->nullable();

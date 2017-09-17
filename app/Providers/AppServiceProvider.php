@@ -4,10 +4,13 @@ namespace App\Providers;
 
 use Stripe\Stripe;
 use OpenTok\OpenTok;
+use App\Models\Report;
+use App\Support\Reference;
 use Laravel\Cashier\Cashier;
 use Aws\Credentials\Credentials;
 use Aws\CloudFront\CloudFrontClient;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Aws\ElasticTranscoder\ElasticTranscoderClient;
 
@@ -21,10 +24,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         View::share('opentokApiKey', config('opentok.api_key'));
+        View::share('reportableReasons', Report::reasons());
 
         Stripe::setApiKey(config('services.stripe.secret'));
 
-        // Cashier::useCurrency('gbp', '£');
+        Route::bind('ref', function ($value) {
+            return Reference::resolve($value);
+        });
     }
 
     /**

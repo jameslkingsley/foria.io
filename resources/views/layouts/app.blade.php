@@ -19,6 +19,7 @@
                 stripeKey: '{{ config('services.stripe.key') }}',
                 pusherKey: '{{ config('broadcasting.connections.pusher.key') }}',
                 openTokKey: '{{ config('opentok.api_key') }}',
+                reportableReasons: JSON.parse('{!! json_encode($reportableReasons) !!}'),
                 csrfToken: '{{ csrf_token() }}',
                 user: null
             };

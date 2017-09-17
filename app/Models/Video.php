@@ -3,19 +3,23 @@
 namespace App\Models;
 
 use App\Traits\Rateable;
+use App\Traits\Reportable;
 use App\Contracts\Purchase;
 use App\Traits\Commentable;
 use App\Traits\Purchasable;
 use App\Traits\BelongsToUser;
+use App\Traits\Referenceable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class Video extends Model implements Purchase
 {
     use Rateable,
+        Reportable,
         Purchasable,
         Commentable,
-        BelongsToUser;
+        BelongsToUser,
+        Referenceable;
 
     /**
      * Guarded attributes.
@@ -31,6 +35,7 @@ class Video extends Model implements Purchase
      */
     protected $appends = [
         'url',
+        'ref',
         'stream_url',
         'edit_url',
         'is_mine',
@@ -39,25 +44,6 @@ class Video extends Model implements Purchase
         'unlocked',
         'locked',
     ];
-
-    /**
-     * Casted attributes.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'subscriber_only' => 'boolean'
-    ];
-
-    /**
-     * Get the route key name for Laravel.
-     *
-     * @return string
-     */
-    public function getRouteKeyName()
-    {
-        return 'permalink';
-    }
 
     /**
      * Gets the purchasable details.
@@ -147,7 +133,7 @@ class Video extends Model implements Purchase
      */
     public function getUrlAttribute()
     {
-        return url("/videos/{$this->permalink}");
+        return url("/videos/{$this->ref}");
     }
 
     /**
@@ -171,7 +157,7 @@ class Video extends Model implements Purchase
      */
     public function getEditUrlAttribute()
     {
-        return url("/videos/edit/{$this->permalink}");
+        return url("/videos/edit/{$this->ref}");
     }
 
     /**

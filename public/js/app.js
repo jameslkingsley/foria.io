@@ -16682,6 +16682,9 @@ Vue.component('f-video-comments', __webpack_require__(193));
 // Ratings
 Vue.component('f-rating', __webpack_require__(196));
 
+// Reporting
+Vue.component('f-report', __webpack_require__(271));
+
 // Purchases & Subscriptions
 Vue.component('f-purchase', __webpack_require__(199));
 Vue.component('f-subscribe', __webpack_require__(202));
@@ -82054,6 +82057,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['video'],
@@ -82101,7 +82106,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         fetch: function fetch() {
             var _this = this;
 
-            return ajax.get('/api/videos/' + this.media.permalink).then(function (r) {
+            return ajax.get('/api/videos/' + this.media.ref).then(function (r) {
                 return _this.media = r.data;
             });
         }
@@ -82138,7 +82143,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "card p-3 m-t-3"
   }, [_c('h2', {
     staticClass: "video-title"
-  }, [_vm._v("\n            " + _vm._s(_vm.media.name) + "\n\n            "), (!_vm.media.is_mine && _vm.media.required_subscription) ? _c('f-subscribe', {
+  }, [_vm._v("\n            " + _vm._s(_vm.media.name) + "\n\n            "), _c('f-report', {
+    attrs: {
+      "reference": _vm.media.ref
+    }
+  }), _vm._v(" "), (!_vm.media.is_mine && _vm.media.required_subscription) ? _c('f-subscribe', {
     staticClass: "is-pulled-right",
     attrs: {
       "tag": _vm.subscribeTag,
@@ -82190,8 +82199,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('f-video-comments', {
     attrs: {
       "preload": _vm.video.comments,
-      "type": "video",
-      "id": _vm.media.id
+      "reference": _vm.media.ref
     }
   })], 1)]), _vm._v(" "), _vm._m(0)])])
 },staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -82912,8 +82920,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: {
-        type: { type: String },
-        id: { type: Number },
+        reference: { type: String },
         preload: { type: Array, default: null }
     },
 
@@ -82930,7 +82937,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         post: function post() {
             var _this = this;
 
-            return ajax.post('/api/comments/' + this.type + '/' + this.id, { body: this.body }).then(function (r) {
+            return ajax.post('/api/comments/' + this.reference, { body: this.body }).then(function (r) {
                 _this.body = '';
                 _this.comments.unshift(r.data);
             });
@@ -82938,7 +82945,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         fetch: function fetch() {
             var _this2 = this;
 
-            return ajax.get('/api/comments/' + this.type + '/' + this.id).then(function (r) {
+            return ajax.get('/api/comments/' + this.reference).then(function (r) {
                 _this2.loaded = true;
                 _this2.comments = r.data;
             });
@@ -86974,6 +86981,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         handle: function handle() {
             this.submitting = true;
 
+            this.$emit('submit', formToObject(this.$refs.form));
+
             this.submit(formToObject(this.$refs.form));
         }
     },
@@ -87314,6 +87323,175 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 266 */,
+/* 267 */,
+/* 268 */,
+/* 269 */,
+/* 270 */,
+/* 271 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(272),
+  /* template */
+  __webpack_require__(273),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\Report.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Report.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-c077b886", Component.options)
+  } else {
+    hotAPI.reload("data-v-c077b886", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 272 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: {
+        reference: { type: String }
+    },
+
+    data: function data() {
+        return {
+            reasons: Foria.reportableReasons,
+            isReporting: false
+        };
+    },
+
+
+    computed: {
+        buttonClasses: function buttonClasses() {
+            return {
+                'button': true
+            };
+        },
+        reasonsList: function reasonsList() {
+            var list = [];
+
+            for (var reason in this.reasons) {
+                list.push({
+                    key: reason,
+                    text: this.reasons[reason]
+                });
+            }
+
+            return list;
+        }
+    },
+
+    methods: {
+        open: function open() {
+            this.isReporting = true;
+        },
+        submit: function submit(data) {
+            ajax.post('/api/report/' + this.reference, data).then(function (r) {
+                console.log(r.data);
+            });
+        }
+    }
+});
+
+/***/ }),
+/* 273 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [_c('button', {
+    class: _vm.buttonClasses,
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.open($event)
+      }
+    }
+  }, [_vm._v("\n        Report\n    ")]), _vm._v(" "), _c('f-modal-form', {
+    attrs: {
+      "title": "Report",
+      "confirm": "Complete",
+      "active": _vm.isReporting
+    },
+    on: {
+      "submit": _vm.submit,
+      "update:active": function($event) {
+        _vm.isReporting = $event
+      }
+    }
+  }, [_c('b-field', {
+    attrs: {
+      "label": "Select a reason for this report"
+    }
+  }, [_c('b-select', {
+    attrs: {
+      "placeholder": "Select a reason",
+      "name": "reason"
+    }
+  }, _vm._l((_vm.reasonsList), function(reason) {
+    return _c('option', {
+      key: reason.key,
+      domProps: {
+        "value": reason.key
+      }
+    }, [_vm._v("\n                    " + _vm._s(reason.text) + "\n                ")])
+  }))], 1)], 1)], 1)
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-c077b886", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

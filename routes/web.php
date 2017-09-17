@@ -3,6 +3,9 @@
 // Homepage
 Route::get('/', 'HomeController@index')->name('home');
 
+// Reporting
+Route::post('/api/report/{ref}', 'ReportController@store');
+
 // Profile
 Route::get('/profile/{user}', 'ProfileController@index');
 
@@ -20,16 +23,16 @@ Route::resource('/api/broadcast', 'BroadcastController');
 
 // Videos
 Route::get('/api/videos/list/{user}', 'VideoController@index');
-Route::get('/api/videos/{video}', 'VideoController@showJson');
+Route::get('/api/videos/{ref}', 'VideoController@showJson');
 Route::post('/api/videos', 'VideoController@store');
-Route::post('/api/videos/{video}', 'VideoController@update');
+Route::post('/api/videos/{ref}', 'VideoController@update');
 Route::get('/videos/new', 'VideoController@create');
-Route::get('/videos/edit/{video}', 'VideoController@edit');
-Route::get('/videos/{video}', 'VideoController@show');
+Route::get('/videos/edit/{ref}', 'VideoController@edit');
+Route::get('/videos/{ref}', 'VideoController@show');
 
 // Comments
-Route::get('/api/comments/{type}/{id}', 'CommentController@index');
-Route::post('/api/comments/{type}/{id}', 'CommentController@store');
+Route::get('/api/comments/{ref}', 'CommentController@index');
+Route::post('/api/comments/{ref}', 'CommentController@store');
 
 // Ratings
 Route::get('/api/ratings/{type}/{id}', 'RatingController@show');

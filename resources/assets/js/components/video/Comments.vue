@@ -33,8 +33,7 @@
 <script>
     export default {
         props: {
-            type: { type: String },
-            id: { type: Number },
+            reference: { type: String },
             preload: { type: Array, default: null }
         },
 
@@ -48,7 +47,7 @@
 
         methods: {
             post() {
-                return ajax.post(`/api/comments/${this.type}/${this.id}`, { body: this.body })
+                return ajax.post(`/api/comments/${this.reference}`, { body: this.body })
                     .then(r => {
                         this.body = '';
                         this.comments.unshift(r.data);
@@ -56,7 +55,7 @@
             },
 
             fetch() {
-                return ajax.get(`/api/comments/${this.type}/${this.id}`)
+                return ajax.get(`/api/comments/${this.reference}`)
                     .then(r => {
                         this.loaded = true;
                         this.comments = r.data;

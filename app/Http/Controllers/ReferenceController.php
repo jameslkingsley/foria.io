@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Reference;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Model;
 
-class CommentController extends Controller
+class ReferenceController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, Model $model)
+    public function index()
     {
-        return $model->comments()->with('user')->get();
+        //
     }
 
     /**
@@ -33,20 +33,18 @@ class CommentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, Model $model)
+    public function store(Request $request)
     {
-        $request->validate(['body' => 'required|string|min:1']);
-
-        return $model->comment($request->body)->load('user');
+        //
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\Reference  $reference
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Reference $reference)
     {
         //
     }
@@ -54,10 +52,10 @@ class CommentController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\Reference  $reference
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Reference $reference)
     {
         //
     }
@@ -66,10 +64,10 @@ class CommentController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Models\Reference  $reference
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Reference $reference)
     {
         //
     }
@@ -77,10 +75,10 @@ class CommentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Models\Reference  $reference
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Reference $reference)
     {
         //
     }

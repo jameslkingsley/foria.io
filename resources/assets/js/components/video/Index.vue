@@ -17,6 +17,8 @@
             <h2 class="video-title">
                 {{ media.name }}
 
+                <f-report :reference="media.ref"></f-report>
+
                 <f-subscribe
                     v-if="! media.is_mine && media.required_subscription"
                     class="is-pulled-right"
@@ -57,7 +59,7 @@
         <div class="columns">
             <div class="column is-9">
                 <div class="card p-3 m-t-3">
-                    <f-video-comments :preload="video.comments" type="video" :id="media.id"></f-video-comments>
+                    <f-video-comments :preload="video.comments" :reference="media.ref"></f-video-comments>
                 </div>
             </div>
 
@@ -118,7 +120,7 @@
             },
 
             fetch() {
-                return ajax.get(`/api/videos/${this.media.permalink}`)
+                return ajax.get(`/api/videos/${this.media.ref}`)
                     .then(r => this.media = r.data);
             }
         },

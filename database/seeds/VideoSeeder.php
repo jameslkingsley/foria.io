@@ -12,6 +12,8 @@ class VideoSeeder extends Seeder
      */
     public function run()
     {
-        factory(Video::class, 30)->create();
+        factory(Video::class, 30)->create()->each(function ($video) {
+            $video->reference()->new();
+        });
     }
 }
