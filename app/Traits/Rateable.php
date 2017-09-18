@@ -87,7 +87,7 @@ trait Rateable
             throw new InvalidArgumentException;
         }
 
-        $this->ratings()->save(
+        return $this->ratings()->save(
             new Rating([
                 'user_id' => auth()->user()->id,
                 'type' => $type

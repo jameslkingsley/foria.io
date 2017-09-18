@@ -19,7 +19,7 @@ class CreateReferencesTable extends Migration
             $table->morphs('model');
             $table->timestamps();
 
-            $table->unique(['hash', 'model_id', 'model_type']);
+            $table->unique('hash');
         });
     }
 

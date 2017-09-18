@@ -2,11 +2,39 @@
 
 namespace App\Traits;
 
-use App\Support\Reference;
-use App\Models\Reference as ReferenceModel;
+use App\Models\Reference;
+use Illuminate\Database\Eloquent\Model;
 
 trait Referenceable
 {
+    /**
+     * Constructor method.
+     *
+     * @return void
+     */
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        $this->appends[] = 'ref';
+    }
+
+    /**
+     * Boot the referenceable trait.
+     *
+     * @return void
+     */
+    protected static function bootReferenceable()
+    {
+        static::created(function (Model $model) {
+            $model->references()->save(
+                new Reference([
+                    'hash' => str_random(12)
+                ])
+            );
+        });
+    }
+
     /**
      * Gets the references for the model.
      *
@@ -14,17 +42,17 @@ trait Referenceable
      */
     public function references()
     {
-        return $this->morphMany(ReferenceModel::class, 'model');
+        return $this->morphMany(Reference::class, 'model');
     }
 
     /**
      * Gets the reference factory instance.
      *
-     * @return TODO
+     * @return App\Models\Reference
      */
     public function reference()
     {
-        return new Reference(get_class($this), $this->id);
+        return $this->references()->first();
     }
 
     /**
@@ -34,6 +62,6 @@ trait Referenceable
      */
     public function getRefAttribute()
     {
-        return optional($this->references()->first())->hash;
+        return optional($this->reference())->hash;
     }
 }

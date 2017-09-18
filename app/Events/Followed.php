@@ -37,7 +37,7 @@ class Followed implements ShouldBroadcast
     public function __construct(Follow $follow)
     {
         $this->follow = $follow;
-        $this->count = $follow->to->follower_count;
+        $this->count = $follow->model->follower_count;
     }
 
     /**

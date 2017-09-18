@@ -15,22 +15,12 @@ class Follow extends Model
     protected $guarded = [];
 
     /**
-     * Gets the 'from' user model.
+     * Gets the followable model.
      *
-     * @return App\Models\User
+     * @return Illuminate\Database\Eloquent\QueryBuilder
      */
-    public function from()
+    public function model()
     {
-        return $this->hasOne(User::class, 'id', 'from_id');
-    }
-
-    /**
-     * Gets the 'to' user model.
-     *
-     * @return App\Models\User
-     */
-    public function to()
-    {
-        return $this->hasOne(User::class, 'id', 'to_id');
+        return $this->morphTo();
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Video;
 use App\Models\Comment;
 use Illuminate\Database\Seeder;
 
@@ -14,8 +15,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(UsersTableSeeder::class);
         $this->call(TokenPackageSeeder::class);
-        $this->call(VideoSeeder::class);
 
+        factory(Video::class, 30)->create();
         factory(Comment::class, 50)->create();
     }
 }

@@ -4,9 +4,9 @@ namespace App\Models;
 
 use App\Traits\Rateable;
 use App\Traits\Reportable;
-use App\Contracts\Purchase;
 use App\Traits\Commentable;
 use App\Traits\Purchasable;
+use App\Contracts\Purchase;
 use App\Traits\BelongsToUser;
 use App\Traits\Referenceable;
 use Illuminate\Database\Eloquent\Model;
@@ -29,13 +29,22 @@ class Video extends Model implements Purchase
     protected $guarded = [];
 
     /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'id',
+        'user_id'
+    ];
+
+    /**
      * Appended attributes.
      *
      * @var array
      */
     protected $appends = [
         'url',
-        'ref',
         'stream_url',
         'edit_url',
         'is_mine',

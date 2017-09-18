@@ -28,8 +28,8 @@ class AppServiceProvider extends ServiceProvider
 
         Stripe::setApiKey(config('services.stripe.secret'));
 
-        Route::bind('ref', function ($value) {
-            return Reference::resolve($value);
+        Route::bind('ref', function ($hash) {
+            return reference($hash);
         });
     }
 

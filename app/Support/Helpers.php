@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Reference;
+
 /**
  * Returns a view that contains the given Vue component with the given attributes.
  *
@@ -13,4 +15,20 @@ function vue(string $name, array $attributes = [])
     ];
 
     return view('vue.index', $data);
+}
+
+/**
+ * Reference factory helper function.
+ *
+ * @return mixed
+ */
+function reference(string $hash)
+{
+    $ref = Reference::where('hash', $hash)->first();
+
+    if (! $ref) {
+        throw new InvalidArgumentException("Reference '{$hash}' does not exist.");
+    }
+
+    return $ref->referenced();
 }

@@ -5,7 +5,7 @@ namespace App\Models;
 use Stripe\Customer;
 use App\Traits\Videos;
 use App\Traits\Billing;
-use App\Traits\Follows;
+use App\Traits\Followable;
 use App\Traits\Subscriptions;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
@@ -13,11 +13,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use Subscriptions,
-        Notifiable,
+    use Videos,
         Billing,
-        Follows,
-        Videos;
+        Followable,
+        Notifiable,
+        Subscriptions;
 
     /**
      * Guarded attributes.
@@ -43,7 +43,6 @@ class User extends Authenticatable
      */
     protected $appends = [
         'is_mine',
-        'follower_count',
         'watch_url',
         'has_card_on_file',
         'avatar_url',
