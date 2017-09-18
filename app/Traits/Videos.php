@@ -13,9 +13,14 @@ trait Videos
      */
     public function videos()
     {
-        return Video::where('user_id', $this->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = Video::where('user_id', $this->id)
+            ->orderBy('created_at', 'desc');
+
+        if (! $this->is_mine) {
+            $query->where('privacy', 'public');
+        }
+
+        return $query->get();
     }
 
     /**

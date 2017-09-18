@@ -13,9 +13,11 @@ class ReportController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Model $model)
     {
-        //
+        return response()->json([
+            'data' => $model->reports()->first()
+        ]);
     }
 
     /**
@@ -36,9 +38,16 @@ class ReportController extends Controller
      */
     public function store(Request $request, Model $model)
     {
-        $request->validate(['reason' => 'required|string|min:1']);
+        $request->validate([
+            'reason' => 'required|string|min:1',
+            'body' => 'string|nullable'
+        ]);
 
-        return $model->report($request->reason);
+        if (! $model->reports()->empty()) {
+            return abort(403);
+        }
+
+        return $model->report($request->reason, $request->body);
     }
 
     /**

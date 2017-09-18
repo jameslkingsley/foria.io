@@ -21,7 +21,7 @@ trait Reportable
      *
      * @return App\Models\Report
      */
-    public function report(string $reason)
+    public function report(string $reason, string $body = '')
     {
         if (! array_key_exists($reason, Report::reasons())) {
             throw new InvalidArgumentException;
@@ -32,7 +32,8 @@ trait Reportable
         return $this->reports()->save(
             new Report([
                 'user_id' => auth()->check() ? auth()->user()->id : null,
-                'reason' => $reason
+                'reason' => $reason,
+                'body' => $body
             ])
         );
     }

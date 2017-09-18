@@ -14,6 +14,15 @@
     }
 }
 
+.select select {
+    box-shadow: $shadow;
+    border: 1px solid transparent !important;
+
+    &:focus {
+        box-shadow: $shadow-active;
+    }
+}
+
 .control.has-icons-left .input:focus ~ .icon {
     color: $primary;
 }

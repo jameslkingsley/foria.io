@@ -15,8 +15,7 @@
 <script>
     export default {
         props: {
-            type: { type: String },
-            id: { type: Number },
+            reference: { type: String },
             preload: { type: Object, default: null }
         },
 
@@ -54,30 +53,26 @@
             like() {
                 if (this.preloaded.has_liked) return this.unrate();
 
-                ajax.post('/api/ratings', {
-                    type: 'like',
-                    model_type: this.type,
-                    model_id: this.id
+                ajax.post(`/api/ratings/${this.reference}`, {
+                    type: 'like'
                 }).then(this.fetch);
             },
 
             dislike() {
                 if (this.preloaded.has_disliked) return this.unrate();
 
-                ajax.post('/api/ratings', {
-                    type: 'dislike',
-                    model_type: this.type,
-                    model_id: this.id
+                ajax.post(`/api/ratings/${this.reference}`, {
+                    type: 'dislike'
                 }).then(this.fetch);
             },
 
             unrate() {
-                ajax.delete(`/api/ratings/${this.type}/${this.id}`)
+                ajax.delete(`/api/ratings/${this.reference}`)
                     .then(this.fetch);
             },
 
             fetch() {
-                ajax.get(`/api/ratings/${this.type}/${this.id}`)
+                ajax.get(`/api/ratings/${this.reference}`)
                     .then(r => {
                         this.preloaded = r.data;
                         this.loaded = true;

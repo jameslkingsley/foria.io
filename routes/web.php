@@ -5,6 +5,7 @@ Route::get('/', 'HomeController@index')->name('home');
 
 // Reporting
 Route::post('/api/report/{ref}', 'ReportController@store');
+Route::get('/api/report/{ref}', 'ReportController@index');
 
 // Profile
 Route::get('/profile/{user}', 'ProfileController@index');
@@ -35,11 +36,11 @@ Route::get('/api/comments/{ref}', 'CommentController@index');
 Route::post('/api/comments/{ref}', 'CommentController@store');
 
 // Ratings
-Route::get('/api/ratings/{type}/{id}', 'RatingController@show');
+Route::get('/api/ratings/{ref}', 'RatingController@show');
 
 Route::middleware(['auth'])->group(function () {
-    Route::post('/api/ratings', 'RatingController@store');
-    Route::delete('/api/ratings/{type}/{id}', 'RatingController@destroy');
+    Route::post('/api/ratings/{ref}', 'RatingController@store');
+    Route::delete('/api/ratings/{ref}', 'RatingController@destroy');
 });
 
 // Purchases

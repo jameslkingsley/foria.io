@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Rating;
 use App\Rules\IsModel;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Model;
 
 class RatingController extends Controller
 {
@@ -14,15 +15,11 @@ class RatingController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Model $model)
     {
         $attributes = (object) $request->validate([
-            'model_id' => 'required|numeric',
-            'type' => 'required|string|in:like,dislike',
-            'model_type' => ['required', 'string', new IsModel],
+            'type' => 'required|string|in:like,dislike'
         ]);
-
-        $model = Rating::resolveModel($attributes->model_type, $attributes->model_id);
 
         $model->unrate();
 
@@ -35,10 +32,8 @@ class RatingController extends Controller
      * @param  \App\Models\Rating  $rating
      * @return \Illuminate\Http\Response
      */
-    public function show(string $type, int $id)
+    public function show(Model $model)
     {
-        $model = Rating::resolveModel($type, $id);
-
         $ratings = $model->ratingsCompact();
 
         return response()->json($ratings);
@@ -49,10 +44,8 @@ class RatingController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function destroy(string $type, int $id)
+    public function destroy(Model $model)
     {
-        $model = Rating::resolveModel($type, $id);
-
         $model->unrate();
     }
 }

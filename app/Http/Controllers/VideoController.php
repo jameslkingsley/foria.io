@@ -113,6 +113,10 @@ class VideoController extends Controller
      */
     public function show(Video $video)
     {
+        if (! $video->is_mine && $video->privacy == 'private') {
+            return abort(404);
+        }
+
         $video->load('user')
             ->load('comments');
 

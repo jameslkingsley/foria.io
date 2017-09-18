@@ -17,8 +17,6 @@
             <h2 class="video-title">
                 {{ media.name }}
 
-                <f-report :reference="media.ref"></f-report>
-
                 <f-subscribe
                     v-if="! media.is_mine && media.required_subscription"
                     class="is-pulled-right"
@@ -45,7 +43,9 @@
             </span>
 
             <span class="video-meta">
-                <f-rating type="video" :id="media.id" class="is-pulled-left"></f-rating>
+                <f-rating :reference="media.ref" class="is-pulled-left"></f-rating>
+
+                <f-report :reference="media.ref" class="is-pulled-right"></f-report>
             </span>
         </div>
 

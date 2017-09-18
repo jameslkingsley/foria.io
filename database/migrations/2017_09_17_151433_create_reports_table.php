@@ -18,6 +18,7 @@ class CreateReportsTable extends Migration
             $table->unsignedInteger('user_id')->nullable();
             $table->morphs('model');
             $table->string('reason')->index();
+            $table->longText('body')->nullable();
             $table->timestamps();
 
             $table->unique(['user_id', 'model_id', 'model_type']);
