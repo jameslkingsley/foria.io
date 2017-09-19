@@ -84329,12 +84329,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     methods: {
         handle: function handle() {
-            return axios[this.state ? 'delete' : 'post']('/follow/' + this.user.id).then(this.fetch);
+            return axios[this.state ? 'delete' : 'post']('/api/follow/' + this.user.name).then(this.fetch);
         },
         fetch: function fetch() {
             var _this = this;
 
-            axios.get('/follow/' + this.user.id).then(function (r) {
+            axios.get('/api/follow/' + this.user.name).then(function (r) {
                 _this.state = r.data;
             });
         }
@@ -87606,6 +87606,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: {
@@ -87628,6 +87635,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         empty: function empty() {
             return this.alerts.length === 0;
+        },
+        count: function count() {
+            return this.alerts.length;
         }
     },
 
@@ -87645,7 +87655,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
 
     created: function created() {
-        //
+        var _this2 = this;
+
+        Echo.private('App.Models.User.' + Foria.user.id).notification(function (n) {
+            _this2.alerts.unshift({ data: n });
+        });
     }
 });
 
@@ -87654,7 +87668,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [(!_vm.empty) ? _c('button', {
+  return _c('b-dropdown', {
+    attrs: {
+      "position": "is-bottom-left",
+      "id": "notifications"
+    }
+  }, [_c('a', {
+    staticClass: "navbar-item",
+    slot: "trigger"
+  }, [_c('i', {
+    staticClass: "material-icons"
+  }, [_vm._v("notifications")]), _vm._v(" "), _c('span', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.count),
+      expression: "count"
+    }],
+    staticClass: "m-l-1"
+  }, [_vm._v(_vm._s(_vm.count))])]), _vm._v(" "), _c('b-dropdown-item', {
+    attrs: {
+      "custom": ""
+    }
+  }, [(!_vm.empty) ? _c('button', {
     staticClass: "button is-pulled-right m-r-3 m-b-3",
     on: {
       "click": function($event) {
@@ -87681,10 +87717,10 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }), _vm._v(" "), _c('span', {
       staticClass: "notification-item-timestamp"
-    }, [_vm._v("\n                " + _vm._s(_vm._f("fromnow")(item.data.timestamp.date)) + "\n            ")])])
+    }, [_vm._v("\n                    " + _vm._s(_vm._f("fromnow")(item.data.timestamp.date)) + "\n                ")])])
   })) : _vm._e(), _vm._v(" "), (_vm.empty) ? _c('div', {
     staticClass: "p-3 has-text-centered notification-list"
-  }, [_vm._v("\n        All caught up!\n    ")]) : _vm._e(), _vm._v(" "), (!_vm.loaded) ? _c('span', [_vm._v("Loading...")]) : _vm._e()])
+  }, [_vm._v("\n            All caught up!\n        ")]) : _vm._e(), _vm._v(" "), (!_vm.loaded) ? _c('span', [_vm._v("Loading...")]) : _vm._e()])], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {

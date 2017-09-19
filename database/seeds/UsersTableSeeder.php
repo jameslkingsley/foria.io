@@ -24,6 +24,18 @@ class UsersTableSeeder extends Seeder
             'tokens' => 1000000
         ]);
 
+        $user = User::create([
+            'name' => 'Test',
+            'email' => 'test@test.com',
+            'password' => bcrypt('password'),
+            'remember_token' => str_random(10),
+            'is_model' => false,
+            'stripe_id' => 'cus_BOXtJ54MeJrMvy',
+            'card_brand' => 'Visa',
+            'card_last_four' => '4242',
+            'tokens' => 1000000
+        ]);
+
         factory(User::class, 30)->create()->each(function ($user) use ($developer) {
             $user->follow($developer);
         });

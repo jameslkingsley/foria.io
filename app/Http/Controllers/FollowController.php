@@ -12,11 +12,15 @@ class FollowController extends Controller
      *
      * @return boolean
      */
-    public function index(Request $request, User $to)
+    public function index(Request $request, User $user)
     {
-        if (auth()->guest()) return false;
+        if (auth()->guest()) {
+            return false;
+        }
 
-        return response()->json(auth()->user()->isFollowing($to));
+        return response()->json(
+            auth()->user()->isFollowing($user)
+        );
     }
 
     /**
@@ -24,11 +28,15 @@ class FollowController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, User $to)
+    public function store(Request $request, User $user)
     {
-        if (auth()->guest()) return false;
+        if (auth()->guest()) {
+            return false;
+        }
 
-        return response()->json(auth()->user()->follow($to));
+        return response()->json(
+            auth()->user()->follow($user)
+        );
     }
 
     /**
@@ -36,10 +44,14 @@ class FollowController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, User $to)
+    public function destroy(Request $request, User $user)
     {
-        if (auth()->guest()) return false;
+        if (auth()->guest()) {
+            return false;
+        }
 
-        return response()->json(auth()->user()->unfollow($to));
+        return response()->json(
+            auth()->user()->unfollow($user)
+        );
     }
 }

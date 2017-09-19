@@ -63,9 +63,9 @@ Route::get('/tokens/packages', 'TokenController@packages');
 Route::resource('/tokens', 'TokenController');
 
 // Following
-Route::get('/follow/{to}', 'FollowController@index');
-Route::post('/follow/{to}', 'FollowController@store');
-Route::delete('/follow/{to}', 'FollowController@destroy');
+Route::get('/api/follow/{user}', 'FollowController@index');
+Route::post('/api/follow/{user}', 'FollowController@store');
+Route::delete('/api/follow/{user}', 'FollowController@destroy');
 
 // Subscriptions
 Route::get('/api/subscription/{user}', 'SubscriptionController@show');

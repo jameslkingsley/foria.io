@@ -30,11 +30,11 @@
             handle() {
                 return axios[
                     (this.state ? 'delete' : 'post')
-                ](`/follow/${this.user.id}`).then(this.fetch);
+                ](`/api/follow/${this.user.name}`).then(this.fetch);
             },
 
             fetch() {
-                axios.get(`/follow/${this.user.id}`).then(r => {
+                axios.get(`/api/follow/${this.user.name}`).then(r => {
                     this.state = r.data;
                 });
             }

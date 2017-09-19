@@ -88,8 +88,6 @@ class NotificationController extends Controller
      */
     public function destroy()
     {
-        foreach (auth()->user()->notifications as $notification) {
-            $notification->delete();
-        }
+        auth()->user()->notifications()->delete();
     }
 }
