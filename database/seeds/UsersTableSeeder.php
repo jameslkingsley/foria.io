@@ -12,7 +12,7 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        User::create([
+        $developer = User::create([
             'name' => 'Kingsley',
             'email' => 'jlkingsley97@gmail.com',
             'password' => bcrypt('password'),
@@ -24,6 +24,8 @@ class UsersTableSeeder extends Seeder
             'tokens' => 1000000
         ]);
 
-        factory(User::class, 30)->create();
+        factory(User::class, 30)->create()->each(function ($user) use ($developer) {
+            $user->follow($developer);
+        });
     }
 }

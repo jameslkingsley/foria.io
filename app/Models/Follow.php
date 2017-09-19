@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use App\Models\User;
+use App\Traits\BelongsToUser;
 use Illuminate\Database\Eloquent\Model;
 
 class Follow extends Model
 {
+    use BelongsToUser;
+
     /**
      * Guarded attributes.
      *

@@ -4,8 +4,10 @@ namespace App\Traits;
 
 use App\Models\User;
 use App\Models\Follow;
-use App\Events\Followed;
 use App\Events\Unfollowed;
+use App\Notifications\Followed;
+
+// use App\Events\Followed;
 
 trait Followable
 {
@@ -60,7 +62,9 @@ trait Followable
                 ])
             );
 
-            event(new Followed($follow));
+            // event(new Followed($follow));
+
+            $user->notify(new Followed($follow));
 
             return $follow;
         }

@@ -16672,6 +16672,9 @@ window.Broadcaster = __WEBPACK_IMPORTED_MODULE_0__broadcaster_index__["a" /* def
 // Profile
 Vue.component('f-profile', __webpack_require__(178));
 
+// Notifications
+Vue.component('f-notifications', __webpack_require__(277));
+
 // Videos
 Vue.component('f-video', __webpack_require__(181));
 Vue.component('f-video-upload', __webpack_require__(184));
@@ -87522,6 +87525,174 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 269 */,
+/* 270 */,
+/* 271 */,
+/* 272 */,
+/* 273 */,
+/* 274 */,
+/* 275 */,
+/* 276 */,
+/* 277 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(278),
+  /* template */
+  __webpack_require__(279),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\Notifications.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Notifications.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-03235c6f", Component.options)
+  } else {
+    hotAPI.reload("data-v-03235c6f", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 278 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: {
+        items: {
+            type: Array,
+            default: null
+        }
+    },
+
+    data: function data() {
+        return {
+            alerts: this.items
+        };
+    },
+
+
+    computed: {
+        loaded: function loaded() {
+            return this.alerts !== null;
+        },
+        empty: function empty() {
+            return this.alerts.length === 0;
+        }
+    },
+
+    methods: {
+        url: function url(item) {
+            return item.data.url.length ? item.data.url : 'javascript:void(0)';
+        },
+        markAsRead: function markAsRead() {
+            var _this = this;
+
+            return ajax.delete('/api/notifications/clear').then(function (r) {
+                return _this.alerts = [];
+            });
+        }
+    },
+
+    created: function created() {
+        //
+    }
+});
+
+/***/ }),
+/* 279 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', [(!_vm.empty) ? _c('button', {
+    staticClass: "button is-pulled-right m-r-3 m-b-3",
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.markAsRead($event)
+      }
+    }
+  }, [_vm._v("Mark all as read")]) : _vm._e(), _vm._v(" "), (_vm.loaded && !_vm.empty) ? _c('div', {
+    staticClass: "notification-list"
+  }, _vm._l((_vm.alerts), function(item) {
+    return _c('a', {
+      staticClass: "notification-item",
+      attrs: {
+        "href": _vm.url(item)
+      }
+    }, [_c('span', {
+      staticClass: "notification-item-icon"
+    }, [_c('i', {
+      staticClass: "material-icons"
+    }, [_vm._v(_vm._s(item.data.icon))])]), _vm._v(" "), _c('span', {
+      staticClass: "notification-item-text",
+      domProps: {
+        "innerHTML": _vm._s(item.data.text)
+      }
+    }), _vm._v(" "), _c('span', {
+      staticClass: "notification-item-timestamp"
+    }, [_vm._v("\n                " + _vm._s(_vm._f("fromnow")(item.data.timestamp.date)) + "\n            ")])])
+  })) : _vm._e(), _vm._v(" "), (_vm.empty) ? _c('div', {
+    staticClass: "p-3 has-text-centered notification-list"
+  }, [_vm._v("\n        All caught up!\n    ")]) : _vm._e(), _vm._v(" "), (!_vm.loaded) ? _c('span', [_vm._v("Loading...")]) : _vm._e()])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-03235c6f", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

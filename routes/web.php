@@ -10,6 +10,9 @@ Route::get('/api/report/{ref}', 'ReportController@index');
 // Profile
 Route::get('/profile/{user}', 'ProfileController@index');
 
+// Notifications
+Route::delete('/api/notifications/clear', 'NotificationController@destroy');
+
 // Watching
 Route::get('/watch/{name}', 'WatchController@index');
 Route::get('/watch/{user}/show', 'WatchController@show');

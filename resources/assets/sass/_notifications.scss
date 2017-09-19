@@ -1,0 +1,50 @@
+#notifications {
+    .dropdown-menu {
+        right: -26px;
+    }
+
+    .dropdown-item {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+.notification-list {
+    min-width: 350px;
+    max-height: 25rem;
+    max-height: 50vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    .notification-item {
+        display: inline-block;
+        width: 100%;
+        margin-bottom: 0.15rem;
+        padding: 0.5rem 0.75rem 0 0.75rem;
+
+        &:hover {
+            background-color: #F5F5F5;
+        }
+
+        .notification-item-icon {
+            float: left;
+            width: 2rem;
+            height: 3rem;
+            margin-right: 0.25rem;
+            text-align: left;
+            line-height: 3rem;
+        }
+
+        .notification-item-text {
+            float: left;
+            width: calc(100% - 3.5rem);
+        }
+
+        .notification-item-timestamp {
+            float: left;
+            font-size: 12px;
+            color: black;
+            opacity: .5;
+        }
+    }
+}

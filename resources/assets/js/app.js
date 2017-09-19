@@ -8,6 +8,9 @@ window.Broadcaster = Broadcaster;
 // Profile
 Vue.component('f-profile', require('./components/profile/Index.vue'));
 
+// Notifications
+Vue.component('f-notifications', require('./components/Notifications.vue'));
+
 // Videos
 Vue.component('f-video', require('./components/video/Index.vue'));
 Vue.component('f-video-upload', require('./components/video/Upload.vue'));

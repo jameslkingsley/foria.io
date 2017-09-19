@@ -40,6 +40,16 @@
                         </b-dropdown-item>
                     </b-dropdown>
 
+                    <b-dropdown position="is-bottom-left" id="notifications">
+                        <a class="navbar-item" slot="trigger">
+                            <i class="material-icons">notifications</i>
+                        </a>
+
+                        <b-dropdown-item custom>
+                            <f-notifications :items="{{ auth()->user()->notifications }}"></f-notifications>
+                        </b-dropdown-item>
+                    </b-dropdown>
+
                     <b-dropdown position="is-bottom-left">
                         <a class="navbar-item" slot="trigger">
                             <span>{{ auth()->user()->name }}</span>
