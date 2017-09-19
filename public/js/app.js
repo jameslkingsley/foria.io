@@ -72784,6 +72784,10 @@ Vue.filter('currency', function (value) {
     return Util.formatAsCurrency(value);
 });
 
+Vue.filter('locale', function (value) {
+    return value.toLocaleString();
+});
+
 Vue.filter('lastFour', function (value) {
     return Util.formatLastFour(value);
 });

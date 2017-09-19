@@ -32,7 +32,7 @@
                     <b-dropdown position="is-bottom-left" id="token-checkout">
                         <a class="navbar-item" slot="trigger">
                             <i class="material-icons m-r-2">local_play</i>
-                            <span>@{{ user.tokens }} Tokens</span>
+                            <span>@{{ user.tokens | locale }} Tokens</span>
                         </a>
 
                         <b-dropdown-item custom>

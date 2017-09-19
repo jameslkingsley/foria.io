@@ -2,6 +2,10 @@ Vue.filter('currency', value => {
     return Util.formatAsCurrency(value);
 });
 
+Vue.filter('locale', value => {
+    return value.toLocaleString();
+});
+
 Vue.filter('lastFour', value => {
     return Util.formatLastFour(value);
 });
