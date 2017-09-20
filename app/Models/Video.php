@@ -78,6 +78,10 @@ class Video extends Model implements Purchase
             return true;
         }
 
+        if ($this->is_mine) {
+            return false;
+        }
+
         if ($this->required_subscription) {
             return ! auth()->user()->subscribedTo($this->user);
         }
