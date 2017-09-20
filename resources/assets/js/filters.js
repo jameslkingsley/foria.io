@@ -14,6 +14,10 @@ Vue.filter('datetime', value => {
     return moment(value).format('D/M/YYYY HH:mm');
 });
 
+Vue.filter('calendar', value => {
+    return moment(value).format('MMMM YYYY');
+});
+
 Vue.filter('fromnow', value => {
     return moment(value).fromNow();
 });

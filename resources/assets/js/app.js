@@ -7,6 +7,7 @@ window.Broadcaster = Broadcaster;
 
 // Profile
 Vue.component('f-profile', require('./components/profile/Index.vue'));
+Vue.component('f-profile-avatar', require('./components/profile/Avatar.vue'));
 
 // Notifications
 Vue.component('f-notifications', require('./components/Notifications.vue'));

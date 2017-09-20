@@ -12,16 +12,16 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        $developer = User::create([
+        $developer = tap(factory(User::class)->create())->update([
             'name' => 'Kingsley',
             'email' => 'jlkingsley97@gmail.com',
             'password' => bcrypt('password'),
-            'remember_token' => str_random(10),
             'is_model' => true,
+            'remember_token' => str_random(10),
             'stripe_id' => 'cus_BOXtJ54MeJrMvy',
             'card_brand' => 'Visa',
             'card_last_four' => '4242',
-            'tokens' => 1000000
+            'tokens' => 1000000,
         ]);
 
         $user = User::create([

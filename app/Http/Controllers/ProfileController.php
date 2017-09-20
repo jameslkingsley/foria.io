@@ -14,6 +14,10 @@ class ProfileController extends Controller
      */
     public function index(Request $request, User $user)
     {
+        if (! $user->is_model) {
+            return abort(404);
+        }
+
         return vue('f-profile', compact('user'));
     }
 

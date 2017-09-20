@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('avatar')->nullable();
+            $table->longText('bio')->nullable();
             $table->bigInteger('tokens')->default(0);
             $table->boolean('is_model')->default(false);
             $table->string('stripe_id')->nullable();
