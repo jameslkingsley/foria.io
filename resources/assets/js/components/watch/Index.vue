@@ -4,7 +4,7 @@
             <div class="m-b-3">
                 <div v-if="editingTopic && user.is_mine">
                     <input type="text" class="input is-pulled-left w-auto m-r-2" v-model="topic">
-                    <button class="button is-primary m-r-1" @click="saveTopic">Save</button>
+                    <button class="button is-primary m-r-2" @click="saveTopic">Save</button>
                     <button class="button" @click="cancelTopic">Cancel</button>
                 </div>
 
@@ -27,7 +27,7 @@
                             <b-dropdown-item @click.native="changeTopic">Change topic</b-dropdown-item>
                         </b-dropdown>
 
-                        <button v-if="user.is_mine" class="button is-primary is-pulled-right has-icon m-r-1" @click="startOrStop">
+                        <button v-if="user.is_mine" class="button is-primary is-pulled-right has-icon m-r-2" @click="startOrStop">
                             <i class="material-icons m-r-2">{{ online ? 'stop' : 'play_arrow' }}</i>
                             {{ online ? 'Stop' : 'Start' }} Broadcast
                         </button>
@@ -86,7 +86,7 @@
             },
 
             openStream() {
-                this.stream = new Stream(this.user.id, this.broadcast);
+                this.stream = new Stream(this.user.name, this.broadcast);
                 return this.stream;
             },
 

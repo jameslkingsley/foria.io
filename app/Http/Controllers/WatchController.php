@@ -37,9 +37,10 @@ class WatchController extends Controller
         // $this->middleware('auth');
 
         $this->user = $user;
+
         $this->openTok = new OpenTok(
-            config('opentok.api_key'),
-            config('opentok.api_secret')
+            config('opentok.key'),
+            config('opentok.secret')
         );
     }
 
@@ -48,14 +49,8 @@ class WatchController extends Controller
      *
      * @return mixed
      */
-    public function index(Request $request, string $name)
+    public function index(Request $request, User $user)
     {
-        $user = $this->user->where('name', $name)->first();
-
-        if (! $user) {
-            return abort(404);
-        }
-
         $broadcast = Broadcast::latest($user);
 
         return vue('f-watch', compact('user', 'broadcast'));
@@ -69,7 +64,7 @@ class WatchController extends Controller
     public function show(Request $request, User $user)
     {
         if (! $broadcast = Broadcast::latest($user)) {
-            return abort(403);
+            return abort(404);
         }
 
         $role = $broadcast->is_mine ? Role::PUBLISHER : Role::SUBSCRIBER;
@@ -83,25 +78,5 @@ class WatchController extends Controller
             'broadcast',
             'token'
         ));
-    }
-
-    /**
-     * Starts the streaming session.
-     *
-     * @return void
-     */
-    public function start(Request $request, User $user)
-    {
-        if (auth()->guest() || $user->id != auth()->user()->id) {
-            return abort(403);
-        }
-
-        $sessionId = $this->openTok
-            ->createSession($this->sessionOptions)
-            ->getSessionId();
-
-        Broadcast::start($sessionId);
-
-        return $sessionId;
     }
 }

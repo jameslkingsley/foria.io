@@ -1,6 +1,7 @@
 <?php
 
-return	[
-    'api_key' => env('MIX_TOKBOX_KEY'),
-    'api_secret' => env('MIX_TOKBOX_SECRET'),
+return [
+    'key' => env('TOKBOX_KEY'),
+    'secret' => env('TOKBOX_SECRET'),
+    'archive' => false
 ];

@@ -2,39 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use OpenTok\OpenTok;
-use OpenTok\MediaMode;
-use OpenTok\ArchiveMode;
-use App\Models\Broadcast;
+use App\Support\LiveStream;
 use App\Events\TopicChanged;
 use Illuminate\Http\Request;
-use App\Http\Requests\BroadcastRequest;
 
 class BroadcastController extends Controller
 {
     /**
-     * Default OpenTok session options.
+     * The live stream instance.
      *
-     * @var array
+     * @var App\Support\LiveStream
      */
-    protected $sessionOptions = [
-        'mediaMode' => MediaMode::ROUTED,
-        'archiveMode' => ArchiveMode::ALWAYS
-    ];
+    protected $stream;
 
     /**
      * Constructor method.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(LiveStream $stream)
     {
         $this->middleware('auth');
 
-        $this->openTok = new OpenTok(
-            config('opentok.api_key'),
-            config('opentok.api_secret')
-        );
+        $this->stream = $stream;
     }
 
     /**
@@ -65,7 +55,7 @@ class BroadcastController extends Controller
      */
     public function store(Request $request)
     {
-        // Start the broadcast
+        //
     }
 
     /**
@@ -110,7 +100,7 @@ class BroadcastController extends Controller
      */
     public function destroy($id)
     {
-        // Stop the broadcast
+        //
     }
 
     /**
@@ -120,17 +110,7 @@ class BroadcastController extends Controller
      */
     public function start(Request $request)
     {
-        $sessionId = $this->openTok
-            ->createSession($this->sessionOptions)
-            ->getSessionId();
-
-        $archive = $this->openTok->startArchive($sessionId);
-
-        return Broadcast::start([
-            'topic' => $request->topic,
-            'session_id' => $sessionId,
-            'archive_id' => $archive->id
-        ]);
+        return $this->stream->start(request('topic', 'Untitled'));
     }
 
     /**
@@ -138,17 +118,9 @@ class BroadcastController extends Controller
      *
      * @return mixed
      */
-    public function stop(BroadcastRequest $request)
+    public function stop(Request $request)
     {
-        $broadcast = $request->broadcast();
-
-        if (! $broadcast) {
-            return;
-        }
-
-        $broadcast->stop();
-
-        $this->openTok->stopArchive($broadcast->archive_id);
+        return $this->stream->stop();
     }
 
     /**
@@ -156,12 +128,13 @@ class BroadcastController extends Controller
      *
      * @return void
      */
-    public function topic(BroadcastRequest $request)
+    public function topic(Request $request)
     {
-        $broadcast = $request->broadcast();
+        $broadcast = $this->stream->getBroadcast();
 
-        $broadcast->topic = $request->topic;
-        $broadcast->save();
+        $broadcast->update([
+            'topic' => $request->topic
+        ]);
 
         event(new TopicChanged($request->topic, $broadcast->user));
     }

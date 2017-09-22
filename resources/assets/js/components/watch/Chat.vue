@@ -60,7 +60,7 @@
             },
 
             fetch() {
-                axios.get(`/api/chat/past/${this.user.id}`).then(r => {
+                axios.get(`/api/chat/past/${this.user.name}`).then(r => {
                     this.messages = r.data;
                     this.fetchCompleted = true;
                 });

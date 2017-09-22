@@ -5,6 +5,7 @@ namespace App\Models;
 use Stripe\Customer;
 use App\Traits\Videos;
 use App\Traits\Billing;
+use App\Models\Broadcast;
 use App\Traits\Followable;
 use App\Traits\Subscriptions;
 use Illuminate\Support\Facades\Storage;
@@ -126,5 +127,15 @@ class User extends Authenticatable
     public function getWatchUrlAttribute()
     {
         return url("/watch/{$this->name}");
+    }
+
+    /**
+     * Gets the broadcasts for the user.
+     *
+     * @return Illuminate\Database\Eloquent\QueryBuilder
+     */
+    public function broadcasts()
+    {
+        return $this->hasMany(Broadcast::class);
     }
 }

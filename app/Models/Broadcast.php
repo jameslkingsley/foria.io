@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use App\Models\User;
+use App\Traits\BelongsToUser;
 use Illuminate\Database\Eloquent\Model;
 
 class Broadcast extends Model
 {
+    use BelongsToUser;
+
     /**
      * Guarded attributes.
      *
@@ -24,16 +27,6 @@ class Broadcast extends Model
     ];
 
     /**
-     * Gets the user model.
-     *
-     * @return App\Models\User
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    /**
      * Gets the latest broadcast for the given user.
      *
      * @return App\Models\Broadcast
@@ -48,38 +41,6 @@ class Broadcast extends Model
             ->where('online', true)
             ->orderBy('created_at', 'desc')
             ->first();
-    }
-
-    /**
-     * Starts a broadcast for the given session ID.
-     *
-     * @return App\Models\Broadcast
-     */
-    public static function start(array $attributes)
-    {
-        $attributes = array_merge($attributes, [
-            'user_id' => auth()->user()->id,
-            'online' => true
-        ]);
-
-        $broadcast = static::create($attributes);
-
-        session(['broadcast' => $broadcast]);
-
-        return $broadcast;
-    }
-
-    /**
-     * Stops the broadcast.
-     *
-     * @return void
-     */
-    public function stop()
-    {
-        $this->online = false;
-        $this->save();
-
-        session(['broadcast' => null]);
     }
 
     /**
@@ -101,6 +62,6 @@ class Broadcast extends Model
      */
     public function getIsMineAttribute()
     {
-        return !auth()->guest() && $this->user_id == auth()->user()->id;
+        return ! auth()->guest() && $this->user_id == auth()->user()->id;
     }
 }

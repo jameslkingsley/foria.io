@@ -1,6 +1,6 @@
 window.Stream = class Stream {
-    constructor(userId) {
-        this.userId = userId;
+    constructor(username) {
+        this.username = username;
         this.fetch().then(r => {
             this.data = r.data;
             this.initializeSession();
@@ -8,7 +8,7 @@ window.Stream = class Stream {
     }
 
     fetch() {
-        return axios.get(`/watch/${this.userId}/show`);
+        return axios.get(`/watch/${this.username}/show`);
     }
 
     handleError(error) {

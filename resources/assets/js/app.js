@@ -1,10 +1,6 @@
 require('./bootstrap');
 require('./stream');
 
-require('webrtc-adapter');
-import Broadcaster from './broadcaster/index';
-window.Broadcaster = Broadcaster;
-
 // Profile
 Vue.component('f-profile', require('./components/profile/Index.vue'));
 Vue.component('f-profile-avatar', require('./components/profile/Avatar.vue'));
