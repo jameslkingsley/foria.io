@@ -15,8 +15,7 @@ Route::delete('/api/notifications/clear', 'NotificationController@destroy');
 
 // Watching
 Route::get('/watch/{user}', 'WatchController@index');
-Route::get('/watch/{user}/show', 'WatchController@show');
-Route::post('/watch/{user}/start', 'WatchController@start');
+Route::get('/api/watch/{user}', 'WatchController@show');
 
 // Broadcasts
 Route::resource('/api/broadcast-query', 'BroadcastQueryController');

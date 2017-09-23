@@ -14493,6 +14493,22 @@ hr {
   width: 100%;
 }
 
+.watch-video-container .watch-placeholder {
+  float: left;
+  width: 100%;
+  height: 0;
+  text-align: center;
+  padding-top: 28%;
+}
+
+.watch-video-container .watch-placeholder .material-icons {
+  font-size: 3rem;
+}
+
+.watch-video-container .watch-placeholder h2 {
+  font-size: 2rem;
+}
+
 .watch-chat-container {
   width: 100%;
   height: 100%;
@@ -15475,18 +15491,20 @@ nav.navbar .navbar-link:focus {
 
 .profile-main {
   float: right;
-  width: 80%;
-  padding: 0 0 0 3rem;
+  width: calc(80% - 3rem);
+  -webkit-box-shadow: 0 7px 14px 0 rgba(50, 50, 93, 0.1), 0 3px 6px 0 rgba(0, 0, 0, 0.07);
+          box-shadow: 0 7px 14px 0 rgba(50, 50, 93, 0.1), 0 3px 6px 0 rgba(0, 0, 0, 0.07);
+  border-radius: 4px;
+  background: white;
 }
 
 .profile-main .profile-main-nav {
   float: left;
   width: 100%;
-  background: white;
   padding: 0 1rem;
-  border-radius: 4px;
-  -webkit-box-shadow: 0 7px 14px 0 rgba(50, 50, 93, 0.1), 0 3px 6px 0 rgba(0, 0, 0, 0.07);
-          box-shadow: 0 7px 14px 0 rgba(50, 50, 93, 0.1), 0 3px 6px 0 rgba(0, 0, 0, 0.07);
+  border-radius: 4px 4px 0 0;
+  -webkit-box-shadow: 0 -1px 0 #f1f5f9 inset;
+          box-shadow: 0 -1px 0 #f1f5f9 inset;
 }
 
 .profile-main .profile-main-nav .profile-main-nav-item {
@@ -15498,16 +15516,14 @@ nav.navbar .navbar-link:focus {
 
 .profile-main .profile-main-nav .profile-main-nav-item.is-active {
   color: #555abf;
+  -webkit-box-shadow: 0 -3px 0 #555abf inset;
+          box-shadow: 0 -3px 0 #555abf inset;
 }
 
 .profile-main .profile-main-content {
   float: left;
   width: 100%;
-  margin-top: 1rem;
-  background: white;
   padding: 1rem;
-  border-radius: 4px;
-  -webkit-box-shadow: 0 7px 14px 0 rgba(50, 50, 93, 0.1), 0 3px 6px 0 rgba(0, 0, 0, 0.07);
-          box-shadow: 0 7px 14px 0 rgba(50, 50, 93, 0.1), 0 3px 6px 0 rgba(0, 0, 0, 0.07);
+  border-radius: 0 0 4px 4px;
 }
 

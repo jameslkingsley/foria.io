@@ -21,6 +21,7 @@
             <div class="profile-main-nav">
                 <a :class="tabClasses(index)" v-for="(tab, index) in tabs" v-text="tab.title" @click.prevent="changeTab(index)"></a>
                 <f-subscribe v-if="! user.is_mine" :user="user" class="is-pulled-right" style="margin-top:12px"></f-subscribe>
+                <f-follow v-if="! user.is_mine" :user="user" class="is-pulled-right m-r-2" style="margin-top:12px"></f-follow>
             </div>
 
             <div class="profile-main-content">
@@ -41,8 +42,7 @@
             return {
                 tabIndex: 0,
                 tabs: [
-                    { title: 'Videos', component: 'f-video-list' },
-                    { title: 'Broadcasts', component: '' }
+                    { title: 'Videos', component: 'f-video-list' }
                 ]
             };
         },

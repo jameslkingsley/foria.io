@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use OpenTok\Role;
 use OpenTok\OpenTok;
 use OpenTok\MediaMode;
 use OpenTok\ArchiveMode;
@@ -137,5 +138,20 @@ class LiveStream
         }
 
         session(['broadcast' => null]);
+    }
+
+    /**
+     * Gets a session token with the given role.
+     *
+     * @return string
+     */
+    public static function token(Broadcast $broadcast, $role)
+    {
+        $stream = new static;
+
+        return $stream->driver()->generateToken(
+            $broadcast->session_id,
+            ['role' => $role]
+        );
     }
 }

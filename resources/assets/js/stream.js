@@ -1,19 +1,31 @@
 window.Stream = class Stream {
-    constructor(username) {
+    constructor(username, options) {
         this.username = username;
+        this.options = options;
+
         this.fetch().then(r => {
             this.data = r.data;
             this.initializeSession();
+        }).catch(({ response }) => {
+            this.options.onError(
+                response.status,
+                response.statusText
+            );
         });
     }
 
     fetch() {
-        return axios.get(`/watch/${this.username}/show`);
+        return ajax.get(`/api/watch/${this.username}`);
     }
 
     handleError(error) {
         if (error) {
-            console.error(error);
+            // console.error(error);
+
+            this.options.onError(
+                error.code,
+                error.message
+            );
         }
     }
 
@@ -26,7 +38,7 @@ window.Stream = class Stream {
                 insertMode: 'append',
                 width: '100%',
                 height: '640px'
-            }, this.handleError);
+            }, e => this.handleError(e));
         });
 
         // Connect to the session
@@ -43,7 +55,10 @@ window.Stream = class Stream {
                         height: '640px'
                     }, this.handleError);
 
-                    this.publisher = this.session.publish(publisher, this.handleError);
+                    this.publisher = this.session.publish(
+                        publisher,
+                        e => this.handleError(e)
+                    );
                 }
             }
         });

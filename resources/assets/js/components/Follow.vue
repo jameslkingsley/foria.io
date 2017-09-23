@@ -30,7 +30,15 @@
             handle() {
                 return axios[
                     (this.state ? 'delete' : 'post')
-                ](`/api/follow/${this.user.name}`).then(this.fetch);
+                ](`/api/follow/${this.user.name}`).then(r => {
+                    if (this.state) {
+                        this.count--;
+                        this.state = false;
+                    } else {
+                        this.count++;
+                        this.state = true;
+                    }
+                });
             },
 
             fetch() {
@@ -42,14 +50,6 @@
 
         created() {
             this.fetch();
-
-            Echo.channel(`followed-${this.user.id}`)
-                .listen('Followed', e => {
-                    this.count = e.count;
-                })
-                .listen('Unfollowed', e => {
-                    this.count = e.count;
-                });
         }
     }
 </script>

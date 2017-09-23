@@ -16478,13 +16478,13 @@ Vue.component('f-rating', __webpack_require__(188));
 // Reporting
 Vue.component('f-report', __webpack_require__(191));
 
-// Purchases & Subscriptions
+// Purchases, Subscriptions and Follows
 Vue.component('f-purchase', __webpack_require__(194));
 Vue.component('f-subscribe', __webpack_require__(197));
+Vue.component('f-follow', __webpack_require__(266));
 
 // Watch
 Vue.component('f-watch', __webpack_require__(200));
-Vue.component('f-watch-follow', __webpack_require__(203));
 Vue.component('f-watch-chat', __webpack_require__(206));
 
 // Tokens
@@ -77576,28 +77576,36 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 window.Stream = function () {
-    function Stream(username) {
+    function Stream(username, options) {
         var _this = this;
 
         _classCallCheck(this, Stream);
 
         this.username = username;
+        this.options = options;
+
         this.fetch().then(function (r) {
             _this.data = r.data;
             _this.initializeSession();
+        }).catch(function (_ref) {
+            var response = _ref.response;
+
+            _this.options.onError(response.status, response.statusText);
         });
     }
 
     _createClass(Stream, [{
         key: 'fetch',
         value: function fetch() {
-            return axios.get('/watch/' + this.username + '/show');
+            return ajax.get('/api/watch/' + this.username);
         }
     }, {
         key: 'handleError',
         value: function handleError(error) {
             if (error) {
-                console.error(error);
+                // console.error(error);
+
+                this.options.onError(error.code, error.message);
             }
         }
     }, {
@@ -77613,7 +77621,9 @@ window.Stream = function () {
                     insertMode: 'append',
                     width: '100%',
                     height: '640px'
-                }, _this2.handleError);
+                }, function (e) {
+                    return _this2.handleError(e);
+                });
             });
 
             // Connect to the session
@@ -77630,7 +77640,9 @@ window.Stream = function () {
                             height: '640px'
                         }, _this2.handleError);
 
-                        _this2.publisher = _this2.session.publish(publisher, _this2.handleError);
+                        _this2.publisher = _this2.session.publish(publisher, function (e) {
+                            return _this2.handleError(e);
+                        });
                     }
                 }
             });
@@ -77735,6 +77747,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user'],
@@ -77742,7 +77755,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     data: function data() {
         return {
             tabIndex: 0,
-            tabs: [{ title: 'Videos', component: 'f-video-list' }, { title: 'Broadcasts', component: '' }]
+            tabs: [{ title: 'Videos', component: 'f-video-list' }]
         };
     },
 
@@ -77809,6 +77822,14 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     })
   }), _vm._v(" "), (!_vm.user.is_mine) ? _c('f-subscribe', {
     staticClass: "is-pulled-right",
+    staticStyle: {
+      "margin-top": "12px"
+    },
+    attrs: {
+      "user": _vm.user
+    }
+  }) : _vm._e(), _vm._v(" "), (!_vm.user.is_mine) ? _c('f-follow', {
+    staticClass: "is-pulled-right m-r-2",
     staticStyle: {
       "margin-top": "12px"
     },
@@ -80235,50 +80256,98 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user', 'broadcast'],
+    props: ['user'],
 
     data: function data() {
         return {
-            online: this.broadcast ? this.broadcast.online : false,
-            editingTopic: false,
-            hasBroadcast: this.broadcast !== null,
-            subscriberMode: false,
-            topic: this.broadcast ? this.broadcast.topic : 'Untitled',
+            offline: {},
             stream: null,
-            broadcaster: this.broadcast
+            hasWebcam: false,
+            editingTopic: false,
+            subscriberMode: false,
+            topic: this.hasBroadcast ? this.stream.broadcast.topic : 'Untitled'
         };
     },
 
 
+    computed: {
+        hasBroadcast: function hasBroadcast() {
+            return this.stream !== null && 'broadcast' in this.stream;
+        },
+        online: function online() {
+            if (!this.hasBroadcast) return false;
+
+            return this.stream.broadcast.online;
+        }
+    },
+
     methods: {
-        startOrStop: function startOrStop() {
+        verifyWebcam: function verifyWebcam() {
             var _this = this;
+
+            navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
+            }).then(function (d) {
+                return _this.hasWebcam = true;
+            }).catch(function (e) {
+                return _this.hasWebcam = false;
+            });
+        },
+        startOrStop: function startOrStop() {
+            var _this2 = this;
 
             if (this.online) {
                 // Stop broadcast
                 axios.delete('/api/broadcast/stop').then(function (r) {
-                    _this.online = false;
-                    _this.broadcaster = null;
-                    _this.subscriberMode = false;
-                    _this.closeStream();
+                    _this2.closeStream();
                 });
             } else {
+                if (!this.hasWebcam) return;
+
                 // Start broadcast
                 axios.post('/api/broadcast/start', {
                     topic: this.topic,
                     subscriberMode: this.subscriberMode
                 }).then(function (r) {
-                    _this.online = true;
-                    _this.broadcaster = r.data;
-                    _this.openStream();
+                    _this2.openStream();
                 });
             }
         },
         openStream: function openStream() {
-            this.stream = new Stream(this.user.name, this.broadcast);
-            return this.stream;
+            var vm = this;
+
+            this.stream = new Stream(this.user.name, {
+                onError: function onError(status, text) {
+                    switch (status) {
+                        case 404:
+                            vm.offline = {
+                                icon: 'cloud_off',
+                                title: 'Offline',
+                                text: vm.user.name + ' is offline.'
+                            };
+
+                            break;
+
+                        case 1500:
+                            vm.offline = {
+                                icon: 'error_outline',
+                                title: 'Error',
+                                text: 'No webcam detected.<br />Refresh the page once connected.'
+                            };
+
+                            break;
+                    }
+                }
+            });
         },
         closeStream: function closeStream() {
             this.stream.close();
@@ -80287,30 +80356,31 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.editingTopic = true;
         },
         saveTopic: function saveTopic() {
-            var _this2 = this;
+            var _this3 = this;
 
-            if (!this.broadcaster) {
+            if (!this.hasBroadcast) {
                 this.editingTopic = false;
                 return;
             }
 
             axios.post('/api/broadcast/topic', { topic: this.topic }).then(function (r) {
-                _this2.editingTopic = false;
+                _this3.editingTopic = false;
             });
         },
         cancelTopic: function cancelTopic() {
             this.editingTopic = false;
-            this.topic = this.broadcaster.topic;
+            this.topic = this.topic;
         }
     },
 
     created: function created() {
-        var _this3 = this;
+        var _this4 = this;
 
+        this.verifyWebcam();
         this.openStream();
 
         Echo.channel('watch-' + this.user.id).listen('TopicChanged', function (e) {
-            _this3.topic = e.topic;
+            _this4.topic = e.topic;
         }).listen('NewSubscription', function (e) {
             //
         });
@@ -80396,6 +80466,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v("Change topic")])], 1) : _vm._e(), _vm._v(" "), (_vm.user.is_mine) ? _c('button', {
     staticClass: "button is-primary is-pulled-right has-icon m-r-2",
+    attrs: {
+      "disabled": !_vm.hasWebcam
+    },
     on: {
       "click": _vm.startOrStop
     }
@@ -80406,16 +80479,24 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "id": "stream-publisher"
     }
-  })]), _vm._v(" "), _c('div', {
+  }, [(!_vm.online) ? _c('div', {
+    staticClass: "watch-placeholder"
+  }, [_c('i', {
+    staticClass: "material-icons"
+  }, [_vm._v(_vm._s(_vm.offline.icon))]), _vm._v(" "), _c('h2', [_vm._v(_vm._s(_vm.offline.title))]), _vm._v(" "), _c('p', {
+    domProps: {
+      "innerHTML": _vm._s(_vm.offline.text)
+    }
+  })]) : _vm._e()])]), _vm._v(" "), _c('div', {
     staticClass: "column is-3"
   }, [_c('div', {
     staticClass: "watch-chat-container"
-  }, [_c('f-watch-chat', {
+  }, [(_vm.hasBroadcast) ? _c('f-watch-chat', {
     attrs: {
       "user": _vm.user,
-      "broadcast": _vm.broadcast
+      "broadcast": _vm.stream.broadcast
     }
-  })], 1)])])
+  }) : _vm._e()], 1)])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -80426,131 +80507,9 @@ if (false) {
 }
 
 /***/ }),
-/* 203 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var Component = __webpack_require__(1)(
-  /* script */
-  __webpack_require__(204),
-  /* template */
-  __webpack_require__(205),
-  /* styles */
-  null,
-  /* scopeId */
-  null,
-  /* moduleIdentifier (server only) */
-  null
-)
-Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\watch\\Follow.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] Follow.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-6aa12f8c", Component.options)
-  } else {
-    hotAPI.reload("data-v-6aa12f8c", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 204 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user'],
-
-    data: function data() {
-        return {
-            state: null,
-            count: this.user.follower_count
-        };
-    },
-
-
-    computed: {
-        icon: function icon() {
-            return this.state ? 'favorite_border' : 'favorite';
-        },
-        text: function text() {
-            return this.state ? 'Unfollow' : 'Follow';
-        }
-    },
-
-    methods: {
-        handle: function handle() {
-            return axios[this.state ? 'delete' : 'post']('/api/follow/' + this.user.name).then(this.fetch);
-        },
-        fetch: function fetch() {
-            var _this = this;
-
-            axios.get('/api/follow/' + this.user.name).then(function (r) {
-                _this.state = r.data;
-            });
-        }
-    },
-
-    created: function created() {
-        var _this2 = this;
-
-        this.fetch();
-
-        Echo.channel('followed-' + this.user.id).listen('Followed', function (e) {
-            _this2.count = e.count;
-        }).listen('Unfollowed', function (e) {
-            _this2.count = e.count;
-        });
-    }
-});
-
-/***/ }),
-/* 205 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return (_vm.state != null) ? _c('button', {
-    staticClass: "button",
-    attrs: {
-      "title": _vm.text
-    },
-    on: {
-      "click": _vm.handle
-    }
-  }, [_c('i', {
-    staticClass: "material-icons m-r-2"
-  }, [_vm._v(_vm._s(_vm.icon))]), _vm._v("\n    " + _vm._s(_vm.count) + "\n")]) : _vm._e()
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-6aa12f8c", module.exports)
-  }
-}
-
-/***/ }),
+/* 203 */,
+/* 204 */,
+/* 205 */,
 /* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -83697,6 +83656,138 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 261 */,
+/* 262 */,
+/* 263 */,
+/* 264 */,
+/* 265 */,
+/* 266 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(267),
+  /* template */
+  __webpack_require__(268),
+  /* styles */
+  null,
+  /* scopeId */
+  null,
+  /* moduleIdentifier (server only) */
+  null
+)
+Component.options.__file = "D:\\Documents\\GitHub\\foria\\resources\\assets\\js\\components\\Follow.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Follow.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-9858f88c", Component.options)
+  } else {
+    hotAPI.reload("data-v-9858f88c", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 267 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['user'],
+
+    data: function data() {
+        return {
+            state: null,
+            count: this.user.follower_count
+        };
+    },
+
+
+    computed: {
+        icon: function icon() {
+            return this.state ? 'favorite_border' : 'favorite';
+        },
+        text: function text() {
+            return this.state ? 'Unfollow' : 'Follow';
+        }
+    },
+
+    methods: {
+        handle: function handle() {
+            var _this = this;
+
+            return axios[this.state ? 'delete' : 'post']('/api/follow/' + this.user.name).then(function (r) {
+                if (_this.state) {
+                    _this.count--;
+                    _this.state = false;
+                } else {
+                    _this.count++;
+                    _this.state = true;
+                }
+            });
+        },
+        fetch: function fetch() {
+            var _this2 = this;
+
+            axios.get('/api/follow/' + this.user.name).then(function (r) {
+                _this2.state = r.data;
+            });
+        }
+    },
+
+    created: function created() {
+        this.fetch();
+    }
+});
+
+/***/ }),
+/* 268 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return (_vm.state != null) ? _c('button', {
+    staticClass: "button",
+    attrs: {
+      "title": _vm.text
+    },
+    on: {
+      "click": _vm.handle
+    }
+  }, [_c('i', {
+    staticClass: "material-icons m-r-2"
+  }, [_vm._v(_vm._s(_vm.icon))]), _vm._v("\n    " + _vm._s(_vm.count) + "\n")]) : _vm._e()
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-9858f88c", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

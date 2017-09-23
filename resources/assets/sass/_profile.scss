@@ -51,16 +51,17 @@
 
 .profile-main {
     float: right;
-    width: 80%;
-    padding: 0 0 0 3rem;
+    width: calc(80% - 3rem);
+    box-shadow: $shadow-large;
+    border-radius: $radius;
+    background: white;
 
     .profile-main-nav {
         float: left;
         width: 100%;
-        background: white;
         padding: 0 1rem;
-        border-radius: $radius;
-        box-shadow: $shadow-large;
+        border-radius: $radius $radius 0 0;
+        box-shadow: 0 -1px 0 $background inset;
 
         .profile-main-nav-item {
             float: left;
@@ -70,6 +71,7 @@
 
             &.is-active {
                 color: $primary;
+                box-shadow: 0 -3px 0 $primary inset;
             }
         }
     }
@@ -77,10 +79,7 @@
     .profile-main-content {
         float: left;
         width: 100%;
-        margin-top: 1rem;
-        background: white;
         padding: 1rem;
-        border-radius: $radius;
-        box-shadow: $shadow-large;
+        border-radius: 0 0 $radius $radius;
     }
 }

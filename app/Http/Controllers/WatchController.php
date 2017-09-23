@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use OpenTok\Role;
-use OpenTok\OpenTok;
 use App\Models\User;
+use OpenTok\OpenTok;
 use OpenTok\MediaMode;
 use App\Models\Broadcast;
+use App\Support\LiveStream;
 use Illuminate\Http\Request;
 
 class WatchController extends Controller
@@ -67,11 +68,11 @@ class WatchController extends Controller
             return abort(404);
         }
 
-        $role = $broadcast->is_mine ? Role::PUBLISHER : Role::SUBSCRIBER;
-
-        $token = $this->openTok->generateToken(
-            $broadcast->session_id,
-            ['role' => $role]
+        $token = LiveStream::token(
+            $broadcast,
+            $broadcast->is_mine
+                ? Role::PUBLISHER
+                : Role::SUBSCRIBER
         );
 
         return response()->json(compact(

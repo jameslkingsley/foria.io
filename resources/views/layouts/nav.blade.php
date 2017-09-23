@@ -52,6 +52,12 @@
                             <a href="{{ url('/profile/'.auth()->user()->name) }}">Profile</a>
                         </b-dropdown-item>
 
+                        @if (auth()->user()->is_model)
+                            <b-dropdown-item has-link>
+                                <a href="{{ auth()->user()->watch_url }}">Broadcast</a>
+                            </b-dropdown-item>
+                        @endif
+
                         <b-dropdown-item has-link>
                             <a href="{{ url('/settings') }}">Settings</a>
                         </b-dropdown-item>

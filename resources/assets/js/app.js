@@ -21,13 +21,13 @@ Vue.component('f-rating', require('./components/Rating.vue'));
 // Reporting
 Vue.component('f-report', require('./components/Report.vue'));
 
-// Purchases & Subscriptions
+// Purchases, Subscriptions and Follows
 Vue.component('f-purchase', require('./components/Purchase.vue'));
 Vue.component('f-subscribe', require('./components/Subscribe.vue'));
+Vue.component('f-follow', require('./components/Follow.vue'));
 
 // Watch
 Vue.component('f-watch', require('./components/watch/Index.vue'));
-Vue.component('f-watch-follow', require('./components/watch/Follow.vue'));
 Vue.component('f-watch-chat', require('./components/watch/Chat.vue'));
 
 // Tokens

@@ -27,7 +27,7 @@
                             <b-dropdown-item @click.native="changeTopic">Change topic</b-dropdown-item>
                         </b-dropdown>
 
-                        <button v-if="user.is_mine" class="button is-primary is-pulled-right has-icon m-r-2" @click="startOrStop">
+                        <button v-if="user.is_mine" :disabled="! hasWebcam" class="button is-primary is-pulled-right has-icon m-r-2" @click="startOrStop">
                             <i class="material-icons m-r-2">{{ online ? 'stop' : 'play_arrow' }}</i>
                             {{ online ? 'Stop' : 'Start' }} Broadcast
                         </button>
@@ -35,12 +35,18 @@
                 </div>
             </div>
 
-            <div class="watch-video-container" id="stream-publisher"></div>
+            <div class="watch-video-container" id="stream-publisher">
+                <div v-if="! online" class="watch-placeholder">
+                    <i class="material-icons">{{ offline.icon }}</i>
+                    <h2>{{ offline.title }}</h2>
+                    <p v-html="offline.text"></p>
+                </div>
+            </div>
         </div>
 
         <div class="column is-3">
             <div class="watch-chat-container">
-                <f-watch-chat :user="user" :broadcast="broadcast"></f-watch-chat>
+                <f-watch-chat v-if="hasBroadcast" :user="user" :broadcast="stream.broadcast"></f-watch-chat>
             </div>
         </div>
     </div>
@@ -48,46 +54,88 @@
 
 <script>
     export default {
-        props: ['user', 'broadcast'],
+        props: ['user'],
 
         data() {
             return {
-                online: this.broadcast ? this.broadcast.online : false,
-                editingTopic: false,
-                hasBroadcast: this.broadcast !== null,
-                subscriberMode: false,
-                topic: this.broadcast ? this.broadcast.topic : 'Untitled',
+                offline: {},
                 stream: null,
-                broadcaster: this.broadcast
+                hasWebcam: false,
+                editingTopic: false,
+                subscriberMode: false,
+                topic: this.hasBroadcast ? this.stream.broadcast.topic : 'Untitled'
             };
         },
 
+        computed: {
+            hasBroadcast() {
+                return this.stream !== null
+                    && 'broadcast' in this.stream;
+            },
+
+            online() {
+                if (! this.hasBroadcast)
+                    return false;
+
+                return this.stream.broadcast.online;
+            }
+        },
+
         methods: {
+            verifyWebcam() {
+                navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                })
+                .then(d => this.hasWebcam = true)
+                .catch(e => this.hasWebcam = false);
+            },
+
             startOrStop() {
                 if (this.online) {
                     // Stop broadcast
                     axios.delete(`/api/broadcast/stop`).then(r => {
-                        this.online = false;
-                        this.broadcaster = null;
-                        this.subscriberMode = false;
                         this.closeStream();
                     });
                 } else {
+                    if (! this.hasWebcam) return;
+
                     // Start broadcast
                     axios.post(`/api/broadcast/start`, {
                         topic: this.topic,
                         subscriberMode: this.subscriberMode
                     }).then(r => {
-                        this.online = true;
-                        this.broadcaster = r.data;
                         this.openStream();
                     });
                 }
             },
 
             openStream() {
-                this.stream = new Stream(this.user.name, this.broadcast);
-                return this.stream;
+                var vm = this;
+
+                this.stream = new Stream(this.user.name, {
+                    onError(status, text) {
+                        switch (status) {
+                            case 404:
+                                vm.offline = {
+                                    icon: 'cloud_off',
+                                    title: 'Offline',
+                                    text: `${vm.user.name} is offline.`
+                                };
+
+                                break;
+
+                            case 1500:
+                                vm.offline = {
+                                    icon: 'error_outline',
+                                    title: 'Error',
+                                    text: 'No webcam detected.<br />Refresh the page once connected.'
+                                };
+
+                                break;
+                        }
+                    }
+                });
             },
 
             closeStream() {
@@ -99,7 +147,7 @@
             },
 
             saveTopic() {
-                if (! this.broadcaster) {
+                if (! this.hasBroadcast) {
                     this.editingTopic = false;
                     return;
                 }
@@ -111,11 +159,12 @@
 
             cancelTopic() {
                 this.editingTopic = false;
-                this.topic = this.broadcaster.topic;
+                this.topic = this.topic;
             }
         },
 
         created() {
+            this.verifyWebcam();
             this.openStream();
 
             Echo.channel(`watch-${this.user.id}`)
