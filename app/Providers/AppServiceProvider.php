@@ -11,6 +11,7 @@ use Aws\Credentials\Credentials;
 use Aws\CloudFront\CloudFrontClient;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Aws\ElasticTranscoder\ElasticTranscoderClient;
 
@@ -23,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Schema::defaultStringLength(191);
+
         View::share('opentokApiKey', config('opentok.api_key'));
         View::share('reportableReasons', Report::reasons());
 
