@@ -8,12 +8,9 @@
 <script>
     export default {
         mounted() {
-            const broadcaster = new Broadcaster({
-                input: this.$refs.input,
-                output: this.$refs.output
-            });
+            const stream = new LiveStream;
 
-            broadcaster.start();
+            console.log(stream);
         }
     }
 </script>
