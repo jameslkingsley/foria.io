@@ -3,6 +3,9 @@ window._ = require('lodash');
 require('./utils');
 window.videojs = require('video.js/dist/video');
 
+require('adapterjs');
+window.kurentoUtils = require('kurento-utils');
+
 window.moment = require('moment');
 require('moment-duration-format');
 

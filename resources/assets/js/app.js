@@ -1,8 +1,7 @@
 require('./bootstrap');
 require('./stream');
 
-import LiveStream from './livestream/index';
-window.LiveStream = LiveStream;
+require('./livestream/client');
 
 // Profile
 Vue.component('f-profile', require('./components/profile/Index.vue'));
