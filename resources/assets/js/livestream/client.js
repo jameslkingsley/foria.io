@@ -1,5 +1,6 @@
 window.LiveStream = {
-    ws: new WebSocket(`wss://${location.host}/one2many`),
+    // ws: new WebSocket(`wss://${location.host}/one2many`),
+    ws: new WebSocket(`wss://media.foria.io:8433/kurento`),
     video: null,
     webRtcPeer: null,
 
