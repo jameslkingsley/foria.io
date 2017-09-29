@@ -12,13 +12,11 @@
         <link href="{{ mix('css/app.css') }}" rel="stylesheet">
 
         <script src="https://js.stripe.com/v3/"></script>
-        <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
 
         <script>
             var Foria = {
                 stripeKey: '{{ config('services.stripe.key') }}',
                 pusherKey: '{{ config('broadcasting.connections.pusher.key') }}',
-                openTokKey: '{{ config('opentok.key') }}',
                 reportableReasons: JSON.parse('{!! json_encode($reportableReasons) !!}'),
                 csrfToken: '{{ csrf_token() }}',
                 user: null
@@ -46,6 +44,7 @@
             </section>
         </div>
 
+        <script src="{{ url('/js/red5.js') }}"></script>
         <script src="{{ mix('js/app.js') }}"></script>
         @yield('scripts')
     </body>

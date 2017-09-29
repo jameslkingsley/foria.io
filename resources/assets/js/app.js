@@ -1,7 +1,7 @@
 require('./bootstrap');
 require('./stream');
 
-require('./livestream/client');
+require('./livestream/index');
 
 // Profile
 Vue.component('f-profile', require('./components/profile/Index.vue'));

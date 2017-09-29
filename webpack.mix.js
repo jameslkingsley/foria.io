@@ -12,5 +12,5 @@ let mix = require('laravel-mix');
  */
 
 mix.js('resources/assets/js/app.js', 'public/js')
-   // .js('resources/assets/js/livestream/server.js', 'storage/app')
+   .copy('resources/assets/js/livestream/lib/red5pro/red5pro-sdk.min.js', 'public/js/red5.js')
    .sass('resources/assets/sass/app.scss', 'public/css');

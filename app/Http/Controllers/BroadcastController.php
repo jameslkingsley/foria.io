@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Broadcast;
 use App\Support\LiveStream;
 use App\Events\TopicChanged;
 use Illuminate\Http\Request;
@@ -55,7 +56,12 @@ class BroadcastController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return auth()->user()->broadcasts()->save(
+            new Broadcast([
+                'online' => true,
+                'topic' => request('topic', 'Untitled')
+            ])
+        );
     }
 
     /**
@@ -87,9 +93,15 @@ class BroadcastController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        if (! $broadcast = Broadcast::latest(auth()->user())) {
+            return abort(404);
+        }
+
+        $broadcast->update([
+            'online' => false
+        ]);
     }
 
     /**
@@ -101,26 +113,6 @@ class BroadcastController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    /**
-     * Starts the broadcast.
-     *
-     * @return App\Models\Broadcast
-     */
-    public function start(Request $request)
-    {
-        return $this->stream->start(request('topic', 'Untitled'));
-    }
-
-    /**
-     * Stops the broadcast.
-     *
-     * @return mixed
-     */
-    public function stop(Request $request)
-    {
-        return $this->stream->stop();
     }
 
     /**

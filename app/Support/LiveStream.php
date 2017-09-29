@@ -12,28 +12,11 @@ use App\Exceptions\NoBroadcastException;
 class LiveStream
 {
     /**
-     * The OpenTok API instance.
-     *
-     * @var OpenTok\OpenTok
-     */
-    protected $openTok;
-
-    /**
      * The broadcast model instance.
      *
      * @var App\Models\Broadcast
      */
     protected $broadcast;
-
-    /**
-     * Default OpenTok session options.
-     *
-     * @var array
-     */
-    protected $sessionOptions = [
-        'mediaMode' => MediaMode::ROUTED,
-        'archiveMode' => ArchiveMode::ALWAYS
-    ];
 
     /**
      * Constructor method.
@@ -42,32 +25,7 @@ class LiveStream
      */
     public function __construct()
     {
-        $this->openTok = new OpenTok(
-            config('opentok.key'),
-            config('opentok.secret')
-        );
-    }
-
-    /**
-     * Gets the streaming driver.
-     *
-     * @return OpenTok\OpenTok
-     */
-    public function driver()
-    {
-        return $this->openTok;
-    }
-
-    /**
-     * Set the session options.
-     *
-     * @return App\Support\LiveStream
-     */
-    public function setSessionOptions(array $options)
-    {
-        $this->sessionOptions = $options;
-
-        return $this;
+        //
     }
 
     /**

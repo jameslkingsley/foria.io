@@ -1,18 +1,19 @@
 <template>
-    <div class="card">
-        <button class="button m-r-2" @click="presenter">
-            Presenter
+    <div class="card p-3">
+        <button class="button m-r-2" @click="broadcast">
+            Broadcast
         </button>
 
-        <button class="button m-r-2" @click="viewer">
-            Viewer
+        <button class="button m-r-2" @click="view">
+            View
         </button>
 
-        <button class="button" @click="terminate">
+        <button class="button" @click="stop">
             Stop
         </button>
 
-        <video ref="video" controls autoplay width="640px" height="480px"></video>
+        <video id="red5pro-publisher" ref="broadcaster" controls autoplay muted width="100%" height="640px"></video>
+        <video id="red5pro-subscriber" ref="viewer" controls autoplay muted width="100%" height="640px"></video>
     </div>
 </template>
 
@@ -20,26 +21,36 @@
     export default {
         data() {
             return {
-                //
+                stream: null
             };
         },
 
         methods: {
-            presenter() {
-                LiveStream.presenter();
+            broadcast() {
+                this.stream = LiveStream.Publisher({
+                    //
+                });
+
+                console.log(this.stream);
             },
 
-            viewer() {
-                LiveStream.viewer();
+            view() {
+                this.stream = LiveStream.Subscriber({
+                    //
+                });
+
+                console.log(this.stream);
             },
 
-            terminate() {
-                LiveStream.stop();
+            stop() {
+                this.stream.stop();
+
+                this.stream = null;
             }
         },
 
         mounted() {
-            LiveStream.setVideo(this.$refs.video);
+            //
         }
     }
 </script>

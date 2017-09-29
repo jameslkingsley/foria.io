@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 127);
+/******/ 	return __webpack_require__(__webpack_require__.s = 128);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1896,7 +1896,7 @@ function loadLocale(name) {
             module && module.exports) {
         try {
             oldLocale = globalLocale._abbr;
-            __webpack_require__(157)("./" + name);
+            __webpack_require__(145)("./" + name);
             // because defineLocale currently also sets the global locale, we
             // want to undo that for lazy loaded locales
             getSetGlobalLocale(oldLocale);
@@ -4531,7 +4531,7 @@ return hooks;
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
 
 /***/ }),
 /* 1 */
@@ -4637,8 +4637,8 @@ module.exports = function normalizeComponent (
 "use strict";
 
 
-var bind = __webpack_require__(122);
-var isBuffer = __webpack_require__(162);
+var bind = __webpack_require__(123);
+var isBuffer = __webpack_require__(150);
 
 /*global toString:true*/
 
@@ -4942,6 +4942,159 @@ module.exports = {
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+
+var logDisabled_ = true;
+var deprecationWarnings_ = true;
+
+// Utility methods.
+var utils = {
+  disableLog: function(bool) {
+    if (typeof bool !== 'boolean') {
+      return new Error('Argument type: ' + typeof bool +
+          '. Please use a boolean.');
+    }
+    logDisabled_ = bool;
+    return (bool) ? 'adapter.js logging disabled' :
+        'adapter.js logging enabled';
+  },
+
+  /**
+   * Disable or enable deprecation warnings
+   * @param {!boolean} bool set to true to disable warnings.
+   */
+  disableWarnings: function(bool) {
+    if (typeof bool !== 'boolean') {
+      return new Error('Argument type: ' + typeof bool +
+          '. Please use a boolean.');
+    }
+    deprecationWarnings_ = !bool;
+    return 'adapter.js deprecation warnings ' + (bool ? 'disabled' : 'enabled');
+  },
+
+  log: function() {
+    if (typeof window === 'object') {
+      if (logDisabled_) {
+        return;
+      }
+      if (typeof console !== 'undefined' && typeof console.log === 'function') {
+        console.log.apply(console, arguments);
+      }
+    }
+  },
+
+  /**
+   * Shows a deprecation warning suggesting the modern and spec-compatible API.
+   */
+  deprecated: function(oldMethod, newMethod) {
+    if (!deprecationWarnings_) {
+      return;
+    }
+    console.warn(oldMethod + ' is deprecated, please use ' + newMethod +
+        ' instead.');
+  },
+
+  /**
+   * Extract browser version out of the provided user agent string.
+   *
+   * @param {!string} uastring userAgent string.
+   * @param {!string} expr Regular expression used as match criteria.
+   * @param {!number} pos position in the version string to be returned.
+   * @return {!number} browser version.
+   */
+  extractVersion: function(uastring, expr, pos) {
+    var match = uastring.match(expr);
+    return match && match.length >= pos && parseInt(match[pos], 10);
+  },
+
+  /**
+   * Browser detector.
+   *
+   * @return {object} result containing browser and version
+   *     properties.
+   */
+  detectBrowser: function(window) {
+    var navigator = window && window.navigator;
+
+    // Returned result object.
+    var result = {};
+    result.browser = null;
+    result.version = null;
+
+    // Fail early if it's not a browser
+    if (typeof window === 'undefined' || !window.navigator) {
+      result.browser = 'Not a browser.';
+      return result;
+    }
+
+    // Firefox.
+    if (navigator.mozGetUserMedia) {
+      result.browser = 'firefox';
+      result.version = this.extractVersion(navigator.userAgent,
+          /Firefox\/(\d+)\./, 1);
+    } else if (navigator.webkitGetUserMedia) {
+      // Chrome, Chromium, Webview, Opera, all use the chrome shim for now
+      if (window.webkitRTCPeerConnection) {
+        result.browser = 'chrome';
+        result.version = this.extractVersion(navigator.userAgent,
+          /Chrom(e|ium)\/(\d+)\./, 2);
+      } else { // Safari (in an unpublished version) or unknown webkit-based.
+        if (navigator.userAgent.match(/Version\/(\d+).(\d+)/)) {
+          result.browser = 'safari';
+          result.version = this.extractVersion(navigator.userAgent,
+            /AppleWebKit\/(\d+)\./, 1);
+        } else { // unknown webkit-based browser.
+          result.browser = 'Unsupported webkit-based browser ' +
+              'with GUM support but no WebRTC support.';
+          return result;
+        }
+      }
+    } else if (navigator.mediaDevices &&
+        navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) { // Edge.
+      result.browser = 'edge';
+      result.version = this.extractVersion(navigator.userAgent,
+          /Edge\/(\d+).(\d+)$/, 2);
+    } else if (navigator.mediaDevices &&
+        navigator.userAgent.match(/AppleWebKit\/(\d+)\./)) {
+        // Safari, with webkitGetUserMedia removed.
+      result.browser = 'safari';
+      result.version = this.extractVersion(navigator.userAgent,
+          /AppleWebKit\/(\d+)\./, 1);
+    } else { // Default fallthrough: not supported.
+      result.browser = 'Not a supported browser.';
+      return result;
+    }
+
+    return result;
+  },
+
+};
+
+// Export.
+module.exports = {
+  log: utils.log,
+  deprecated: utils.deprecated,
+  disableLog: utils.disableLog,
+  disableWarnings: utils.disableWarnings,
+  extractVersion: utils.extractVersion,
+  shimCreateObjectURL: utils.shimCreateObjectURL,
+  detectBrowser: utils.detectBrowser.bind(utils)
+};
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports) {
 
 var g;
@@ -4968,7 +5121,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -4996,14 +5149,14 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {
 
 var utils = __webpack_require__(2);
-var normalizeHeaderName = __webpack_require__(165);
+var normalizeHeaderName = __webpack_require__(153);
 
 var DEFAULT_CONTENT_TYPE = {
   'Content-Type': 'application/x-www-form-urlencoded'
@@ -5019,10 +5172,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(123);
+    adapter = __webpack_require__(124);
   } else if (typeof process !== 'undefined') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(123);
+    adapter = __webpack_require__(124);
   }
   return adapter;
 }
@@ -5093,273 +5246,667 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(164)))
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports) {
-
-var grammar = module.exports = {
-  v: [{
-      name: 'version',
-      reg: /^(\d*)$/
-  }],
-  o: [{ //o=- 20518 0 IN IP4 203.0.113.1
-    // NB: sessionId will be a String in most cases because it is huge
-    name: 'origin',
-    reg: /^(\S*) (\d*) (\d*) (\S*) IP(\d) (\S*)/,
-    names: ['username', 'sessionId', 'sessionVersion', 'netType', 'ipVer', 'address'],
-    format: "%s %s %d %s IP%d %s"
-  }],
-  // default parsing of these only (though some of these feel outdated)
-  s: [{ name: 'name' }],
-  i: [{ name: 'description' }],
-  u: [{ name: 'uri' }],
-  e: [{ name: 'email' }],
-  p: [{ name: 'phone' }],
-  z: [{ name: 'timezones' }], // TODO: this one can actually be parsed properly..
-  r: [{ name: 'repeats' }],   // TODO: this one can also be parsed properly
-  //k: [{}], // outdated thing ignored
-  t: [{ //t=0 0
-    name: 'timing',
-    reg: /^(\d*) (\d*)/,
-    names: ['start', 'stop'],
-    format: "%d %d"
-  }],
-  c: [{ //c=IN IP4 10.47.197.26
-      name: 'connection',
-      reg: /^IN IP(\d) (\S*)/,
-      names: ['version', 'ip'],
-      format: "IN IP%d %s"
-  }],
-  b: [{ //b=AS:4000
-      push: 'bandwidth',
-      reg: /^(TIAS|AS|CT|RR|RS):(\d*)/,
-      names: ['type', 'limit'],
-      format: "%s:%s"
-  }],
-  m: [{ //m=video 51744 RTP/AVP 126 97 98 34 31
-      // NB: special - pushes to session
-      // TODO: rtp/fmtp should be filtered by the payloads found here?
-      reg: /^(\w*) (\d*) ([\w\/]*)(?: (.*))?/,
-      names: ['type', 'port', 'protocol', 'payloads'],
-      format: "%s %d %s %s"
-  }],
-  a: [
-    { //a=rtpmap:110 opus/48000/2
-      push: 'rtp',
-      reg: /^rtpmap:(\d*) ([\w\-]*)(?:\s*\/(\d*)(?:\s*\/(\S*))?)?/,
-      names: ['payload', 'codec', 'rate', 'encoding'],
-      format: function (o) {
-        return (o.encoding) ?
-          "rtpmap:%d %s/%s/%s":
-          o.rate ?
-          "rtpmap:%d %s/%s":
-          "rtpmap:%d %s";
-      }
-    },
-    {
-      //a=fmtp:108 profile-level-id=24;object=23;bitrate=64000
-      //a=fmtp:111 minptime=10; useinbandfec=1
-      push: 'fmtp',
-      reg: /^fmtp:(\d*) ([\S| ]*)/,
-      names: ['payload', 'config'],
-      format: "fmtp:%d %s"
-    },
-    { //a=control:streamid=0
-        name: 'control',
-        reg: /^control:(.*)/,
-        format: "control:%s"
-    },
-    { //a=rtcp:65179 IN IP4 193.84.77.194
-      name: 'rtcp',
-      reg: /^rtcp:(\d*)(?: (\S*) IP(\d) (\S*))?/,
-      names: ['port', 'netType', 'ipVer', 'address'],
-      format: function (o) {
-        return (o.address != null) ?
-          "rtcp:%d %s IP%d %s":
-          "rtcp:%d";
-      }
-    },
-    { //a=rtcp-fb:98 trr-int 100
-      push: 'rtcpFbTrrInt',
-      reg: /^rtcp-fb:(\*|\d*) trr-int (\d*)/,
-      names: ['payload', 'value'],
-      format: "rtcp-fb:%d trr-int %d"
-    },
-    { //a=rtcp-fb:98 nack rpsi
-      push: 'rtcpFb',
-      reg: /^rtcp-fb:(\*|\d*) ([\w-_]*)(?: ([\w-_]*))?/,
-      names: ['payload', 'type', 'subtype'],
-      format: function (o) {
-        return (o.subtype != null) ?
-          "rtcp-fb:%s %s %s":
-          "rtcp-fb:%s %s";
-      }
-    },
-    { //a=extmap:2 urn:ietf:params:rtp-hdrext:toffset
-      //a=extmap:1/recvonly URI-gps-string
-      push: 'ext',
-      reg: /^extmap:([\w_\/]*) (\S*)(?: (\S*))?/,
-      names: ['value', 'uri', 'config'], // value may include "/direction" suffix
-      format: function (o) {
-        return (o.config != null) ?
-          "extmap:%s %s %s":
-          "extmap:%s %s";
-      }
-    },
-    {
-      //a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:PS1uQCVeeCFCanVmcjkpPywjNWhcYD0mXXtxaVBR|2^20|1:32
-      push: 'crypto',
-      reg: /^crypto:(\d*) ([\w_]*) (\S*)(?: (\S*))?/,
-      names: ['id', 'suite', 'config', 'sessionConfig'],
-      format: function (o) {
-        return (o.sessionConfig != null) ?
-          "crypto:%d %s %s %s":
-          "crypto:%d %s %s";
-      }
-    },
-    { //a=setup:actpass
-      name: 'setup',
-      reg: /^setup:(\w*)/,
-      format: "setup:%s"
-    },
-    { //a=mid:1
-      name: 'mid',
-      reg: /^mid:([^\s]*)/,
-      format: "mid:%s"
-    },
-    { //a=msid:0c8b064d-d807-43b4-b434-f92a889d8587 98178685-d409-46e0-8e16-7ef0db0db64a
-      name: 'msid',
-      reg: /^msid:(.*)/,
-      format: "msid:%s"
-    },
-    { //a=ptime:20
-      name: 'ptime',
-      reg: /^ptime:(\d*)/,
-      format: "ptime:%d"
-    },
-    { //a=maxptime:60
-      name: 'maxptime',
-      reg: /^maxptime:(\d*)/,
-      format: "maxptime:%d"
-    },
-    { //a=sendrecv
-      name: 'direction',
-      reg: /^(sendrecv|recvonly|sendonly|inactive)/
-    },
-    { //a=ice-lite
-      name: 'icelite',
-      reg: /^(ice-lite)/
-    },
-    { //a=ice-ufrag:F7gI
-      name: 'iceUfrag',
-      reg: /^ice-ufrag:(\S*)/,
-      format: "ice-ufrag:%s"
-    },
-    { //a=ice-pwd:x9cml/YzichV2+XlhiMu8g
-      name: 'icePwd',
-      reg: /^ice-pwd:(\S*)/,
-      format: "ice-pwd:%s"
-    },
-    { //a=fingerprint:SHA-1 00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33
-      name: 'fingerprint',
-      reg: /^fingerprint:(\S*) (\S*)/,
-      names: ['type', 'hash'],
-      format: "fingerprint:%s %s"
-    },
-    {
-      //a=candidate:0 1 UDP 2113667327 203.0.113.1 54400 typ host
-      //a=candidate:1162875081 1 udp 2113937151 192.168.34.75 60017 typ host generation 0
-      //a=candidate:3289912957 2 udp 1845501695 193.84.77.194 60017 typ srflx raddr 192.168.34.75 rport 60017 generation 0
-      //a=candidate:229815620 1 tcp 1518280447 192.168.150.19 60017 typ host tcptype active generation 0
-      //a=candidate:3289912957 2 tcp 1845501695 193.84.77.194 60017 typ srflx raddr 192.168.34.75 rport 60017 tcptype passive generation 0
-      push:'candidates',
-      reg: /^candidate:(\S*) (\d*) (\S*) (\d*) (\S*) (\d*) typ (\S*)(?: raddr (\S*) rport (\d*))?(?: tcptype (\S*))?(?: generation (\d*))?/,
-      names: ['foundation', 'component', 'transport', 'priority', 'ip', 'port', 'type', 'raddr', 'rport', 'tcptype', 'generation'],
-      format: function (o) {
-        var str = "candidate:%s %d %s %d %s %d typ %s";
-
-        str += (o.raddr != null) ? " raddr %s rport %d" : "%v%v";
-
-        // NB: candidate has three optional chunks, so %void middles one if it's missing
-        str += (o.tcptype != null) ? " tcptype %s" : "%v";
-
-        if (o.generation != null) {
-          str += " generation %d";
-        }
-        return str;
-      }
-    },
-    { //a=end-of-candidates (keep after the candidates line for readability)
-      name: 'endOfCandidates',
-      reg: /^(end-of-candidates)/
-    },
-    { //a=remote-candidates:1 203.0.113.1 54400 2 203.0.113.1 54401 ...
-      name: 'remoteCandidates',
-      reg: /^remote-candidates:(.*)/,
-      format: "remote-candidates:%s"
-    },
-    { //a=ice-options:google-ice
-      name: 'iceOptions',
-      reg: /^ice-options:(\S*)/,
-      format: "ice-options:%s"
-    },
-    { //a=ssrc:2566107569 cname:t9YU8M1UxTF8Y1A1
-      push: "ssrcs",
-      reg: /^ssrc:(\d*) ([\w_]*):(.*)/,
-      names: ['id', 'attribute', 'value'],
-      format: "ssrc:%d %s:%s"
-    },
-    { //a=ssrc-group:FEC 1 2
-      push: "ssrcGroups",
-      reg: /^ssrc-group:(\w*) (.*)/,
-      names: ['semantics', 'ssrcs'],
-      format: "ssrc-group:%s %s"
-    },
-    { //a=msid-semantic: WMS Jvlam5X3SX1OP6pn20zWogvaKJz5Hjf9OnlV
-      name: "msidSemantic",
-      reg: /^msid-semantic:\s?(\w*) (\S*)/,
-      names: ['semantic', 'token'],
-      format: "msid-semantic: %s %s" // space after ":" is not accidental
-    },
-    { //a=group:BUNDLE audio video
-      push: 'groups',
-      reg: /^group:(\w*) (.*)/,
-      names: ['type', 'mids'],
-      format: "group:%s %s"
-    },
-    { //a=rtcp-mux
-      name: 'rtcpMux',
-      reg: /^(rtcp-mux)/
-    },
-    { //a=rtcp-rsize
-      name: 'rtcpRsize',
-      reg: /^(rtcp-rsize)/
-    },
-    { // any a= that we don't understand is kepts verbatim on media.invalid
-      push: 'invalid',
-      names: ["value"]
-    }
-  ]
-};
-
-// set sensible defaults to avoid polluting the grammar with boring details
-Object.keys(grammar).forEach(function (key) {
-  var objs = grammar[key];
-  objs.forEach(function (obj) {
-    if (!obj.reg) {
-      obj.reg = /(.*)/;
-    }
-    if (!obj.format) {
-      obj.format = "%s";
-    }
-  });
-});
-
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(152)))
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+ /* eslint-env node */
+
+
+// SDP helpers.
+var SDPUtils = {};
+
+// Generate an alphanumeric identifier for cname or mids.
+// TODO: use UUIDs instead? https://gist.github.com/jed/982883
+SDPUtils.generateIdentifier = function() {
+  return Math.random().toString(36).substr(2, 10);
+};
+
+// The RTCP CNAME used by all peerconnections from the same JS.
+SDPUtils.localCName = SDPUtils.generateIdentifier();
+
+// Splits SDP into lines, dealing with both CRLF and LF.
+SDPUtils.splitLines = function(blob) {
+  return blob.trim().split('\n').map(function(line) {
+    return line.trim();
+  });
+};
+// Splits SDP into sessionpart and mediasections. Ensures CRLF.
+SDPUtils.splitSections = function(blob) {
+  var parts = blob.split('\nm=');
+  return parts.map(function(part, index) {
+    return (index > 0 ? 'm=' + part : part).trim() + '\r\n';
+  });
+};
+
+// Returns lines that start with a certain prefix.
+SDPUtils.matchPrefix = function(blob, prefix) {
+  return SDPUtils.splitLines(blob).filter(function(line) {
+    return line.indexOf(prefix) === 0;
+  });
+};
+
+// Parses an ICE candidate line. Sample input:
+// candidate:702786350 2 udp 41819902 8.8.8.8 60769 typ relay raddr 8.8.8.8
+// rport 55996"
+SDPUtils.parseCandidate = function(line) {
+  var parts;
+  // Parse both variants.
+  if (line.indexOf('a=candidate:') === 0) {
+    parts = line.substring(12).split(' ');
+  } else {
+    parts = line.substring(10).split(' ');
+  }
+
+  var candidate = {
+    foundation: parts[0],
+    component: parseInt(parts[1], 10),
+    protocol: parts[2].toLowerCase(),
+    priority: parseInt(parts[3], 10),
+    ip: parts[4],
+    port: parseInt(parts[5], 10),
+    // skip parts[6] == 'typ'
+    type: parts[7]
+  };
+
+  for (var i = 8; i < parts.length; i += 2) {
+    switch (parts[i]) {
+      case 'raddr':
+        candidate.relatedAddress = parts[i + 1];
+        break;
+      case 'rport':
+        candidate.relatedPort = parseInt(parts[i + 1], 10);
+        break;
+      case 'tcptype':
+        candidate.tcpType = parts[i + 1];
+        break;
+      case 'ufrag':
+        candidate.ufrag = parts[i + 1]; // for backward compability.
+        candidate.usernameFragment = parts[i + 1];
+        break;
+      default: // extension handling, in particular ufrag
+        candidate[parts[i]] = parts[i + 1];
+        break;
+    }
+  }
+  return candidate;
+};
+
+// Translates a candidate object into SDP candidate attribute.
+SDPUtils.writeCandidate = function(candidate) {
+  var sdp = [];
+  sdp.push(candidate.foundation);
+  sdp.push(candidate.component);
+  sdp.push(candidate.protocol.toUpperCase());
+  sdp.push(candidate.priority);
+  sdp.push(candidate.ip);
+  sdp.push(candidate.port);
+
+  var type = candidate.type;
+  sdp.push('typ');
+  sdp.push(type);
+  if (type !== 'host' && candidate.relatedAddress &&
+      candidate.relatedPort) {
+    sdp.push('raddr');
+    sdp.push(candidate.relatedAddress); // was: relAddr
+    sdp.push('rport');
+    sdp.push(candidate.relatedPort); // was: relPort
+  }
+  if (candidate.tcpType && candidate.protocol.toLowerCase() === 'tcp') {
+    sdp.push('tcptype');
+    sdp.push(candidate.tcpType);
+  }
+  if (candidate.ufrag) {
+    sdp.push('ufrag');
+    sdp.push(candidate.ufrag);
+  }
+  return 'candidate:' + sdp.join(' ');
+};
+
+// Parses an ice-options line, returns an array of option tags.
+// a=ice-options:foo bar
+SDPUtils.parseIceOptions = function(line) {
+  return line.substr(14).split(' ');
+}
+
+// Parses an rtpmap line, returns RTCRtpCoddecParameters. Sample input:
+// a=rtpmap:111 opus/48000/2
+SDPUtils.parseRtpMap = function(line) {
+  var parts = line.substr(9).split(' ');
+  var parsed = {
+    payloadType: parseInt(parts.shift(), 10) // was: id
+  };
+
+  parts = parts[0].split('/');
+
+  parsed.name = parts[0];
+  parsed.clockRate = parseInt(parts[1], 10); // was: clockrate
+  // was: channels
+  parsed.numChannels = parts.length === 3 ? parseInt(parts[2], 10) : 1;
+  return parsed;
+};
+
+// Generate an a=rtpmap line from RTCRtpCodecCapability or
+// RTCRtpCodecParameters.
+SDPUtils.writeRtpMap = function(codec) {
+  var pt = codec.payloadType;
+  if (codec.preferredPayloadType !== undefined) {
+    pt = codec.preferredPayloadType;
+  }
+  return 'a=rtpmap:' + pt + ' ' + codec.name + '/' + codec.clockRate +
+      (codec.numChannels !== 1 ? '/' + codec.numChannels : '') + '\r\n';
+};
+
+// Parses an a=extmap line (headerextension from RFC 5285). Sample input:
+// a=extmap:2 urn:ietf:params:rtp-hdrext:toffset
+// a=extmap:2/sendonly urn:ietf:params:rtp-hdrext:toffset
+SDPUtils.parseExtmap = function(line) {
+  var parts = line.substr(9).split(' ');
+  return {
+    id: parseInt(parts[0], 10),
+    direction: parts[0].indexOf('/') > 0 ? parts[0].split('/')[1] : 'sendrecv',
+    uri: parts[1]
+  };
+};
+
+// Generates a=extmap line from RTCRtpHeaderExtensionParameters or
+// RTCRtpHeaderExtension.
+SDPUtils.writeExtmap = function(headerExtension) {
+  return 'a=extmap:' + (headerExtension.id || headerExtension.preferredId) +
+      (headerExtension.direction && headerExtension.direction !== 'sendrecv'
+          ? '/' + headerExtension.direction
+          : '') +
+      ' ' + headerExtension.uri + '\r\n';
+};
+
+// Parses an ftmp line, returns dictionary. Sample input:
+// a=fmtp:96 vbr=on;cng=on
+// Also deals with vbr=on; cng=on
+SDPUtils.parseFmtp = function(line) {
+  var parsed = {};
+  var kv;
+  var parts = line.substr(line.indexOf(' ') + 1).split(';');
+  for (var j = 0; j < parts.length; j++) {
+    kv = parts[j].trim().split('=');
+    parsed[kv[0].trim()] = kv[1];
+  }
+  return parsed;
+};
+
+// Generates an a=ftmp line from RTCRtpCodecCapability or RTCRtpCodecParameters.
+SDPUtils.writeFmtp = function(codec) {
+  var line = '';
+  var pt = codec.payloadType;
+  if (codec.preferredPayloadType !== undefined) {
+    pt = codec.preferredPayloadType;
+  }
+  if (codec.parameters && Object.keys(codec.parameters).length) {
+    var params = [];
+    Object.keys(codec.parameters).forEach(function(param) {
+      params.push(param + '=' + codec.parameters[param]);
+    });
+    line += 'a=fmtp:' + pt + ' ' + params.join(';') + '\r\n';
+  }
+  return line;
+};
+
+// Parses an rtcp-fb line, returns RTCPRtcpFeedback object. Sample input:
+// a=rtcp-fb:98 nack rpsi
+SDPUtils.parseRtcpFb = function(line) {
+  var parts = line.substr(line.indexOf(' ') + 1).split(' ');
+  return {
+    type: parts.shift(),
+    parameter: parts.join(' ')
+  };
+};
+// Generate a=rtcp-fb lines from RTCRtpCodecCapability or RTCRtpCodecParameters.
+SDPUtils.writeRtcpFb = function(codec) {
+  var lines = '';
+  var pt = codec.payloadType;
+  if (codec.preferredPayloadType !== undefined) {
+    pt = codec.preferredPayloadType;
+  }
+  if (codec.rtcpFeedback && codec.rtcpFeedback.length) {
+    // FIXME: special handling for trr-int?
+    codec.rtcpFeedback.forEach(function(fb) {
+      lines += 'a=rtcp-fb:' + pt + ' ' + fb.type +
+      (fb.parameter && fb.parameter.length ? ' ' + fb.parameter : '') +
+          '\r\n';
+    });
+  }
+  return lines;
+};
+
+// Parses an RFC 5576 ssrc media attribute. Sample input:
+// a=ssrc:3735928559 cname:something
+SDPUtils.parseSsrcMedia = function(line) {
+  var sp = line.indexOf(' ');
+  var parts = {
+    ssrc: parseInt(line.substr(7, sp - 7), 10)
+  };
+  var colon = line.indexOf(':', sp);
+  if (colon > -1) {
+    parts.attribute = line.substr(sp + 1, colon - sp - 1);
+    parts.value = line.substr(colon + 1);
+  } else {
+    parts.attribute = line.substr(sp + 1);
+  }
+  return parts;
+};
+
+// Extracts the MID (RFC 5888) from a media section.
+// returns the MID or undefined if no mid line was found.
+SDPUtils.getMid = function(mediaSection) {
+  var mid = SDPUtils.matchPrefix(mediaSection, 'a=mid:')[0];
+  if (mid) {
+    return mid.substr(6);
+  }
+}
+
+SDPUtils.parseFingerprint = function(line) {
+  var parts = line.substr(14).split(' ');
+  return {
+    algorithm: parts[0].toLowerCase(), // algorithm is case-sensitive in Edge.
+    value: parts[1]
+  };
+};
+
+// Extracts DTLS parameters from SDP media section or sessionpart.
+// FIXME: for consistency with other functions this should only
+//   get the fingerprint line as input. See also getIceParameters.
+SDPUtils.getDtlsParameters = function(mediaSection, sessionpart) {
+  var lines = SDPUtils.matchPrefix(mediaSection + sessionpart,
+      'a=fingerprint:');
+  // Note: a=setup line is ignored since we use the 'auto' role.
+  // Note2: 'algorithm' is not case sensitive except in Edge.
+  return {
+    role: 'auto',
+    fingerprints: lines.map(SDPUtils.parseFingerprint)
+  };
+};
+
+// Serializes DTLS parameters to SDP.
+SDPUtils.writeDtlsParameters = function(params, setupType) {
+  var sdp = 'a=setup:' + setupType + '\r\n';
+  params.fingerprints.forEach(function(fp) {
+    sdp += 'a=fingerprint:' + fp.algorithm + ' ' + fp.value + '\r\n';
+  });
+  return sdp;
+};
+// Parses ICE information from SDP media section or sessionpart.
+// FIXME: for consistency with other functions this should only
+//   get the ice-ufrag and ice-pwd lines as input.
+SDPUtils.getIceParameters = function(mediaSection, sessionpart) {
+  var lines = SDPUtils.splitLines(mediaSection);
+  // Search in session part, too.
+  lines = lines.concat(SDPUtils.splitLines(sessionpart));
+  var iceParameters = {
+    usernameFragment: lines.filter(function(line) {
+      return line.indexOf('a=ice-ufrag:') === 0;
+    })[0].substr(12),
+    password: lines.filter(function(line) {
+      return line.indexOf('a=ice-pwd:') === 0;
+    })[0].substr(10)
+  };
+  return iceParameters;
+};
+
+// Serializes ICE parameters to SDP.
+SDPUtils.writeIceParameters = function(params) {
+  return 'a=ice-ufrag:' + params.usernameFragment + '\r\n' +
+      'a=ice-pwd:' + params.password + '\r\n';
+};
+
+// Parses the SDP media section and returns RTCRtpParameters.
+SDPUtils.parseRtpParameters = function(mediaSection) {
+  var description = {
+    codecs: [],
+    headerExtensions: [],
+    fecMechanisms: [],
+    rtcp: []
+  };
+  var lines = SDPUtils.splitLines(mediaSection);
+  var mline = lines[0].split(' ');
+  for (var i = 3; i < mline.length; i++) { // find all codecs from mline[3..]
+    var pt = mline[i];
+    var rtpmapline = SDPUtils.matchPrefix(
+        mediaSection, 'a=rtpmap:' + pt + ' ')[0];
+    if (rtpmapline) {
+      var codec = SDPUtils.parseRtpMap(rtpmapline);
+      var fmtps = SDPUtils.matchPrefix(
+          mediaSection, 'a=fmtp:' + pt + ' ');
+      // Only the first a=fmtp:<pt> is considered.
+      codec.parameters = fmtps.length ? SDPUtils.parseFmtp(fmtps[0]) : {};
+      codec.rtcpFeedback = SDPUtils.matchPrefix(
+          mediaSection, 'a=rtcp-fb:' + pt + ' ')
+        .map(SDPUtils.parseRtcpFb);
+      description.codecs.push(codec);
+      // parse FEC mechanisms from rtpmap lines.
+      switch (codec.name.toUpperCase()) {
+        case 'RED':
+        case 'ULPFEC':
+          description.fecMechanisms.push(codec.name.toUpperCase());
+          break;
+        default: // only RED and ULPFEC are recognized as FEC mechanisms.
+          break;
+      }
+    }
+  }
+  SDPUtils.matchPrefix(mediaSection, 'a=extmap:').forEach(function(line) {
+    description.headerExtensions.push(SDPUtils.parseExtmap(line));
+  });
+  // FIXME: parse rtcp.
+  return description;
+};
+
+// Generates parts of the SDP media section describing the capabilities /
+// parameters.
+SDPUtils.writeRtpDescription = function(kind, caps) {
+  var sdp = '';
+
+  // Build the mline.
+  sdp += 'm=' + kind + ' ';
+  sdp += caps.codecs.length > 0 ? '9' : '0'; // reject if no codecs.
+  sdp += ' UDP/TLS/RTP/SAVPF ';
+  sdp += caps.codecs.map(function(codec) {
+    if (codec.preferredPayloadType !== undefined) {
+      return codec.preferredPayloadType;
+    }
+    return codec.payloadType;
+  }).join(' ') + '\r\n';
+
+  sdp += 'c=IN IP4 0.0.0.0\r\n';
+  sdp += 'a=rtcp:9 IN IP4 0.0.0.0\r\n';
+
+  // Add a=rtpmap lines for each codec. Also fmtp and rtcp-fb.
+  caps.codecs.forEach(function(codec) {
+    sdp += SDPUtils.writeRtpMap(codec);
+    sdp += SDPUtils.writeFmtp(codec);
+    sdp += SDPUtils.writeRtcpFb(codec);
+  });
+  var maxptime = 0;
+  caps.codecs.forEach(function(codec) {
+    if (codec.maxptime > maxptime) {
+      maxptime = codec.maxptime;
+    }
+  });
+  if (maxptime > 0) {
+    sdp += 'a=maxptime:' + maxptime + '\r\n';
+  }
+  sdp += 'a=rtcp-mux\r\n';
+
+  caps.headerExtensions.forEach(function(extension) {
+    sdp += SDPUtils.writeExtmap(extension);
+  });
+  // FIXME: write fecMechanisms.
+  return sdp;
+};
+
+// Parses the SDP media section and returns an array of
+// RTCRtpEncodingParameters.
+SDPUtils.parseRtpEncodingParameters = function(mediaSection) {
+  var encodingParameters = [];
+  var description = SDPUtils.parseRtpParameters(mediaSection);
+  var hasRed = description.fecMechanisms.indexOf('RED') !== -1;
+  var hasUlpfec = description.fecMechanisms.indexOf('ULPFEC') !== -1;
+
+  // filter a=ssrc:... cname:, ignore PlanB-msid
+  var ssrcs = SDPUtils.matchPrefix(mediaSection, 'a=ssrc:')
+  .map(function(line) {
+    return SDPUtils.parseSsrcMedia(line);
+  })
+  .filter(function(parts) {
+    return parts.attribute === 'cname';
+  });
+  var primarySsrc = ssrcs.length > 0 && ssrcs[0].ssrc;
+  var secondarySsrc;
+
+  var flows = SDPUtils.matchPrefix(mediaSection, 'a=ssrc-group:FID')
+  .map(function(line) {
+    var parts = line.split(' ');
+    parts.shift();
+    return parts.map(function(part) {
+      return parseInt(part, 10);
+    });
+  });
+  if (flows.length > 0 && flows[0].length > 1 && flows[0][0] === primarySsrc) {
+    secondarySsrc = flows[0][1];
+  }
+
+  description.codecs.forEach(function(codec) {
+    if (codec.name.toUpperCase() === 'RTX' && codec.parameters.apt) {
+      var encParam = {
+        ssrc: primarySsrc,
+        codecPayloadType: parseInt(codec.parameters.apt, 10),
+        rtx: {
+          ssrc: secondarySsrc
+        }
+      };
+      encodingParameters.push(encParam);
+      if (hasRed) {
+        encParam = JSON.parse(JSON.stringify(encParam));
+        encParam.fec = {
+          ssrc: secondarySsrc,
+          mechanism: hasUlpfec ? 'red+ulpfec' : 'red'
+        };
+        encodingParameters.push(encParam);
+      }
+    }
+  });
+  if (encodingParameters.length === 0 && primarySsrc) {
+    encodingParameters.push({
+      ssrc: primarySsrc
+    });
+  }
+
+  // we support both b=AS and b=TIAS but interpret AS as TIAS.
+  var bandwidth = SDPUtils.matchPrefix(mediaSection, 'b=');
+  if (bandwidth.length) {
+    if (bandwidth[0].indexOf('b=TIAS:') === 0) {
+      bandwidth = parseInt(bandwidth[0].substr(7), 10);
+    } else if (bandwidth[0].indexOf('b=AS:') === 0) {
+      // use formula from JSEP to convert b=AS to TIAS value.
+      bandwidth = parseInt(bandwidth[0].substr(5), 10) * 1000 * 0.95
+          - (50 * 40 * 8);
+    } else {
+      bandwidth = undefined;
+    }
+    encodingParameters.forEach(function(params) {
+      params.maxBitrate = bandwidth;
+    });
+  }
+  return encodingParameters;
+};
+
+// parses http://draft.ortc.org/#rtcrtcpparameters*
+SDPUtils.parseRtcpParameters = function(mediaSection) {
+  var rtcpParameters = {};
+
+  var cname;
+  // Gets the first SSRC. Note that with RTX there might be multiple
+  // SSRCs.
+  var remoteSsrc = SDPUtils.matchPrefix(mediaSection, 'a=ssrc:')
+      .map(function(line) {
+        return SDPUtils.parseSsrcMedia(line);
+      })
+      .filter(function(obj) {
+        return obj.attribute === 'cname';
+      })[0];
+  if (remoteSsrc) {
+    rtcpParameters.cname = remoteSsrc.value;
+    rtcpParameters.ssrc = remoteSsrc.ssrc;
+  }
+
+  // Edge uses the compound attribute instead of reducedSize
+  // compound is !reducedSize
+  var rsize = SDPUtils.matchPrefix(mediaSection, 'a=rtcp-rsize');
+  rtcpParameters.reducedSize = rsize.length > 0;
+  rtcpParameters.compound = rsize.length === 0;
+
+  // parses the rtcp-mux attrіbute.
+  // Note that Edge does not support unmuxed RTCP.
+  var mux = SDPUtils.matchPrefix(mediaSection, 'a=rtcp-mux');
+  rtcpParameters.mux = mux.length > 0;
+
+  return rtcpParameters;
+};
+
+// parses either a=msid: or a=ssrc:... msid lines and returns
+// the id of the MediaStream and MediaStreamTrack.
+SDPUtils.parseMsid = function(mediaSection) {
+  var parts;
+  var spec = SDPUtils.matchPrefix(mediaSection, 'a=msid:');
+  if (spec.length === 1) {
+    parts = spec[0].substr(7).split(' ');
+    return {stream: parts[0], track: parts[1]};
+  }
+  var planB = SDPUtils.matchPrefix(mediaSection, 'a=ssrc:')
+  .map(function(line) {
+    return SDPUtils.parseSsrcMedia(line);
+  })
+  .filter(function(parts) {
+    return parts.attribute === 'msid';
+  });
+  if (planB.length > 0) {
+    parts = planB[0].value.split(' ');
+    return {stream: parts[0], track: parts[1]};
+  }
+};
+
+// Generate a session ID for SDP.
+// https://tools.ietf.org/html/draft-ietf-rtcweb-jsep-20#section-5.2.1
+// recommends using a cryptographically random +ve 64-bit value
+// but right now this should be acceptable and within the right range
+SDPUtils.generateSessionId = function() {
+  return Math.random().toString().substr(2, 21);
+};
+
+// Write boilder plate for start of SDP
+// sessId argument is optional - if not supplied it will
+// be generated randomly
+// sessVersion is optional and defaults to 2
+SDPUtils.writeSessionBoilerplate = function(sessId, sessVer) {
+  var sessionId;
+  var version = sessVer !== undefined ? sessVer : 2;
+  if (sessId) {
+    sessionId = sessId;
+  } else {
+    sessionId = SDPUtils.generateSessionId();
+  }
+  // FIXME: sess-id should be an NTP timestamp.
+  return 'v=0\r\n' +
+      'o=thisisadapterortc ' + sessionId + ' ' + version + ' IN IP4 127.0.0.1\r\n' +
+      's=-\r\n' +
+      't=0 0\r\n';
+};
+
+SDPUtils.writeMediaSection = function(transceiver, caps, type, stream) {
+  var sdp = SDPUtils.writeRtpDescription(transceiver.kind, caps);
+
+  // Map ICE parameters (ufrag, pwd) to SDP.
+  sdp += SDPUtils.writeIceParameters(
+      transceiver.iceGatherer.getLocalParameters());
+
+  // Map DTLS parameters to SDP.
+  sdp += SDPUtils.writeDtlsParameters(
+      transceiver.dtlsTransport.getLocalParameters(),
+      type === 'offer' ? 'actpass' : 'active');
+
+  sdp += 'a=mid:' + transceiver.mid + '\r\n';
+
+  if (transceiver.direction) {
+    sdp += 'a=' + transceiver.direction + '\r\n';
+  } else if (transceiver.rtpSender && transceiver.rtpReceiver) {
+    sdp += 'a=sendrecv\r\n';
+  } else if (transceiver.rtpSender) {
+    sdp += 'a=sendonly\r\n';
+  } else if (transceiver.rtpReceiver) {
+    sdp += 'a=recvonly\r\n';
+  } else {
+    sdp += 'a=inactive\r\n';
+  }
+
+  if (transceiver.rtpSender) {
+    // spec.
+    var msid = 'msid:' + stream.id + ' ' +
+        transceiver.rtpSender.track.id + '\r\n';
+    sdp += 'a=' + msid;
+
+    // for Chrome.
+    sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
+        ' ' + msid;
+    if (transceiver.sendEncodingParameters[0].rtx) {
+      sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].rtx.ssrc +
+          ' ' + msid;
+      sdp += 'a=ssrc-group:FID ' +
+          transceiver.sendEncodingParameters[0].ssrc + ' ' +
+          transceiver.sendEncodingParameters[0].rtx.ssrc +
+          '\r\n';
+    }
+  }
+  // FIXME: this should be written by writeRtpDescription.
+  sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
+      ' cname:' + SDPUtils.localCName + '\r\n';
+  if (transceiver.rtpSender && transceiver.sendEncodingParameters[0].rtx) {
+    sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].rtx.ssrc +
+        ' cname:' + SDPUtils.localCName + '\r\n';
+  }
+  return sdp;
+};
+
+// Gets the direction from the mediaSection or the sessionpart.
+SDPUtils.getDirection = function(mediaSection, sessionpart) {
+  // Look for sendrecv, sendonly, recvonly, inactive, default to sendrecv.
+  var lines = SDPUtils.splitLines(mediaSection);
+  for (var i = 0; i < lines.length; i++) {
+    switch (lines[i]) {
+      case 'a=sendrecv':
+      case 'a=sendonly':
+      case 'a=recvonly':
+      case 'a=inactive':
+        return lines[i].substr(2);
+      default:
+        // FIXME: What should happen here?
+    }
+  }
+  if (sessionpart) {
+    return SDPUtils.getDirection(sessionpart);
+  }
+  return 'sendrecv';
+};
+
+SDPUtils.getKind = function(mediaSection) {
+  var lines = SDPUtils.splitLines(mediaSection);
+  var mline = lines[0].split(' ');
+  return mline[0].substr(2);
+};
+
+SDPUtils.isRejected = function(mediaSection) {
+  return mediaSection.split(' ', 2)[1] === '0';
+};
+
+SDPUtils.parseMLine = function(mediaSection) {
+  var lines = SDPUtils.splitLines(mediaSection);
+  var mline = lines[0].split(' ');
+  return {
+    kind: mline[0].substr(2),
+    port: parseInt(mline[1], 10),
+    protocol: mline[2],
+    fmt: mline.slice(3).join(' ')
+  };
+};
+
+// Expose public methods.
+if (true) {
+  module.exports = SDPUtils;
+}
+
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5437,7 +5984,7 @@ return af;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5584,7 +6131,7 @@ return ar;
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5648,7 +6195,7 @@ return arDz;
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5712,7 +6259,7 @@ return arKw;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5843,7 +6390,7 @@ return arLy;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -5908,7 +6455,7 @@ return arMa;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6018,7 +6565,7 @@ return arSa;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6082,7 +6629,7 @@ return arTn;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6192,7 +6739,7 @@ return az;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6331,7 +6878,7 @@ return be;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6426,7 +6973,7 @@ return bg;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6550,7 +7097,7 @@ return bn;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6674,7 +7221,7 @@ return bo;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6787,7 +7334,7 @@ return br;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -6935,7 +7482,7 @@ return bs;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7028,7 +7575,7 @@ return ca;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7205,7 +7752,7 @@ return cs;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7273,7 +7820,7 @@ return cv;
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7359,7 +7906,7 @@ return cy;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7424,7 +7971,7 @@ return da;
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7507,7 +8054,7 @@ return de;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7591,7 +8138,7 @@ return deAt;
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7674,7 +8221,7 @@ return deCh;
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7779,7 +8326,7 @@ return dv;
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7884,7 +8431,7 @@ return el;
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7956,7 +8503,7 @@ return enAu;
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8024,7 +8571,7 @@ return enCa;
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8096,7 +8643,7 @@ return enGb;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8168,7 +8715,7 @@ return enIe;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8240,7 +8787,7 @@ return enNz;
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8318,7 +8865,7 @@ return eo;
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8406,7 +8953,7 @@ return es;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8493,7 +9040,7 @@ return esDo;
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8578,7 +9125,7 @@ return et;
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8649,7 +9196,7 @@ return eu;
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8761,7 +9308,7 @@ return fa;
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8873,7 +9420,7 @@ return fi;
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8938,7 +9485,7 @@ return fo;
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9026,7 +9573,7 @@ return fr;
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9105,7 +9652,7 @@ return frCa;
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9188,7 +9735,7 @@ return frCh;
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9268,7 +9815,7 @@ return fy;
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9349,7 +9896,7 @@ return gd;
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9431,7 +9978,7 @@ return gl;
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9558,7 +10105,7 @@ return gomLatn;
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9662,7 +10209,7 @@ return he;
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9791,7 +10338,7 @@ return hi;
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9941,7 +10488,7 @@ return hr;
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10055,7 +10602,7 @@ return hu;
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10155,7 +10702,7 @@ return hyAm;
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10243,7 +10790,7 @@ return id;
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10375,7 +10922,7 @@ return is;
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10450,7 +10997,7 @@ return it;
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10535,7 +11082,7 @@ return ja;
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10623,7 +11170,7 @@ return jv;
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10717,7 +11264,7 @@ return ka;
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10809,7 +11356,7 @@ return kk;
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10872,7 +11419,7 @@ return km;
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11003,7 +11550,7 @@ return kn;
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11077,7 +11624,7 @@ return ko;
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11170,7 +11717,7 @@ return ky;
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11312,7 +11859,7 @@ return lb;
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11387,7 +11934,7 @@ return lo;
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11509,7 +12056,7 @@ return lt;
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11611,7 +12158,7 @@ return lv;
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11727,7 +12274,7 @@ return me;
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11796,7 +12343,7 @@ return mi;
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11891,7 +12438,7 @@ return mk;
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11977,7 +12524,7 @@ return ml;
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12141,7 +12688,7 @@ return mr;
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12228,7 +12775,7 @@ return ms;
 
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12316,7 +12863,7 @@ return msMy;
 
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12417,7 +12964,7 @@ return my;
 
 
 /***/ }),
-/* 80 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12485,7 +13032,7 @@ return nb;
 
 
 /***/ }),
-/* 81 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12613,7 +13160,7 @@ return ne;
 
 
 /***/ }),
-/* 82 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12706,7 +13253,7 @@ return nl;
 
 
 /***/ }),
-/* 83 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12799,7 +13346,7 @@ return nlBe;
 
 
 /***/ }),
-/* 84 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12864,7 +13411,7 @@ return nn;
 
 
 /***/ }),
-/* 85 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12993,7 +13540,7 @@ return paIn;
 
 
 /***/ }),
-/* 86 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13105,7 +13652,7 @@ return pl;
 
 
 /***/ }),
-/* 87 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13175,7 +13722,7 @@ return pt;
 
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13241,7 +13788,7 @@ return ptBr;
 
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13321,7 +13868,7 @@ return ro;
 
 
 /***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13509,7 +14056,7 @@ return ru;
 
 
 /***/ }),
-/* 91 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13612,7 +14159,7 @@ return sd;
 
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13678,7 +14225,7 @@ return se;
 
 
 /***/ }),
-/* 93 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13754,7 +14301,7 @@ return si;
 
 
 /***/ }),
-/* 94 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13909,7 +14456,7 @@ return sk;
 
 
 /***/ }),
-/* 95 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14076,7 +14623,7 @@ return sl;
 
 
 /***/ }),
-/* 96 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14151,7 +14698,7 @@ return sq;
 
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14266,7 +14813,7 @@ return sr;
 
 
 /***/ }),
-/* 98 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14381,7 +14928,7 @@ return srCyrl;
 
 
 /***/ }),
-/* 99 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14475,7 +15022,7 @@ return ss;
 
 
 /***/ }),
-/* 100 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14549,7 +15096,7 @@ return sv;
 
 
 /***/ }),
-/* 101 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14613,7 +15160,7 @@ return sw;
 
 
 /***/ }),
-/* 102 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14748,7 +15295,7 @@ return ta;
 
 
 /***/ }),
-/* 103 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14842,7 +15389,7 @@ return te;
 
 
 /***/ }),
-/* 104 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14915,7 +15462,7 @@ return tet;
 
 
 /***/ }),
-/* 105 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14987,7 +15534,7 @@ return th;
 
 
 /***/ }),
-/* 106 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15054,7 +15601,7 @@ return tlPh;
 
 
 /***/ }),
-/* 107 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15179,7 +15726,7 @@ return tlh;
 
 
 /***/ }),
-/* 108 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15274,7 +15821,7 @@ return tr;
 
 
 /***/ }),
-/* 109 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15370,7 +15917,7 @@ return tzl;
 
 
 /***/ }),
-/* 110 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15433,7 +15980,7 @@ return tzm;
 
 
 /***/ }),
-/* 111 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15496,7 +16043,7 @@ return tzmLatn;
 
 
 /***/ }),
-/* 112 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15652,7 +16199,7 @@ return uk;
 
 
 /***/ }),
-/* 113 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15756,7 +16303,7 @@ return ur;
 
 
 /***/ }),
-/* 114 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15819,7 +16366,7 @@ return uz;
 
 
 /***/ }),
-/* 115 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15882,7 +16429,7 @@ return uzLatn;
 
 
 /***/ }),
-/* 116 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15966,7 +16513,7 @@ return vi;
 
 
 /***/ }),
-/* 117 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16039,7 +16586,7 @@ return xPseudo;
 
 
 /***/ }),
-/* 118 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16104,7 +16651,7 @@ return yo;
 
 
 /***/ }),
-/* 119 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16220,7 +16767,7 @@ return zhCn;
 
 
 /***/ }),
-/* 120 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16330,7 +16877,7 @@ return zhHk;
 
 
 /***/ }),
-/* 121 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16439,7 +16986,7 @@ return zhTw;
 
 
 /***/ }),
-/* 122 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16457,19 +17004,19 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 123 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(2);
-var settle = __webpack_require__(166);
-var buildURL = __webpack_require__(168);
-var parseHeaders = __webpack_require__(169);
-var isURLSameOrigin = __webpack_require__(170);
-var createError = __webpack_require__(124);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(171);
+var settle = __webpack_require__(154);
+var buildURL = __webpack_require__(156);
+var parseHeaders = __webpack_require__(157);
+var isURLSameOrigin = __webpack_require__(158);
+var createError = __webpack_require__(125);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(159);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -16566,7 +17113,7 @@ module.exports = function xhrAdapter(config) {
     // This is only done if running in a standard browser environment.
     // Specifically not if we're in a web worker, or react-native.
     if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(172);
+      var cookies = __webpack_require__(160);
 
       // Add xsrf header
       var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -16644,13 +17191,13 @@ module.exports = function xhrAdapter(config) {
 
 
 /***/ }),
-/* 124 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var enhanceError = __webpack_require__(167);
+var enhanceError = __webpack_require__(155);
 
 /**
  * Create an Error with the specified message, config, error code, request and response.
@@ -16669,7 +17216,7 @@ module.exports = function createError(message, config, code, request, response) 
 
 
 /***/ }),
-/* 125 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16681,7 +17228,7 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 126 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16707,79 +17254,79 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 127 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(128);
-module.exports = __webpack_require__(286);
-
-
-/***/ }),
 /* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(129);
-__webpack_require__(188);
+module.exports = __webpack_require__(276);
 
-__webpack_require__(189);
+
+/***/ }),
+/* 129 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(130);
+__webpack_require__(176);
+
+__webpack_require__(177);
 
 // Profile
-Vue.component('f-profile', __webpack_require__(190));
-Vue.component('f-profile-avatar', __webpack_require__(193));
+Vue.component('f-profile', __webpack_require__(180));
+Vue.component('f-profile-avatar', __webpack_require__(183));
 
 // Notifications
-Vue.component('f-notifications', __webpack_require__(196));
+Vue.component('f-notifications', __webpack_require__(186));
 
 // Videos
-Vue.component('f-video', __webpack_require__(199));
-Vue.component('f-video-upload', __webpack_require__(202));
-Vue.component('f-video-edit', __webpack_require__(205));
-Vue.component('f-video-list', __webpack_require__(208));
-Vue.component('f-video-comments', __webpack_require__(211));
+Vue.component('f-video', __webpack_require__(189));
+Vue.component('f-video-upload', __webpack_require__(192));
+Vue.component('f-video-edit', __webpack_require__(195));
+Vue.component('f-video-list', __webpack_require__(198));
+Vue.component('f-video-comments', __webpack_require__(201));
 
 // Ratings
-Vue.component('f-rating', __webpack_require__(214));
+Vue.component('f-rating', __webpack_require__(204));
 
 // Reporting
-Vue.component('f-report', __webpack_require__(217));
+Vue.component('f-report', __webpack_require__(207));
 
 // Purchases, Subscriptions and Follows
-Vue.component('f-purchase', __webpack_require__(220));
-Vue.component('f-subscribe', __webpack_require__(223));
-Vue.component('f-follow', __webpack_require__(226));
+Vue.component('f-purchase', __webpack_require__(210));
+Vue.component('f-subscribe', __webpack_require__(213));
+Vue.component('f-follow', __webpack_require__(216));
 
 // Watch
-Vue.component('f-watch', __webpack_require__(229));
-Vue.component('f-watch-chat', __webpack_require__(232));
+Vue.component('f-watch', __webpack_require__(219));
+Vue.component('f-watch-chat', __webpack_require__(222));
 
 // Tokens
-Vue.component('f-token-checkout', __webpack_require__(235));
+Vue.component('f-token-checkout', __webpack_require__(225));
 
 // Broadcasts
-Vue.component('f-broadcast-list', __webpack_require__(238));
-Vue.component('f-broadcast-tile', __webpack_require__(241));
+Vue.component('f-broadcast-list', __webpack_require__(228));
+Vue.component('f-broadcast-tile', __webpack_require__(231));
 
 // Settings
-Vue.component('f-settings', __webpack_require__(244));
-Vue.component('f-settings-account', __webpack_require__(247));
-Vue.component('f-settings-billing', __webpack_require__(250));
-Vue.component('f-settings-subscriptions', __webpack_require__(253));
-Vue.component('f-settings-notifications', __webpack_require__(256));
-Vue.component('f-settings-model', __webpack_require__(259));
-Vue.component('f-settings-stats', __webpack_require__(262));
+Vue.component('f-settings', __webpack_require__(234));
+Vue.component('f-settings-account', __webpack_require__(237));
+Vue.component('f-settings-billing', __webpack_require__(240));
+Vue.component('f-settings-subscriptions', __webpack_require__(243));
+Vue.component('f-settings-notifications', __webpack_require__(246));
+Vue.component('f-settings-model', __webpack_require__(249));
+Vue.component('f-settings-stats', __webpack_require__(252));
 
 // Form
-Vue.component('f-form', __webpack_require__(265));
-Vue.component('f-form-button', __webpack_require__(268));
-Vue.component('f-form-image-upload', __webpack_require__(271));
-Vue.component('f-form-video-upload', __webpack_require__(274));
-Vue.component('f-modal-form', __webpack_require__(277));
+Vue.component('f-form', __webpack_require__(255));
+Vue.component('f-form-button', __webpack_require__(258));
+Vue.component('f-form-image-upload', __webpack_require__(261));
+Vue.component('f-form-video-upload', __webpack_require__(264));
+Vue.component('f-modal-form', __webpack_require__(267));
 
 // Modal
-Vue.component('f-modal', __webpack_require__(280));
+Vue.component('f-modal', __webpack_require__(270));
 
 // Stream Testing
-Vue.component('f-stream-test', __webpack_require__(283));
+Vue.component('f-stream-test', __webpack_require__(273));
 
 var app = new Vue({
     el: '#app',
@@ -16808,29 +17355,29 @@ var app = new Vue({
 });
 
 /***/ }),
-/* 129 */
+/* 130 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_buefy__ = __webpack_require__(183);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_buefy__ = __webpack_require__(171);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_buefy___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_buefy__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_laravel_echo__ = __webpack_require__(186);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_laravel_echo__ = __webpack_require__(174);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_laravel_echo___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_laravel_echo__);
-window._ = __webpack_require__(130);
+window._ = __webpack_require__(131);
 
-__webpack_require__(131);
-window.videojs = __webpack_require__(132);
+__webpack_require__(132);
+window.Red5 = window.red5prosdk;
 
-__webpack_require__(133);
-window.kurentoUtils = __webpack_require__(134);
+__webpack_require__(143);
+window.videojs = __webpack_require__(144);
 
 window.moment = __webpack_require__(0);
-__webpack_require__(158);
+__webpack_require__(146);
 
-window.formToObject = __webpack_require__(159);
+window.formToObject = __webpack_require__(147);
 
-window.axios = __webpack_require__(160);
+window.axios = __webpack_require__(148);
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 window.axios.defaults.headers.common['X-CSRF-TOKEN'] = Foria.csrfToken;
 
@@ -16844,9 +17391,9 @@ window.axios.interceptors.response.use(function (response) {
 
 window.ajax = window.axios;
 
-window.Vue = __webpack_require__(180);
+window.Vue = __webpack_require__(168);
 
-var VueResource = __webpack_require__(181);
+var VueResource = __webpack_require__(169);
 Vue.use(VueResource);
 
 Vue.http.headers.common['X-CSRF-TOKEN'] = Foria.csrfToken;
@@ -16854,11 +17401,11 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = Foria.csrfToken;
 
 Vue.use(__WEBPACK_IMPORTED_MODULE_0_buefy___default.a);
 
-__webpack_require__(184);
-__webpack_require__(185);
+__webpack_require__(172);
+__webpack_require__(173);
 
 
-window.Pusher = __webpack_require__(187);
+window.Pusher = __webpack_require__(175);
 
 window.Echo = new __WEBPACK_IMPORTED_MODULE_1_laravel_echo___default.a({
     broadcaster: 'pusher',
@@ -16867,7 +17414,7 @@ window.Echo = new __WEBPACK_IMPORTED_MODULE_1_laravel_echo___default.a({
 });
 
 /***/ }),
-/* 130 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -33956,10 +34503,3671 @@ window.Echo = new __WEBPACK_IMPORTED_MODULE_1_laravel_echo___default.a({
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(4)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4), __webpack_require__(5)(module)))
 
 /***/ }),
-/* 131 */
+/* 132 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+
+
+var adapterFactory = __webpack_require__(133);
+module.exports = adapterFactory({window: global.window});
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+
+/***/ }),
+/* 133 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+
+
+var utils = __webpack_require__(3);
+// Shimming starts here.
+module.exports = function(dependencies, opts) {
+  var window = dependencies && dependencies.window;
+
+  var options = {
+    shimChrome: true,
+    shimFirefox: true,
+    shimEdge: true,
+    shimSafari: true,
+  };
+
+  for (var key in opts) {
+    if (hasOwnProperty.call(opts, key)) {
+      options[key] = opts[key];
+    }
+  }
+
+  // Utils.
+  var logging = utils.log;
+  var browserDetails = utils.detectBrowser(window);
+
+  // Export to the adapter global object visible in the browser.
+  var adapter = {
+    browserDetails: browserDetails,
+    extractVersion: utils.extractVersion,
+    disableLog: utils.disableLog,
+    disableWarnings: utils.disableWarnings
+  };
+
+  // Uncomment the line below if you want logging to occur, including logging
+  // for the switch statement below. Can also be turned on in the browser via
+  // adapter.disableLog(false), but then logging from the switch statement below
+  // will not appear.
+  // require('./utils').disableLog(false);
+
+  // Browser shims.
+  var chromeShim = __webpack_require__(134) || null;
+  var edgeShim = __webpack_require__(136) || null;
+  var firefoxShim = __webpack_require__(139) || null;
+  var safariShim = __webpack_require__(141) || null;
+  var commonShim = __webpack_require__(142) || null;
+
+  // Shim browser if found.
+  switch (browserDetails.browser) {
+    case 'chrome':
+      if (!chromeShim || !chromeShim.shimPeerConnection ||
+          !options.shimChrome) {
+        logging('Chrome shim is not included in this adapter release.');
+        return adapter;
+      }
+      logging('adapter.js shimming chrome.');
+      // Export to the adapter global object visible in the browser.
+      adapter.browserShim = chromeShim;
+      commonShim.shimCreateObjectURL(window);
+
+      chromeShim.shimGetUserMedia(window);
+      chromeShim.shimMediaStream(window);
+      chromeShim.shimSourceObject(window);
+      chromeShim.shimPeerConnection(window);
+      chromeShim.shimOnTrack(window);
+      chromeShim.shimAddTrackRemoveTrack(window);
+      chromeShim.shimGetSendersWithDtmf(window);
+
+      commonShim.shimRTCIceCandidate(window);
+      break;
+    case 'firefox':
+      if (!firefoxShim || !firefoxShim.shimPeerConnection ||
+          !options.shimFirefox) {
+        logging('Firefox shim is not included in this adapter release.');
+        return adapter;
+      }
+      logging('adapter.js shimming firefox.');
+      // Export to the adapter global object visible in the browser.
+      adapter.browserShim = firefoxShim;
+      commonShim.shimCreateObjectURL(window);
+
+      firefoxShim.shimGetUserMedia(window);
+      firefoxShim.shimSourceObject(window);
+      firefoxShim.shimPeerConnection(window);
+      firefoxShim.shimOnTrack(window);
+
+      commonShim.shimRTCIceCandidate(window);
+      break;
+    case 'edge':
+      if (!edgeShim || !edgeShim.shimPeerConnection || !options.shimEdge) {
+        logging('MS edge shim is not included in this adapter release.');
+        return adapter;
+      }
+      logging('adapter.js shimming edge.');
+      // Export to the adapter global object visible in the browser.
+      adapter.browserShim = edgeShim;
+      commonShim.shimCreateObjectURL(window);
+
+      edgeShim.shimGetUserMedia(window);
+      edgeShim.shimPeerConnection(window);
+      edgeShim.shimReplaceTrack(window);
+
+      // the edge shim implements the full RTCIceCandidate object.
+      break;
+    case 'safari':
+      if (!safariShim || !options.shimSafari) {
+        logging('Safari shim is not included in this adapter release.');
+        return adapter;
+      }
+      logging('adapter.js shimming safari.');
+      // Export to the adapter global object visible in the browser.
+      adapter.browserShim = safariShim;
+      commonShim.shimCreateObjectURL(window);
+
+      safariShim.shimRTCIceServerUrls(window);
+      safariShim.shimCallbacksAPI(window);
+      safariShim.shimLocalStreamsAPI(window);
+      safariShim.shimRemoteStreamsAPI(window);
+      safariShim.shimTrackEventTransceiver(window);
+      safariShim.shimGetUserMedia(window);
+
+      commonShim.shimRTCIceCandidate(window);
+      break;
+    default:
+      logging('Unsupported browser!');
+      break;
+  }
+
+  return adapter;
+};
+
+
+/***/ }),
+/* 134 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+var utils = __webpack_require__(3);
+var logging = utils.log;
+
+var chromeShim = {
+  shimMediaStream: function(window) {
+    window.MediaStream = window.MediaStream || window.webkitMediaStream;
+  },
+
+  shimOnTrack: function(window) {
+    if (typeof window === 'object' && window.RTCPeerConnection && !('ontrack' in
+        window.RTCPeerConnection.prototype)) {
+      Object.defineProperty(window.RTCPeerConnection.prototype, 'ontrack', {
+        get: function() {
+          return this._ontrack;
+        },
+        set: function(f) {
+          if (this._ontrack) {
+            this.removeEventListener('track', this._ontrack);
+          }
+          this.addEventListener('track', this._ontrack = f);
+        }
+      });
+      var origSetRemoteDescription =
+          window.RTCPeerConnection.prototype.setRemoteDescription;
+      window.RTCPeerConnection.prototype.setRemoteDescription = function() {
+        var pc = this;
+        if (!pc._ontrackpoly) {
+          pc._ontrackpoly = function(e) {
+            // onaddstream does not fire when a track is added to an existing
+            // stream. But stream.onaddtrack is implemented so we use that.
+            e.stream.addEventListener('addtrack', function(te) {
+              var receiver;
+              if (window.RTCPeerConnection.prototype.getReceivers) {
+                receiver = pc.getReceivers().find(function(r) {
+                  return r.track && r.track.id === te.track.id;
+                });
+              } else {
+                receiver = {track: te.track};
+              }
+
+              var event = new Event('track');
+              event.track = te.track;
+              event.receiver = receiver;
+              event.transceiver = {receiver: receiver};
+              event.streams = [e.stream];
+              pc.dispatchEvent(event);
+            });
+            e.stream.getTracks().forEach(function(track) {
+              var receiver;
+              if (window.RTCPeerConnection.prototype.getReceivers) {
+                receiver = pc.getReceivers().find(function(r) {
+                  return r.track && r.track.id === track.id;
+                });
+              } else {
+                receiver = {track: track};
+              }
+              var event = new Event('track');
+              event.track = track;
+              event.receiver = receiver;
+              event.transceiver = {receiver: receiver};
+              event.streams = [e.stream];
+              pc.dispatchEvent(event);
+            });
+          };
+          pc.addEventListener('addstream', pc._ontrackpoly);
+        }
+        return origSetRemoteDescription.apply(pc, arguments);
+      };
+    }
+  },
+
+  shimGetSendersWithDtmf: function(window) {
+    // Overrides addTrack/removeTrack, depends on shimAddTrackRemoveTrack.
+    if (typeof window === 'object' && window.RTCPeerConnection &&
+        !('getSenders' in window.RTCPeerConnection.prototype) &&
+        'createDTMFSender' in window.RTCPeerConnection.prototype) {
+      var shimSenderWithDtmf = function(pc, track) {
+        return {
+          track: track,
+          get dtmf() {
+            if (this._dtmf === undefined) {
+              if (track.kind === 'audio') {
+                this._dtmf = pc.createDTMFSender(track);
+              } else {
+                this._dtmf = null;
+              }
+            }
+            return this._dtmf;
+          },
+          _pc: pc
+        };
+      };
+
+      // augment addTrack when getSenders is not available.
+      if (!window.RTCPeerConnection.prototype.getSenders) {
+        window.RTCPeerConnection.prototype.getSenders = function() {
+          this._senders = this._senders || [];
+          return this._senders.slice(); // return a copy of the internal state.
+        };
+        var origAddTrack = window.RTCPeerConnection.prototype.addTrack;
+        window.RTCPeerConnection.prototype.addTrack = function(track, stream) {
+          var pc = this;
+          var sender = origAddTrack.apply(pc, arguments);
+          if (!sender) {
+            sender = shimSenderWithDtmf(pc, track);
+            pc._senders.push(sender);
+          }
+          return sender;
+        };
+
+        var origRemoveTrack = window.RTCPeerConnection.prototype.removeTrack;
+        window.RTCPeerConnection.prototype.removeTrack = function(sender) {
+          var pc = this;
+          origRemoveTrack.apply(pc, arguments);
+          var idx = pc._senders.indexOf(sender);
+          if (idx !== -1) {
+            pc._senders.splice(idx, 1);
+          }
+        };
+      }
+      var origAddStream = window.RTCPeerConnection.prototype.addStream;
+      window.RTCPeerConnection.prototype.addStream = function(stream) {
+        var pc = this;
+        pc._senders = pc._senders || [];
+        origAddStream.apply(pc, [stream]);
+        stream.getTracks().forEach(function(track) {
+          pc._senders.push(shimSenderWithDtmf(pc, track));
+        });
+      };
+
+      var origRemoveStream = window.RTCPeerConnection.prototype.removeStream;
+      window.RTCPeerConnection.prototype.removeStream = function(stream) {
+        var pc = this;
+        pc._senders = pc._senders || [];
+        origRemoveStream.apply(pc, [(pc._streams[stream.id] || stream)]);
+
+        stream.getTracks().forEach(function(track) {
+          var sender = pc._senders.find(function(s) {
+            return s.track === track;
+          });
+          if (sender) {
+            pc._senders.splice(pc._senders.indexOf(sender), 1); // remove sender
+          }
+        });
+      };
+    } else if (typeof window === 'object' && window.RTCPeerConnection &&
+               'getSenders' in window.RTCPeerConnection.prototype &&
+               'createDTMFSender' in window.RTCPeerConnection.prototype &&
+               window.RTCRtpSender &&
+               !('dtmf' in window.RTCRtpSender.prototype)) {
+      var origGetSenders = window.RTCPeerConnection.prototype.getSenders;
+      window.RTCPeerConnection.prototype.getSenders = function() {
+        var pc = this;
+        var senders = origGetSenders.apply(pc, []);
+        senders.forEach(function(sender) {
+          sender._pc = pc;
+        });
+        return senders;
+      };
+
+      Object.defineProperty(window.RTCRtpSender.prototype, 'dtmf', {
+        get: function() {
+          if (this._dtmf === undefined) {
+            if (this.track.kind === 'audio') {
+              this._dtmf = this._pc.createDTMFSender(this.track);
+            } else {
+              this._dtmf = null;
+            }
+          }
+          return this._dtmf;
+        }
+      });
+    }
+  },
+
+  shimSourceObject: function(window) {
+    var URL = window && window.URL;
+
+    if (typeof window === 'object') {
+      if (window.HTMLMediaElement &&
+        !('srcObject' in window.HTMLMediaElement.prototype)) {
+        // Shim the srcObject property, once, when HTMLMediaElement is found.
+        Object.defineProperty(window.HTMLMediaElement.prototype, 'srcObject', {
+          get: function() {
+            return this._srcObject;
+          },
+          set: function(stream) {
+            var self = this;
+            // Use _srcObject as a private property for this shim
+            this._srcObject = stream;
+            if (this.src) {
+              URL.revokeObjectURL(this.src);
+            }
+
+            if (!stream) {
+              this.src = '';
+              return undefined;
+            }
+            this.src = URL.createObjectURL(stream);
+            // We need to recreate the blob url when a track is added or
+            // removed. Doing it manually since we want to avoid a recursion.
+            stream.addEventListener('addtrack', function() {
+              if (self.src) {
+                URL.revokeObjectURL(self.src);
+              }
+              self.src = URL.createObjectURL(stream);
+            });
+            stream.addEventListener('removetrack', function() {
+              if (self.src) {
+                URL.revokeObjectURL(self.src);
+              }
+              self.src = URL.createObjectURL(stream);
+            });
+          }
+        });
+      }
+    }
+  },
+
+  shimAddTrackRemoveTrack: function(window) {
+    var browserDetails = utils.detectBrowser(window);
+    // shim addTrack and removeTrack.
+    if (window.RTCPeerConnection.prototype.addTrack &&
+        browserDetails.version >= 62) {
+      return;
+    }
+
+    // also shim pc.getLocalStreams when addTrack is shimmed
+    // to return the original streams.
+    var origGetLocalStreams = window.RTCPeerConnection.prototype
+        .getLocalStreams;
+    window.RTCPeerConnection.prototype.getLocalStreams = function() {
+      var self = this;
+      var nativeStreams = origGetLocalStreams.apply(this);
+      self._reverseStreams = self._reverseStreams || {};
+      return nativeStreams.map(function(stream) {
+        return self._reverseStreams[stream.id];
+      });
+    };
+
+    var origAddStream = window.RTCPeerConnection.prototype.addStream;
+    window.RTCPeerConnection.prototype.addStream = function(stream) {
+      var pc = this;
+      pc._streams = pc._streams || {};
+      pc._reverseStreams = pc._reverseStreams || {};
+
+      stream.getTracks().forEach(function(track) {
+        var alreadyExists = pc.getSenders().find(function(s) {
+          return s.track === track;
+        });
+        if (alreadyExists) {
+          throw new DOMException('Track already exists.',
+              'InvalidAccessError');
+        }
+      });
+      // Add identity mapping for consistency with addTrack.
+      // Unless this is being used with a stream from addTrack.
+      if (!pc._reverseStreams[stream.id]) {
+        var newStream = new window.MediaStream(stream.getTracks());
+        pc._streams[stream.id] = newStream;
+        pc._reverseStreams[newStream.id] = stream;
+        stream = newStream;
+      }
+      origAddStream.apply(pc, [stream]);
+    };
+
+    var origRemoveStream = window.RTCPeerConnection.prototype.removeStream;
+    window.RTCPeerConnection.prototype.removeStream = function(stream) {
+      var pc = this;
+      pc._streams = pc._streams || {};
+      pc._reverseStreams = pc._reverseStreams || {};
+
+      origRemoveStream.apply(pc, [(pc._streams[stream.id] || stream)]);
+      delete pc._reverseStreams[(pc._streams[stream.id] ?
+          pc._streams[stream.id].id : stream.id)];
+      delete pc._streams[stream.id];
+    };
+
+    window.RTCPeerConnection.prototype.addTrack = function(track, stream) {
+      var pc = this;
+      if (pc.signalingState === 'closed') {
+        throw new DOMException(
+          'The RTCPeerConnection\'s signalingState is \'closed\'.',
+          'InvalidStateError');
+      }
+      var streams = [].slice.call(arguments, 1);
+      if (streams.length !== 1 ||
+          !streams[0].getTracks().find(function(t) {
+            return t === track;
+          })) {
+        // this is not fully correct but all we can manage without
+        // [[associated MediaStreams]] internal slot.
+        throw new DOMException(
+          'The adapter.js addTrack polyfill only supports a single ' +
+          ' stream which is associated with the specified track.',
+          'NotSupportedError');
+      }
+
+      var alreadyExists = pc.getSenders().find(function(s) {
+        return s.track === track;
+      });
+      if (alreadyExists) {
+        throw new DOMException('Track already exists.',
+            'InvalidAccessError');
+      }
+
+      pc._streams = pc._streams || {};
+      pc._reverseStreams = pc._reverseStreams || {};
+      var oldStream = pc._streams[stream.id];
+      if (oldStream) {
+        // this is using odd Chrome behaviour, use with caution:
+        // https://bugs.chromium.org/p/webrtc/issues/detail?id=7815
+        // Note: we rely on the high-level addTrack/dtmf shim to
+        // create the sender with a dtmf sender.
+        oldStream.addTrack(track);
+
+        // Trigger ONN async.
+        Promise.resolve().then(function() {
+          pc.dispatchEvent(new Event('negotiationneeded'));
+        });
+      } else {
+        var newStream = new window.MediaStream([track]);
+        pc._streams[stream.id] = newStream;
+        pc._reverseStreams[newStream.id] = stream;
+        pc.addStream(newStream);
+      }
+      return pc.getSenders().find(function(s) {
+        return s.track === track;
+      });
+    };
+
+    // replace the internal stream id with the external one and
+    // vice versa.
+    function replaceInternalStreamId(pc, description) {
+      var sdp = description.sdp;
+      Object.keys(pc._reverseStreams || []).forEach(function(internalId) {
+        var externalStream = pc._reverseStreams[internalId];
+        var internalStream = pc._streams[externalStream.id];
+        sdp = sdp.replace(new RegExp(internalStream.id, 'g'),
+            externalStream.id);
+      });
+      return new RTCSessionDescription({
+        type: description.type,
+        sdp: sdp
+      });
+    }
+    function replaceExternalStreamId(pc, description) {
+      var sdp = description.sdp;
+      Object.keys(pc._reverseStreams || []).forEach(function(internalId) {
+        var externalStream = pc._reverseStreams[internalId];
+        var internalStream = pc._streams[externalStream.id];
+        sdp = sdp.replace(new RegExp(externalStream.id, 'g'),
+            internalStream.id);
+      });
+      return new RTCSessionDescription({
+        type: description.type,
+        sdp: sdp
+      });
+    }
+    ['createOffer', 'createAnswer'].forEach(function(method) {
+      var nativeMethod = window.RTCPeerConnection.prototype[method];
+      window.RTCPeerConnection.prototype[method] = function() {
+        var pc = this;
+        var args = arguments;
+        var isLegacyCall = arguments.length &&
+            typeof arguments[0] === 'function';
+        if (isLegacyCall) {
+          return nativeMethod.apply(pc, [
+            function(description) {
+              var desc = replaceInternalStreamId(pc, description);
+              args[0].apply(null, [desc]);
+            },
+            function(err) {
+              if (args[1]) {
+                args[1].apply(null, err);
+              }
+            }, arguments[2]
+          ]);
+        }
+        return nativeMethod.apply(pc, arguments)
+        .then(function(description) {
+          return replaceInternalStreamId(pc, description);
+        });
+      };
+    });
+
+    var origSetLocalDescription =
+        window.RTCPeerConnection.prototype.setLocalDescription;
+    window.RTCPeerConnection.prototype.setLocalDescription = function() {
+      var pc = this;
+      if (!arguments.length || !arguments[0].type) {
+        return origSetLocalDescription.apply(pc, arguments);
+      }
+      arguments[0] = replaceExternalStreamId(pc, arguments[0]);
+      return origSetLocalDescription.apply(pc, arguments);
+    };
+
+    // TODO: mangle getStats: https://w3c.github.io/webrtc-stats/#dom-rtcmediastreamstats-streamidentifier
+
+    var origLocalDescription = Object.getOwnPropertyDescriptor(
+        window.RTCPeerConnection.prototype, 'localDescription');
+    Object.defineProperty(window.RTCPeerConnection.prototype,
+        'localDescription', {
+          get: function() {
+            var pc = this;
+            var description = origLocalDescription.get.apply(this);
+            if (description.type === '') {
+              return description;
+            }
+            return replaceInternalStreamId(pc, description);
+          }
+        });
+
+    window.RTCPeerConnection.prototype.removeTrack = function(sender) {
+      var pc = this;
+      if (pc.signalingState === 'closed') {
+        throw new DOMException(
+          'The RTCPeerConnection\'s signalingState is \'closed\'.',
+          'InvalidStateError');
+      }
+      // We can not yet check for sender instanceof RTCRtpSender
+      // since we shim RTPSender. So we check if sender._pc is set.
+      if (!sender._pc) {
+        throw new DOMException('Argument 1 of RTCPeerConnection.removeTrack ' +
+            'does not implement interface RTCRtpSender.', 'TypeError');
+      }
+      var isLocal = sender._pc === pc;
+      if (!isLocal) {
+        throw new DOMException('Sender was not created by this connection.',
+            'InvalidAccessError');
+      }
+
+      // Search for the native stream the senders track belongs to.
+      pc._streams = pc._streams || {};
+      var stream;
+      Object.keys(pc._streams).forEach(function(streamid) {
+        var hasTrack = pc._streams[streamid].getTracks().find(function(track) {
+          return sender.track === track;
+        });
+        if (hasTrack) {
+          stream = pc._streams[streamid];
+        }
+      });
+
+      if (stream) {
+        if (stream.getTracks().length === 1) {
+          // if this is the last track of the stream, remove the stream. This
+          // takes care of any shimmed _senders.
+          pc.removeStream(stream);
+        } else {
+          // relying on the same odd chrome behaviour as above.
+          stream.removeTrack(sender.track);
+        }
+        pc.dispatchEvent(new Event('negotiationneeded'));
+      }
+    };
+  },
+
+  shimPeerConnection: function(window) {
+    var browserDetails = utils.detectBrowser(window);
+
+    // The RTCPeerConnection object.
+    if (!window.RTCPeerConnection) {
+      window.RTCPeerConnection = function(pcConfig, pcConstraints) {
+        // Translate iceTransportPolicy to iceTransports,
+        // see https://code.google.com/p/webrtc/issues/detail?id=4869
+        // this was fixed in M56 along with unprefixing RTCPeerConnection.
+        logging('PeerConnection');
+        if (pcConfig && pcConfig.iceTransportPolicy) {
+          pcConfig.iceTransports = pcConfig.iceTransportPolicy;
+        }
+
+        return new window.webkitRTCPeerConnection(pcConfig, pcConstraints);
+      };
+      window.RTCPeerConnection.prototype =
+          window.webkitRTCPeerConnection.prototype;
+      // wrap static methods. Currently just generateCertificate.
+      if (window.webkitRTCPeerConnection.generateCertificate) {
+        Object.defineProperty(window.RTCPeerConnection, 'generateCertificate', {
+          get: function() {
+            return window.webkitRTCPeerConnection.generateCertificate;
+          }
+        });
+      }
+    } else {
+      // migrate from non-spec RTCIceServer.url to RTCIceServer.urls
+      var OrigPeerConnection = window.RTCPeerConnection;
+      window.RTCPeerConnection = function(pcConfig, pcConstraints) {
+        if (pcConfig && pcConfig.iceServers) {
+          var newIceServers = [];
+          for (var i = 0; i < pcConfig.iceServers.length; i++) {
+            var server = pcConfig.iceServers[i];
+            if (!server.hasOwnProperty('urls') &&
+                server.hasOwnProperty('url')) {
+              utils.deprecated('RTCIceServer.url', 'RTCIceServer.urls');
+              server = JSON.parse(JSON.stringify(server));
+              server.urls = server.url;
+              newIceServers.push(server);
+            } else {
+              newIceServers.push(pcConfig.iceServers[i]);
+            }
+          }
+          pcConfig.iceServers = newIceServers;
+        }
+        return new OrigPeerConnection(pcConfig, pcConstraints);
+      };
+      window.RTCPeerConnection.prototype = OrigPeerConnection.prototype;
+      // wrap static methods. Currently just generateCertificate.
+      Object.defineProperty(window.RTCPeerConnection, 'generateCertificate', {
+        get: function() {
+          return OrigPeerConnection.generateCertificate;
+        }
+      });
+    }
+
+    var origGetStats = window.RTCPeerConnection.prototype.getStats;
+    window.RTCPeerConnection.prototype.getStats = function(selector,
+        successCallback, errorCallback) {
+      var self = this;
+      var args = arguments;
+
+      // If selector is a function then we are in the old style stats so just
+      // pass back the original getStats format to avoid breaking old users.
+      if (arguments.length > 0 && typeof selector === 'function') {
+        return origGetStats.apply(this, arguments);
+      }
+
+      // When spec-style getStats is supported, return those when called with
+      // either no arguments or the selector argument is null.
+      if (origGetStats.length === 0 && (arguments.length === 0 ||
+          typeof arguments[0] !== 'function')) {
+        return origGetStats.apply(this, []);
+      }
+
+      var fixChromeStats_ = function(response) {
+        var standardReport = {};
+        var reports = response.result();
+        reports.forEach(function(report) {
+          var standardStats = {
+            id: report.id,
+            timestamp: report.timestamp,
+            type: {
+              localcandidate: 'local-candidate',
+              remotecandidate: 'remote-candidate'
+            }[report.type] || report.type
+          };
+          report.names().forEach(function(name) {
+            standardStats[name] = report.stat(name);
+          });
+          standardReport[standardStats.id] = standardStats;
+        });
+
+        return standardReport;
+      };
+
+      // shim getStats with maplike support
+      var makeMapStats = function(stats) {
+        return new Map(Object.keys(stats).map(function(key) {
+          return [key, stats[key]];
+        }));
+      };
+
+      if (arguments.length >= 2) {
+        var successCallbackWrapper_ = function(response) {
+          args[1](makeMapStats(fixChromeStats_(response)));
+        };
+
+        return origGetStats.apply(this, [successCallbackWrapper_,
+          arguments[0]]);
+      }
+
+      // promise-support
+      return new Promise(function(resolve, reject) {
+        origGetStats.apply(self, [
+          function(response) {
+            resolve(makeMapStats(fixChromeStats_(response)));
+          }, reject]);
+      }).then(successCallback, errorCallback);
+    };
+
+    // add promise support -- natively available in Chrome 51
+    if (browserDetails.version < 51) {
+      ['setLocalDescription', 'setRemoteDescription', 'addIceCandidate']
+          .forEach(function(method) {
+            var nativeMethod = window.RTCPeerConnection.prototype[method];
+            window.RTCPeerConnection.prototype[method] = function() {
+              var args = arguments;
+              var self = this;
+              var promise = new Promise(function(resolve, reject) {
+                nativeMethod.apply(self, [args[0], resolve, reject]);
+              });
+              if (args.length < 2) {
+                return promise;
+              }
+              return promise.then(function() {
+                args[1].apply(null, []);
+              },
+              function(err) {
+                if (args.length >= 3) {
+                  args[2].apply(null, [err]);
+                }
+              });
+            };
+          });
+    }
+
+    // promise support for createOffer and createAnswer. Available (without
+    // bugs) since M52: crbug/619289
+    if (browserDetails.version < 52) {
+      ['createOffer', 'createAnswer'].forEach(function(method) {
+        var nativeMethod = window.RTCPeerConnection.prototype[method];
+        window.RTCPeerConnection.prototype[method] = function() {
+          var self = this;
+          if (arguments.length < 1 || (arguments.length === 1 &&
+              typeof arguments[0] === 'object')) {
+            var opts = arguments.length === 1 ? arguments[0] : undefined;
+            return new Promise(function(resolve, reject) {
+              nativeMethod.apply(self, [resolve, reject, opts]);
+            });
+          }
+          return nativeMethod.apply(this, arguments);
+        };
+      });
+    }
+
+    // shim implicit creation of RTCSessionDescription/RTCIceCandidate
+    ['setLocalDescription', 'setRemoteDescription', 'addIceCandidate']
+        .forEach(function(method) {
+          var nativeMethod = window.RTCPeerConnection.prototype[method];
+          window.RTCPeerConnection.prototype[method] = function() {
+            arguments[0] = new ((method === 'addIceCandidate') ?
+                window.RTCIceCandidate :
+                window.RTCSessionDescription)(arguments[0]);
+            return nativeMethod.apply(this, arguments);
+          };
+        });
+
+    // support for addIceCandidate(null or undefined)
+    var nativeAddIceCandidate =
+        window.RTCPeerConnection.prototype.addIceCandidate;
+    window.RTCPeerConnection.prototype.addIceCandidate = function() {
+      if (!arguments[0]) {
+        if (arguments[1]) {
+          arguments[1].apply(null);
+        }
+        return Promise.resolve();
+      }
+      return nativeAddIceCandidate.apply(this, arguments);
+    };
+  }
+};
+
+
+// Expose public methods.
+module.exports = {
+  shimMediaStream: chromeShim.shimMediaStream,
+  shimOnTrack: chromeShim.shimOnTrack,
+  shimAddTrackRemoveTrack: chromeShim.shimAddTrackRemoveTrack,
+  shimGetSendersWithDtmf: chromeShim.shimGetSendersWithDtmf,
+  shimSourceObject: chromeShim.shimSourceObject,
+  shimPeerConnection: chromeShim.shimPeerConnection,
+  shimGetUserMedia: __webpack_require__(135)
+};
+
+
+/***/ }),
+/* 135 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+var utils = __webpack_require__(3);
+var logging = utils.log;
+
+// Expose public methods.
+module.exports = function(window) {
+  var browserDetails = utils.detectBrowser(window);
+  var navigator = window && window.navigator;
+
+  var constraintsToChrome_ = function(c) {
+    if (typeof c !== 'object' || c.mandatory || c.optional) {
+      return c;
+    }
+    var cc = {};
+    Object.keys(c).forEach(function(key) {
+      if (key === 'require' || key === 'advanced' || key === 'mediaSource') {
+        return;
+      }
+      var r = (typeof c[key] === 'object') ? c[key] : {ideal: c[key]};
+      if (r.exact !== undefined && typeof r.exact === 'number') {
+        r.min = r.max = r.exact;
+      }
+      var oldname_ = function(prefix, name) {
+        if (prefix) {
+          return prefix + name.charAt(0).toUpperCase() + name.slice(1);
+        }
+        return (name === 'deviceId') ? 'sourceId' : name;
+      };
+      if (r.ideal !== undefined) {
+        cc.optional = cc.optional || [];
+        var oc = {};
+        if (typeof r.ideal === 'number') {
+          oc[oldname_('min', key)] = r.ideal;
+          cc.optional.push(oc);
+          oc = {};
+          oc[oldname_('max', key)] = r.ideal;
+          cc.optional.push(oc);
+        } else {
+          oc[oldname_('', key)] = r.ideal;
+          cc.optional.push(oc);
+        }
+      }
+      if (r.exact !== undefined && typeof r.exact !== 'number') {
+        cc.mandatory = cc.mandatory || {};
+        cc.mandatory[oldname_('', key)] = r.exact;
+      } else {
+        ['min', 'max'].forEach(function(mix) {
+          if (r[mix] !== undefined) {
+            cc.mandatory = cc.mandatory || {};
+            cc.mandatory[oldname_(mix, key)] = r[mix];
+          }
+        });
+      }
+    });
+    if (c.advanced) {
+      cc.optional = (cc.optional || []).concat(c.advanced);
+    }
+    return cc;
+  };
+
+  var shimConstraints_ = function(constraints, func) {
+    constraints = JSON.parse(JSON.stringify(constraints));
+    if (constraints && typeof constraints.audio === 'object') {
+      var remap = function(obj, a, b) {
+        if (a in obj && !(b in obj)) {
+          obj[b] = obj[a];
+          delete obj[a];
+        }
+      };
+      constraints = JSON.parse(JSON.stringify(constraints));
+      remap(constraints.audio, 'autoGainControl', 'googAutoGainControl');
+      remap(constraints.audio, 'noiseSuppression', 'googNoiseSuppression');
+      constraints.audio = constraintsToChrome_(constraints.audio);
+    }
+    if (constraints && typeof constraints.video === 'object') {
+      // Shim facingMode for mobile & surface pro.
+      var face = constraints.video.facingMode;
+      face = face && ((typeof face === 'object') ? face : {ideal: face});
+      var getSupportedFacingModeLies = browserDetails.version < 61;
+
+      if ((face && (face.exact === 'user' || face.exact === 'environment' ||
+                    face.ideal === 'user' || face.ideal === 'environment')) &&
+          !(navigator.mediaDevices.getSupportedConstraints &&
+            navigator.mediaDevices.getSupportedConstraints().facingMode &&
+            !getSupportedFacingModeLies)) {
+        delete constraints.video.facingMode;
+        var matches;
+        if (face.exact === 'environment' || face.ideal === 'environment') {
+          matches = ['back', 'rear'];
+        } else if (face.exact === 'user' || face.ideal === 'user') {
+          matches = ['front'];
+        }
+        if (matches) {
+          // Look for matches in label, or use last cam for back (typical).
+          return navigator.mediaDevices.enumerateDevices()
+          .then(function(devices) {
+            devices = devices.filter(function(d) {
+              return d.kind === 'videoinput';
+            });
+            var dev = devices.find(function(d) {
+              return matches.some(function(match) {
+                return d.label.toLowerCase().indexOf(match) !== -1;
+              });
+            });
+            if (!dev && devices.length && matches.indexOf('back') !== -1) {
+              dev = devices[devices.length - 1]; // more likely the back cam
+            }
+            if (dev) {
+              constraints.video.deviceId = face.exact ? {exact: dev.deviceId} :
+                                                        {ideal: dev.deviceId};
+            }
+            constraints.video = constraintsToChrome_(constraints.video);
+            logging('chrome: ' + JSON.stringify(constraints));
+            return func(constraints);
+          });
+        }
+      }
+      constraints.video = constraintsToChrome_(constraints.video);
+    }
+    logging('chrome: ' + JSON.stringify(constraints));
+    return func(constraints);
+  };
+
+  var shimError_ = function(e) {
+    return {
+      name: {
+        PermissionDeniedError: 'NotAllowedError',
+        InvalidStateError: 'NotReadableError',
+        DevicesNotFoundError: 'NotFoundError',
+        ConstraintNotSatisfiedError: 'OverconstrainedError',
+        TrackStartError: 'NotReadableError',
+        MediaDeviceFailedDueToShutdown: 'NotReadableError',
+        MediaDeviceKillSwitchOn: 'NotReadableError'
+      }[e.name] || e.name,
+      message: e.message,
+      constraint: e.constraintName,
+      toString: function() {
+        return this.name + (this.message && ': ') + this.message;
+      }
+    };
+  };
+
+  var getUserMedia_ = function(constraints, onSuccess, onError) {
+    shimConstraints_(constraints, function(c) {
+      navigator.webkitGetUserMedia(c, onSuccess, function(e) {
+        if (onError) {
+          onError(shimError_(e));
+        }
+      });
+    });
+  };
+
+  navigator.getUserMedia = getUserMedia_;
+
+  // Returns the result of getUserMedia as a Promise.
+  var getUserMediaPromise_ = function(constraints) {
+    return new Promise(function(resolve, reject) {
+      navigator.getUserMedia(constraints, resolve, reject);
+    });
+  };
+
+  if (!navigator.mediaDevices) {
+    navigator.mediaDevices = {
+      getUserMedia: getUserMediaPromise_,
+      enumerateDevices: function() {
+        return new Promise(function(resolve) {
+          var kinds = {audio: 'audioinput', video: 'videoinput'};
+          return window.MediaStreamTrack.getSources(function(devices) {
+            resolve(devices.map(function(device) {
+              return {label: device.label,
+                kind: kinds[device.kind],
+                deviceId: device.id,
+                groupId: ''};
+            }));
+          });
+        });
+      },
+      getSupportedConstraints: function() {
+        return {
+          deviceId: true, echoCancellation: true, facingMode: true,
+          frameRate: true, height: true, width: true
+        };
+      }
+    };
+  }
+
+  // A shim for getUserMedia method on the mediaDevices object.
+  // TODO(KaptenJansson) remove once implemented in Chrome stable.
+  if (!navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia = function(constraints) {
+      return getUserMediaPromise_(constraints);
+    };
+  } else {
+    // Even though Chrome 45 has navigator.mediaDevices and a getUserMedia
+    // function which returns a Promise, it does not accept spec-style
+    // constraints.
+    var origGetUserMedia = navigator.mediaDevices.getUserMedia.
+        bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = function(cs) {
+      return shimConstraints_(cs, function(c) {
+        return origGetUserMedia(c).then(function(stream) {
+          if (c.audio && !stream.getAudioTracks().length ||
+              c.video && !stream.getVideoTracks().length) {
+            stream.getTracks().forEach(function(track) {
+              track.stop();
+            });
+            throw new DOMException('', 'NotFoundError');
+          }
+          return stream;
+        }, function(e) {
+          return Promise.reject(shimError_(e));
+        });
+      });
+    };
+  }
+
+  // Dummy devicechange event methods.
+  // TODO(KaptenJansson) remove once implemented in Chrome stable.
+  if (typeof navigator.mediaDevices.addEventListener === 'undefined') {
+    navigator.mediaDevices.addEventListener = function() {
+      logging('Dummy mediaDevices.addEventListener called.');
+    };
+  }
+  if (typeof navigator.mediaDevices.removeEventListener === 'undefined') {
+    navigator.mediaDevices.removeEventListener = function() {
+      logging('Dummy mediaDevices.removeEventListener called.');
+    };
+  }
+};
+
+
+/***/ }),
+/* 136 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+
+var utils = __webpack_require__(3);
+var shimRTCPeerConnection = __webpack_require__(137);
+
+module.exports = {
+  shimGetUserMedia: __webpack_require__(138),
+  shimPeerConnection: function(window) {
+    var browserDetails = utils.detectBrowser(window);
+
+    if (window.RTCIceGatherer) {
+      // ORTC defines an RTCIceCandidate object but no constructor.
+      // Not implemented in Edge.
+      if (!window.RTCIceCandidate) {
+        window.RTCIceCandidate = function(args) {
+          return args;
+        };
+      }
+      // ORTC does not have a session description object but
+      // other browsers (i.e. Chrome) that will support both PC and ORTC
+      // in the future might have this defined already.
+      if (!window.RTCSessionDescription) {
+        window.RTCSessionDescription = function(args) {
+          return args;
+        };
+      }
+      // this adds an additional event listener to MediaStrackTrack that signals
+      // when a tracks enabled property was changed. Workaround for a bug in
+      // addStream, see below. No longer required in 15025+
+      if (browserDetails.version < 15025) {
+        var origMSTEnabled = Object.getOwnPropertyDescriptor(
+            window.MediaStreamTrack.prototype, 'enabled');
+        Object.defineProperty(window.MediaStreamTrack.prototype, 'enabled', {
+          set: function(value) {
+            origMSTEnabled.set.call(this, value);
+            var ev = new Event('enabled');
+            ev.enabled = value;
+            this.dispatchEvent(ev);
+          }
+        });
+      }
+    }
+
+    // ORTC defines the DTMF sender a bit different.
+    // https://github.com/w3c/ortc/issues/714
+    if (window.RTCRtpSender && !('dtmf' in window.RTCRtpSender.prototype)) {
+      Object.defineProperty(window.RTCRtpSender.prototype, 'dtmf', {
+        get: function() {
+          if (this._dtmf === undefined) {
+            if (this.track.kind === 'audio') {
+              this._dtmf = new window.RTCDtmfSender(this);
+            } else if (this.track.kind === 'video') {
+              this._dtmf = null;
+            }
+          }
+          return this._dtmf;
+        }
+      });
+    }
+
+    window.RTCPeerConnection =
+        shimRTCPeerConnection(window, browserDetails.version);
+  },
+  shimReplaceTrack: function(window) {
+    // ORTC has replaceTrack -- https://github.com/w3c/ortc/issues/614
+    if (window.RTCRtpSender &&
+        !('replaceTrack' in window.RTCRtpSender.prototype)) {
+      window.RTCRtpSender.prototype.replaceTrack =
+          window.RTCRtpSender.prototype.setTrack;
+    }
+  }
+};
+
+
+/***/ }),
+/* 137 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*
+ *  Copyright (c) 2017 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+
+var SDPUtils = __webpack_require__(7);
+
+function writeMediaSection(transceiver, caps, type, stream, dtlsRole) {
+  var sdp = SDPUtils.writeRtpDescription(transceiver.kind, caps);
+
+  // Map ICE parameters (ufrag, pwd) to SDP.
+  sdp += SDPUtils.writeIceParameters(
+      transceiver.iceGatherer.getLocalParameters());
+
+  // Map DTLS parameters to SDP.
+  sdp += SDPUtils.writeDtlsParameters(
+      transceiver.dtlsTransport.getLocalParameters(),
+      type === 'offer' ? 'actpass' : dtlsRole || 'active');
+
+  sdp += 'a=mid:' + transceiver.mid + '\r\n';
+
+  if (transceiver.direction) {
+    sdp += 'a=' + transceiver.direction + '\r\n';
+  } else if (transceiver.rtpSender && transceiver.rtpReceiver) {
+    sdp += 'a=sendrecv\r\n';
+  } else if (transceiver.rtpSender) {
+    sdp += 'a=sendonly\r\n';
+  } else if (transceiver.rtpReceiver) {
+    sdp += 'a=recvonly\r\n';
+  } else {
+    sdp += 'a=inactive\r\n';
+  }
+
+  if (transceiver.rtpSender) {
+    // spec.
+    var msid = 'msid:' + stream.id + ' ' +
+        transceiver.rtpSender.track.id + '\r\n';
+    sdp += 'a=' + msid;
+
+    // for Chrome.
+    sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
+        ' ' + msid;
+    if (transceiver.sendEncodingParameters[0].rtx) {
+      sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].rtx.ssrc +
+          ' ' + msid;
+      sdp += 'a=ssrc-group:FID ' +
+          transceiver.sendEncodingParameters[0].ssrc + ' ' +
+          transceiver.sendEncodingParameters[0].rtx.ssrc +
+          '\r\n';
+    }
+  }
+  // FIXME: this should be written by writeRtpDescription.
+  sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
+      ' cname:' + SDPUtils.localCName + '\r\n';
+  if (transceiver.rtpSender && transceiver.sendEncodingParameters[0].rtx) {
+    sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].rtx.ssrc +
+        ' cname:' + SDPUtils.localCName + '\r\n';
+  }
+  return sdp;
+}
+
+// Edge does not like
+// 1) stun: filtered after 14393 unless ?transport=udp is present
+// 2) turn: that does not have all of turn:host:port?transport=udp
+// 3) turn: with ipv6 addresses
+// 4) turn: occurring muliple times
+function filterIceServers(iceServers, edgeVersion) {
+  var hasTurn = false;
+  iceServers = JSON.parse(JSON.stringify(iceServers));
+  return iceServers.filter(function(server) {
+    if (server && (server.urls || server.url)) {
+      var urls = server.urls || server.url;
+      if (server.url && !server.urls) {
+        console.warn('RTCIceServer.url is deprecated! Use urls instead.');
+      }
+      var isString = typeof urls === 'string';
+      if (isString) {
+        urls = [urls];
+      }
+      urls = urls.filter(function(url) {
+        var validTurn = url.indexOf('turn:') === 0 &&
+            url.indexOf('transport=udp') !== -1 &&
+            url.indexOf('turn:[') === -1 &&
+            !hasTurn;
+
+        if (validTurn) {
+          hasTurn = true;
+          return true;
+        }
+        return url.indexOf('stun:') === 0 && edgeVersion >= 14393 &&
+            url.indexOf('?transport=udp') === -1;
+      });
+
+      delete server.url;
+      server.urls = isString ? urls[0] : urls;
+      return !!urls.length;
+    }
+    return false;
+  });
+}
+
+// Determines the intersection of local and remote capabilities.
+function getCommonCapabilities(localCapabilities, remoteCapabilities) {
+  var commonCapabilities = {
+    codecs: [],
+    headerExtensions: [],
+    fecMechanisms: []
+  };
+
+  var findCodecByPayloadType = function(pt, codecs) {
+    pt = parseInt(pt, 10);
+    for (var i = 0; i < codecs.length; i++) {
+      if (codecs[i].payloadType === pt ||
+          codecs[i].preferredPayloadType === pt) {
+        return codecs[i];
+      }
+    }
+  };
+
+  var rtxCapabilityMatches = function(lRtx, rRtx, lCodecs, rCodecs) {
+    var lCodec = findCodecByPayloadType(lRtx.parameters.apt, lCodecs);
+    var rCodec = findCodecByPayloadType(rRtx.parameters.apt, rCodecs);
+    return lCodec && rCodec &&
+        lCodec.name.toLowerCase() === rCodec.name.toLowerCase();
+  };
+
+  localCapabilities.codecs.forEach(function(lCodec) {
+    for (var i = 0; i < remoteCapabilities.codecs.length; i++) {
+      var rCodec = remoteCapabilities.codecs[i];
+      if (lCodec.name.toLowerCase() === rCodec.name.toLowerCase() &&
+          lCodec.clockRate === rCodec.clockRate) {
+        if (lCodec.name.toLowerCase() === 'rtx' &&
+            lCodec.parameters && rCodec.parameters.apt) {
+          // for RTX we need to find the local rtx that has a apt
+          // which points to the same local codec as the remote one.
+          if (!rtxCapabilityMatches(lCodec, rCodec,
+              localCapabilities.codecs, remoteCapabilities.codecs)) {
+            continue;
+          }
+        }
+        rCodec = JSON.parse(JSON.stringify(rCodec)); // deepcopy
+        // number of channels is the highest common number of channels
+        rCodec.numChannels = Math.min(lCodec.numChannels,
+            rCodec.numChannels);
+        // push rCodec so we reply with offerer payload type
+        commonCapabilities.codecs.push(rCodec);
+
+        // determine common feedback mechanisms
+        rCodec.rtcpFeedback = rCodec.rtcpFeedback.filter(function(fb) {
+          for (var j = 0; j < lCodec.rtcpFeedback.length; j++) {
+            if (lCodec.rtcpFeedback[j].type === fb.type &&
+                lCodec.rtcpFeedback[j].parameter === fb.parameter) {
+              return true;
+            }
+          }
+          return false;
+        });
+        // FIXME: also need to determine .parameters
+        //  see https://github.com/openpeer/ortc/issues/569
+        break;
+      }
+    }
+  });
+
+  localCapabilities.headerExtensions.forEach(function(lHeaderExtension) {
+    for (var i = 0; i < remoteCapabilities.headerExtensions.length;
+         i++) {
+      var rHeaderExtension = remoteCapabilities.headerExtensions[i];
+      if (lHeaderExtension.uri === rHeaderExtension.uri) {
+        commonCapabilities.headerExtensions.push(rHeaderExtension);
+        break;
+      }
+    }
+  });
+
+  // FIXME: fecMechanisms
+  return commonCapabilities;
+}
+
+// is action=setLocalDescription with type allowed in signalingState
+function isActionAllowedInSignalingState(action, type, signalingState) {
+  return {
+    offer: {
+      setLocalDescription: ['stable', 'have-local-offer'],
+      setRemoteDescription: ['stable', 'have-remote-offer']
+    },
+    answer: {
+      setLocalDescription: ['have-remote-offer', 'have-local-pranswer'],
+      setRemoteDescription: ['have-local-offer', 'have-remote-pranswer']
+    }
+  }[type][action].indexOf(signalingState) !== -1;
+}
+
+function maybeAddCandidate(iceTransport, candidate) {
+  // Edge's internal representation adds some fields therefore
+  // not all fieldѕ are taken into account.
+  var alreadyAdded = iceTransport.getRemoteCandidates()
+      .find(function(remoteCandidate) {
+        return candidate.foundation === remoteCandidate.foundation &&
+            candidate.ip === remoteCandidate.ip &&
+            candidate.port === remoteCandidate.port &&
+            candidate.priority === remoteCandidate.priority &&
+            candidate.protocol === remoteCandidate.protocol &&
+            candidate.type === remoteCandidate.type;
+      });
+  if (!alreadyAdded) {
+    iceTransport.addRemoteCandidate(candidate);
+  }
+  return !alreadyAdded;
+}
+
+module.exports = function(window, edgeVersion) {
+  var RTCPeerConnection = function(config) {
+    var self = this;
+
+    var _eventTarget = document.createDocumentFragment();
+    ['addEventListener', 'removeEventListener', 'dispatchEvent']
+        .forEach(function(method) {
+          self[method] = _eventTarget[method].bind(_eventTarget);
+        });
+
+    this.onicecandidate = null;
+    this.onaddstream = null;
+    this.ontrack = null;
+    this.onremovestream = null;
+    this.onsignalingstatechange = null;
+    this.oniceconnectionstatechange = null;
+    this.onicegatheringstatechange = null;
+    this.onnegotiationneeded = null;
+    this.ondatachannel = null;
+    this.canTrickleIceCandidates = null;
+
+    this.needNegotiation = false;
+
+    this.localStreams = [];
+    this.remoteStreams = [];
+
+    this.localDescription = null;
+    this.remoteDescription = null;
+
+    this.signalingState = 'stable';
+    this.iceConnectionState = 'new';
+    this.iceGatheringState = 'new';
+
+    config = JSON.parse(JSON.stringify(config || {}));
+
+    this.usingBundle = config.bundlePolicy === 'max-bundle';
+    if (config.rtcpMuxPolicy === 'negotiate') {
+      var e = new Error('rtcpMuxPolicy \'negotiate\' is not supported');
+      e.name = 'NotSupportedError';
+      throw(e);
+    } else if (!config.rtcpMuxPolicy) {
+      config.rtcpMuxPolicy = 'require';
+    }
+
+    switch (config.iceTransportPolicy) {
+      case 'all':
+      case 'relay':
+        break;
+      default:
+        config.iceTransportPolicy = 'all';
+        break;
+    }
+
+    switch (config.bundlePolicy) {
+      case 'balanced':
+      case 'max-compat':
+      case 'max-bundle':
+        break;
+      default:
+        config.bundlePolicy = 'balanced';
+        break;
+    }
+
+    config.iceServers = filterIceServers(config.iceServers || [], edgeVersion);
+
+    this._iceGatherers = [];
+    if (config.iceCandidatePoolSize) {
+      for (var i = config.iceCandidatePoolSize; i > 0; i--) {
+        this._iceGatherers = new window.RTCIceGatherer({
+          iceServers: config.iceServers,
+          gatherPolicy: config.iceTransportPolicy
+        });
+      }
+    } else {
+      config.iceCandidatePoolSize = 0;
+    }
+
+    this._config = config;
+
+    // per-track iceGathers, iceTransports, dtlsTransports, rtpSenders, ...
+    // everything that is needed to describe a SDP m-line.
+    this.transceivers = [];
+
+    this._sdpSessionId = SDPUtils.generateSessionId();
+    this._sdpSessionVersion = 0;
+
+    this._dtlsRole = undefined; // role for a=setup to use in answers.
+  };
+
+  RTCPeerConnection.prototype._emitGatheringStateChange = function() {
+    var event = new Event('icegatheringstatechange');
+    this.dispatchEvent(event);
+    if (typeof this.onicegatheringstatechange === 'function') {
+      this.onicegatheringstatechange(event);
+    }
+  };
+
+  RTCPeerConnection.prototype.getConfiguration = function() {
+    return this._config;
+  };
+
+  RTCPeerConnection.prototype.getLocalStreams = function() {
+    return this.localStreams;
+  };
+
+  RTCPeerConnection.prototype.getRemoteStreams = function() {
+    return this.remoteStreams;
+  };
+
+  // internal helper to create a transceiver object.
+  // (whih is not yet the same as the WebRTC 1.0 transceiver)
+  RTCPeerConnection.prototype._createTransceiver = function(kind) {
+    var hasBundleTransport = this.transceivers.length > 0;
+    var transceiver = {
+      track: null,
+      iceGatherer: null,
+      iceTransport: null,
+      dtlsTransport: null,
+      localCapabilities: null,
+      remoteCapabilities: null,
+      rtpSender: null,
+      rtpReceiver: null,
+      kind: kind,
+      mid: null,
+      sendEncodingParameters: null,
+      recvEncodingParameters: null,
+      stream: null,
+      wantReceive: true
+    };
+    if (this.usingBundle && hasBundleTransport) {
+      transceiver.iceTransport = this.transceivers[0].iceTransport;
+      transceiver.dtlsTransport = this.transceivers[0].dtlsTransport;
+    } else {
+      var transports = this._createIceAndDtlsTransports();
+      transceiver.iceTransport = transports.iceTransport;
+      transceiver.dtlsTransport = transports.dtlsTransport;
+    }
+    this.transceivers.push(transceiver);
+    return transceiver;
+  };
+
+  RTCPeerConnection.prototype.addTrack = function(track, stream) {
+    var transceiver;
+    for (var i = 0; i < this.transceivers.length; i++) {
+      if (!this.transceivers[i].track &&
+          this.transceivers[i].kind === track.kind) {
+        transceiver = this.transceivers[i];
+      }
+    }
+    if (!transceiver) {
+      transceiver = this._createTransceiver(track.kind);
+    }
+
+    this._maybeFireNegotiationNeeded();
+
+    if (this.localStreams.indexOf(stream) === -1) {
+      this.localStreams.push(stream);
+    }
+
+    transceiver.track = track;
+    transceiver.stream = stream;
+    transceiver.rtpSender = new window.RTCRtpSender(track,
+        transceiver.dtlsTransport);
+    return transceiver.rtpSender;
+  };
+
+  RTCPeerConnection.prototype.addStream = function(stream) {
+    var self = this;
+    if (edgeVersion >= 15025) {
+      stream.getTracks().forEach(function(track) {
+        self.addTrack(track, stream);
+      });
+    } else {
+      // Clone is necessary for local demos mostly, attaching directly
+      // to two different senders does not work (build 10547).
+      // Fixed in 15025 (or earlier)
+      var clonedStream = stream.clone();
+      stream.getTracks().forEach(function(track, idx) {
+        var clonedTrack = clonedStream.getTracks()[idx];
+        track.addEventListener('enabled', function(event) {
+          clonedTrack.enabled = event.enabled;
+        });
+      });
+      clonedStream.getTracks().forEach(function(track) {
+        self.addTrack(track, clonedStream);
+      });
+    }
+  };
+
+  RTCPeerConnection.prototype.removeStream = function(stream) {
+    var idx = this.localStreams.indexOf(stream);
+    if (idx > -1) {
+      this.localStreams.splice(idx, 1);
+      this._maybeFireNegotiationNeeded();
+    }
+  };
+
+  RTCPeerConnection.prototype.getSenders = function() {
+    return this.transceivers.filter(function(transceiver) {
+      return !!transceiver.rtpSender;
+    })
+    .map(function(transceiver) {
+      return transceiver.rtpSender;
+    });
+  };
+
+  RTCPeerConnection.prototype.getReceivers = function() {
+    return this.transceivers.filter(function(transceiver) {
+      return !!transceiver.rtpReceiver;
+    })
+    .map(function(transceiver) {
+      return transceiver.rtpReceiver;
+    });
+  };
+
+
+  RTCPeerConnection.prototype._createIceGatherer = function(sdpMLineIndex,
+      usingBundle) {
+    var self = this;
+    if (usingBundle && sdpMLineIndex > 0) {
+      return this.transceivers[0].iceGatherer;
+    } else if (this._iceGatherers.length) {
+      return this._iceGatherers.shift();
+    }
+    var iceGatherer = new window.RTCIceGatherer({
+      iceServers: this._config.iceServers,
+      gatherPolicy: this._config.iceTransportPolicy
+    });
+    Object.defineProperty(iceGatherer, 'state',
+        {value: 'new', writable: true}
+    );
+
+    this.transceivers[sdpMLineIndex].candidates = [];
+    this.transceivers[sdpMLineIndex].bufferCandidates = function(event) {
+      var end = !event.candidate || Object.keys(event.candidate).length === 0;
+      // polyfill since RTCIceGatherer.state is not implemented in
+      // Edge 10547 yet.
+      iceGatherer.state = end ? 'completed' : 'gathering';
+      if (self.transceivers[sdpMLineIndex].candidates !== null) {
+        self.transceivers[sdpMLineIndex].candidates.push(event.candidate);
+      }
+    };
+    iceGatherer.addEventListener('localcandidate',
+      this.transceivers[sdpMLineIndex].bufferCandidates);
+    return iceGatherer;
+  };
+
+  // start gathering from an RTCIceGatherer.
+  RTCPeerConnection.prototype._gather = function(mid, sdpMLineIndex) {
+    var self = this;
+    var iceGatherer = this.transceivers[sdpMLineIndex].iceGatherer;
+    if (iceGatherer.onlocalcandidate) {
+      return;
+    }
+    var candidates = this.transceivers[sdpMLineIndex].candidates;
+    this.transceivers[sdpMLineIndex].candidates = null;
+    iceGatherer.removeEventListener('localcandidate',
+      this.transceivers[sdpMLineIndex].bufferCandidates);
+    iceGatherer.onlocalcandidate = function(evt) {
+      if (self.usingBundle && sdpMLineIndex > 0) {
+        // if we know that we use bundle we can drop candidates with
+        // ѕdpMLineIndex > 0. If we don't do this then our state gets
+        // confused since we dispose the extra ice gatherer.
+        return;
+      }
+      var event = new Event('icecandidate');
+      event.candidate = {sdpMid: mid, sdpMLineIndex: sdpMLineIndex};
+
+      var cand = evt.candidate;
+      // Edge emits an empty object for RTCIceCandidateComplete‥
+      var end = !cand || Object.keys(cand).length === 0;
+      if (end) {
+        // polyfill since RTCIceGatherer.state is not implemented in
+        // Edge 10547 yet.
+        if (iceGatherer.state === 'new' || iceGatherer.state === 'gathering') {
+          iceGatherer.state = 'completed';
+        }
+      } else {
+        if (iceGatherer.state === 'new') {
+          iceGatherer.state = 'gathering';
+        }
+        // RTCIceCandidate doesn't have a component, needs to be added
+        cand.component = 1;
+        event.candidate.candidate = SDPUtils.writeCandidate(cand);
+      }
+
+      // update local description.
+      var sections = SDPUtils.splitSections(self.localDescription.sdp);
+      if (!end) {
+        sections[event.candidate.sdpMLineIndex + 1] +=
+            'a=' + event.candidate.candidate + '\r\n';
+      } else {
+        sections[event.candidate.sdpMLineIndex + 1] +=
+            'a=end-of-candidates\r\n';
+      }
+      self.localDescription.sdp = sections.join('');
+      var complete = self.transceivers.every(function(transceiver) {
+        return transceiver.iceGatherer &&
+            transceiver.iceGatherer.state === 'completed';
+      });
+
+      if (self.iceGatheringState !== 'gathering') {
+        self.iceGatheringState = 'gathering';
+        self._emitGatheringStateChange();
+      }
+
+      // Emit candidate. Also emit null candidate when all gatherers are
+      // complete.
+      if (!end) {
+        self.dispatchEvent(event);
+        if (typeof self.onicecandidate === 'function') {
+          self.onicecandidate(event);
+        }
+      }
+      if (complete) {
+        self.dispatchEvent(new Event('icecandidate'));
+        if (typeof self.onicecandidate === 'function') {
+          self.onicecandidate(new Event('icecandidate'));
+        }
+        self.iceGatheringState = 'complete';
+        self._emitGatheringStateChange();
+      }
+    };
+
+    // emit already gathered candidates.
+    window.setTimeout(function() {
+      candidates.forEach(function(candidate) {
+        var e = new Event('RTCIceGatherEvent');
+        e.candidate = candidate;
+        iceGatherer.onlocalcandidate(e);
+      });
+    }, 0);
+  };
+
+  // Create ICE transport and DTLS transport.
+  RTCPeerConnection.prototype._createIceAndDtlsTransports = function() {
+    var self = this;
+    var iceTransport = new window.RTCIceTransport(null);
+    iceTransport.onicestatechange = function() {
+      self._updateConnectionState();
+    };
+
+    var dtlsTransport = new window.RTCDtlsTransport(iceTransport);
+    dtlsTransport.ondtlsstatechange = function() {
+      self._updateConnectionState();
+    };
+    dtlsTransport.onerror = function() {
+      // onerror does not set state to failed by itself.
+      Object.defineProperty(dtlsTransport, 'state',
+          {value: 'failed', writable: true});
+      self._updateConnectionState();
+    };
+
+    return {
+      iceTransport: iceTransport,
+      dtlsTransport: dtlsTransport
+    };
+  };
+
+  // Destroy ICE gatherer, ICE transport and DTLS transport.
+  // Without triggering the callbacks.
+  RTCPeerConnection.prototype._disposeIceAndDtlsTransports = function(
+      sdpMLineIndex) {
+    var iceGatherer = this.transceivers[sdpMLineIndex].iceGatherer;
+    if (iceGatherer) {
+      delete iceGatherer.onlocalcandidate;
+      delete this.transceivers[sdpMLineIndex].iceGatherer;
+    }
+    var iceTransport = this.transceivers[sdpMLineIndex].iceTransport;
+    if (iceTransport) {
+      delete iceTransport.onicestatechange;
+      delete this.transceivers[sdpMLineIndex].iceTransport;
+    }
+    var dtlsTransport = this.transceivers[sdpMLineIndex].dtlsTransport;
+    if (dtlsTransport) {
+      delete dtlsTransport.ondtlsstatechange;
+      delete dtlsTransport.onerror;
+      delete this.transceivers[sdpMLineIndex].dtlsTransport;
+    }
+  };
+
+  // Start the RTP Sender and Receiver for a transceiver.
+  RTCPeerConnection.prototype._transceive = function(transceiver,
+      send, recv) {
+    var params = getCommonCapabilities(transceiver.localCapabilities,
+        transceiver.remoteCapabilities);
+    if (send && transceiver.rtpSender) {
+      params.encodings = transceiver.sendEncodingParameters;
+      params.rtcp = {
+        cname: SDPUtils.localCName,
+        compound: transceiver.rtcpParameters.compound
+      };
+      if (transceiver.recvEncodingParameters.length) {
+        params.rtcp.ssrc = transceiver.recvEncodingParameters[0].ssrc;
+      }
+      transceiver.rtpSender.send(params);
+    }
+    if (recv && transceiver.rtpReceiver && params.codecs.length > 0) {
+      // remove RTX field in Edge 14942
+      if (transceiver.kind === 'video'
+          && transceiver.recvEncodingParameters
+          && edgeVersion < 15019) {
+        transceiver.recvEncodingParameters.forEach(function(p) {
+          delete p.rtx;
+        });
+      }
+      params.encodings = transceiver.recvEncodingParameters;
+      params.rtcp = {
+        cname: transceiver.rtcpParameters.cname,
+        compound: transceiver.rtcpParameters.compound
+      };
+      if (transceiver.sendEncodingParameters.length) {
+        params.rtcp.ssrc = transceiver.sendEncodingParameters[0].ssrc;
+      }
+      transceiver.rtpReceiver.receive(params);
+    }
+  };
+
+  RTCPeerConnection.prototype.setLocalDescription = function(description) {
+    var self = this;
+    var args = arguments;
+
+    if (!isActionAllowedInSignalingState('setLocalDescription',
+        description.type, this.signalingState)) {
+      return new Promise(function(resolve, reject) {
+        var e = new Error('Can not set local ' + description.type +
+            ' in state ' + self.signalingState);
+        e.name = 'InvalidStateError';
+        if (args.length > 2 && typeof args[2] === 'function') {
+          args[2].apply(null, [e]);
+        }
+        reject(e);
+      });
+    }
+
+    var sections;
+    var sessionpart;
+    if (description.type === 'offer') {
+      // VERY limited support for SDP munging. Limited to:
+      // * changing the order of codecs
+      sections = SDPUtils.splitSections(description.sdp);
+      sessionpart = sections.shift();
+      sections.forEach(function(mediaSection, sdpMLineIndex) {
+        var caps = SDPUtils.parseRtpParameters(mediaSection);
+        self.transceivers[sdpMLineIndex].localCapabilities = caps;
+      });
+
+      this.transceivers.forEach(function(transceiver, sdpMLineIndex) {
+        self._gather(transceiver.mid, sdpMLineIndex);
+      });
+    } else if (description.type === 'answer') {
+      sections = SDPUtils.splitSections(self.remoteDescription.sdp);
+      sessionpart = sections.shift();
+      var isIceLite = SDPUtils.matchPrefix(sessionpart,
+          'a=ice-lite').length > 0;
+      sections.forEach(function(mediaSection, sdpMLineIndex) {
+        var transceiver = self.transceivers[sdpMLineIndex];
+        var iceGatherer = transceiver.iceGatherer;
+        var iceTransport = transceiver.iceTransport;
+        var dtlsTransport = transceiver.dtlsTransport;
+        var localCapabilities = transceiver.localCapabilities;
+        var remoteCapabilities = transceiver.remoteCapabilities;
+
+        // treat bundle-only as not-rejected.
+        var rejected = SDPUtils.isRejected(mediaSection) &&
+            !SDPUtils.matchPrefix(mediaSection, 'a=bundle-only').length === 1;
+
+        if (!rejected && !transceiver.isDatachannel) {
+          var remoteIceParameters = SDPUtils.getIceParameters(
+              mediaSection, sessionpart);
+          var remoteDtlsParameters = SDPUtils.getDtlsParameters(
+              mediaSection, sessionpart);
+          if (isIceLite) {
+            remoteDtlsParameters.role = 'server';
+          }
+
+          if (!self.usingBundle || sdpMLineIndex === 0) {
+            self._gather(transceiver.mid, sdpMLineIndex);
+            if (iceTransport.state === 'new') {
+              iceTransport.start(iceGatherer, remoteIceParameters,
+                  isIceLite ? 'controlling' : 'controlled');
+            }
+            if (dtlsTransport.state === 'new') {
+              dtlsTransport.start(remoteDtlsParameters);
+            }
+          }
+
+          // Calculate intersection of capabilities.
+          var params = getCommonCapabilities(localCapabilities,
+              remoteCapabilities);
+
+          // Start the RTCRtpSender. The RTCRtpReceiver for this
+          // transceiver has already been started in setRemoteDescription.
+          self._transceive(transceiver,
+              params.codecs.length > 0,
+              false);
+        }
+      });
+    }
+
+    this.localDescription = {
+      type: description.type,
+      sdp: description.sdp
+    };
+    switch (description.type) {
+      case 'offer':
+        this._updateSignalingState('have-local-offer');
+        break;
+      case 'answer':
+        this._updateSignalingState('stable');
+        break;
+      default:
+        throw new TypeError('unsupported type "' + description.type +
+            '"');
+    }
+
+    // If a success callback was provided, emit ICE candidates after it
+    // has been executed. Otherwise, emit callback after the Promise is
+    // resolved.
+    var cb = arguments.length > 1 && typeof arguments[1] === 'function' &&
+        arguments[1];
+    return new Promise(function(resolve) {
+      if (cb) {
+        cb.apply(null);
+      }
+      resolve();
+    });
+  };
+
+  RTCPeerConnection.prototype.setRemoteDescription = function(description) {
+    var self = this;
+    var args = arguments;
+
+    if (!isActionAllowedInSignalingState('setRemoteDescription',
+        description.type, this.signalingState)) {
+      return new Promise(function(resolve, reject) {
+        var e = new Error('Can not set remote ' + description.type +
+            ' in state ' + self.signalingState);
+        e.name = 'InvalidStateError';
+        if (args.length > 2 && typeof args[2] === 'function') {
+          args[2].apply(null, [e]);
+        }
+        reject(e);
+      });
+    }
+
+    var streams = {};
+    this.remoteStreams.forEach(function(stream) {
+      streams[stream.id] = stream;
+    });
+    var receiverList = [];
+    var sections = SDPUtils.splitSections(description.sdp);
+    var sessionpart = sections.shift();
+    var isIceLite = SDPUtils.matchPrefix(sessionpart,
+        'a=ice-lite').length > 0;
+    var usingBundle = SDPUtils.matchPrefix(sessionpart,
+        'a=group:BUNDLE ').length > 0;
+    this.usingBundle = usingBundle;
+    var iceOptions = SDPUtils.matchPrefix(sessionpart,
+        'a=ice-options:')[0];
+    if (iceOptions) {
+      this.canTrickleIceCandidates = iceOptions.substr(14).split(' ')
+          .indexOf('trickle') >= 0;
+    } else {
+      this.canTrickleIceCandidates = false;
+    }
+
+    sections.forEach(function(mediaSection, sdpMLineIndex) {
+      var lines = SDPUtils.splitLines(mediaSection);
+      var kind = SDPUtils.getKind(mediaSection);
+      // treat bundle-only as not-rejected.
+      var rejected = SDPUtils.isRejected(mediaSection) &&
+          !SDPUtils.matchPrefix(mediaSection, 'a=bundle-only').length === 1;
+      var protocol = lines[0].substr(2).split(' ')[2];
+
+      var direction = SDPUtils.getDirection(mediaSection, sessionpart);
+      var remoteMsid = SDPUtils.parseMsid(mediaSection);
+
+      var mid = SDPUtils.getMid(mediaSection) || SDPUtils.generateIdentifier();
+
+      // Reject datachannels which are not implemented yet.
+      if (kind === 'application' && protocol === 'DTLS/SCTP') {
+        self.transceivers[sdpMLineIndex] = {
+          mid: mid,
+          isDatachannel: true
+        };
+        return;
+      }
+
+      var transceiver;
+      var iceGatherer;
+      var iceTransport;
+      var dtlsTransport;
+      var rtpReceiver;
+      var sendEncodingParameters;
+      var recvEncodingParameters;
+      var localCapabilities;
+
+      var track;
+      // FIXME: ensure the mediaSection has rtcp-mux set.
+      var remoteCapabilities = SDPUtils.parseRtpParameters(mediaSection);
+      var remoteIceParameters;
+      var remoteDtlsParameters;
+      if (!rejected) {
+        remoteIceParameters = SDPUtils.getIceParameters(mediaSection,
+            sessionpart);
+        remoteDtlsParameters = SDPUtils.getDtlsParameters(mediaSection,
+            sessionpart);
+        remoteDtlsParameters.role = 'client';
+      }
+      recvEncodingParameters =
+          SDPUtils.parseRtpEncodingParameters(mediaSection);
+
+      var rtcpParameters = SDPUtils.parseRtcpParameters(mediaSection);
+
+      var isComplete = SDPUtils.matchPrefix(mediaSection,
+          'a=end-of-candidates', sessionpart).length > 0;
+      var cands = SDPUtils.matchPrefix(mediaSection, 'a=candidate:')
+          .map(function(cand) {
+            return SDPUtils.parseCandidate(cand);
+          })
+          .filter(function(cand) {
+            return cand.component === 1;
+          });
+
+      // Check if we can use BUNDLE and dispose transports.
+      if ((description.type === 'offer' || description.type === 'answer') &&
+          !rejected && usingBundle && sdpMLineIndex > 0 &&
+          self.transceivers[sdpMLineIndex]) {
+        self._disposeIceAndDtlsTransports(sdpMLineIndex);
+        self.transceivers[sdpMLineIndex].iceGatherer =
+            self.transceivers[0].iceGatherer;
+        self.transceivers[sdpMLineIndex].iceTransport =
+            self.transceivers[0].iceTransport;
+        self.transceivers[sdpMLineIndex].dtlsTransport =
+            self.transceivers[0].dtlsTransport;
+        if (self.transceivers[sdpMLineIndex].rtpSender) {
+          self.transceivers[sdpMLineIndex].rtpSender.setTransport(
+              self.transceivers[0].dtlsTransport);
+        }
+        if (self.transceivers[sdpMLineIndex].rtpReceiver) {
+          self.transceivers[sdpMLineIndex].rtpReceiver.setTransport(
+              self.transceivers[0].dtlsTransport);
+        }
+      }
+      if (description.type === 'offer' && !rejected) {
+        transceiver = self.transceivers[sdpMLineIndex] ||
+            self._createTransceiver(kind);
+        transceiver.mid = mid;
+
+        if (!transceiver.iceGatherer) {
+          transceiver.iceGatherer = self._createIceGatherer(sdpMLineIndex,
+              usingBundle);
+        }
+
+        if (cands.length && transceiver.iceTransport.state === 'new') {
+          if (isComplete && (!usingBundle || sdpMLineIndex === 0)) {
+            transceiver.iceTransport.setRemoteCandidates(cands);
+          } else {
+            cands.forEach(function(candidate) {
+              maybeAddCandidate(transceiver.iceTransport, candidate);
+            });
+          }
+        }
+
+        localCapabilities = window.RTCRtpReceiver.getCapabilities(kind);
+
+        // filter RTX until additional stuff needed for RTX is implemented
+        // in adapter.js
+        if (edgeVersion < 15019) {
+          localCapabilities.codecs = localCapabilities.codecs.filter(
+              function(codec) {
+                return codec.name !== 'rtx';
+              });
+        }
+
+        sendEncodingParameters = transceiver.sendEncodingParameters || [{
+          ssrc: (2 * sdpMLineIndex + 2) * 1001
+        }];
+
+        var isNewTrack = false;
+        if (direction === 'sendrecv' || direction === 'sendonly') {
+          isNewTrack = !transceiver.rtpReceiver;
+          rtpReceiver = transceiver.rtpReceiver ||
+              new window.RTCRtpReceiver(transceiver.dtlsTransport, kind);
+
+          if (isNewTrack) {
+            var stream;
+            track = rtpReceiver.track;
+            // FIXME: does not work with Plan B.
+            if (remoteMsid) {
+              if (!streams[remoteMsid.stream]) {
+                streams[remoteMsid.stream] = new window.MediaStream();
+                Object.defineProperty(streams[remoteMsid.stream], 'id', {
+                  get: function() {
+                    return remoteMsid.stream;
+                  }
+                });
+              }
+              Object.defineProperty(track, 'id', {
+                get: function() {
+                  return remoteMsid.track;
+                }
+              });
+              stream = streams[remoteMsid.stream];
+            } else {
+              if (!streams.default) {
+                streams.default = new window.MediaStream();
+              }
+              stream = streams.default;
+            }
+            stream.addTrack(track);
+            receiverList.push([track, rtpReceiver, stream]);
+          }
+        }
+
+        transceiver.localCapabilities = localCapabilities;
+        transceiver.remoteCapabilities = remoteCapabilities;
+        transceiver.rtpReceiver = rtpReceiver;
+        transceiver.rtcpParameters = rtcpParameters;
+        transceiver.sendEncodingParameters = sendEncodingParameters;
+        transceiver.recvEncodingParameters = recvEncodingParameters;
+
+        // Start the RTCRtpReceiver now. The RTPSender is started in
+        // setLocalDescription.
+        self._transceive(self.transceivers[sdpMLineIndex],
+            false,
+            isNewTrack);
+      } else if (description.type === 'answer' && !rejected) {
+        transceiver = self.transceivers[sdpMLineIndex];
+        iceGatherer = transceiver.iceGatherer;
+        iceTransport = transceiver.iceTransport;
+        dtlsTransport = transceiver.dtlsTransport;
+        rtpReceiver = transceiver.rtpReceiver;
+        sendEncodingParameters = transceiver.sendEncodingParameters;
+        localCapabilities = transceiver.localCapabilities;
+
+        self.transceivers[sdpMLineIndex].recvEncodingParameters =
+            recvEncodingParameters;
+        self.transceivers[sdpMLineIndex].remoteCapabilities =
+            remoteCapabilities;
+        self.transceivers[sdpMLineIndex].rtcpParameters = rtcpParameters;
+
+        if (cands.length && iceTransport.state === 'new') {
+          if ((isIceLite || isComplete) &&
+              (!usingBundle || sdpMLineIndex === 0)) {
+            iceTransport.setRemoteCandidates(cands);
+          } else {
+            cands.forEach(function(candidate) {
+              maybeAddCandidate(transceiver.iceTransport, candidate);
+            });
+          }
+        }
+
+        if (!usingBundle || sdpMLineIndex === 0) {
+          if (iceTransport.state === 'new') {
+            iceTransport.start(iceGatherer, remoteIceParameters,
+                'controlling');
+          }
+          if (dtlsTransport.state === 'new') {
+            dtlsTransport.start(remoteDtlsParameters);
+          }
+        }
+
+        self._transceive(transceiver,
+            direction === 'sendrecv' || direction === 'recvonly',
+            direction === 'sendrecv' || direction === 'sendonly');
+
+        if (rtpReceiver &&
+            (direction === 'sendrecv' || direction === 'sendonly')) {
+          track = rtpReceiver.track;
+          if (remoteMsid) {
+            if (!streams[remoteMsid.stream]) {
+              streams[remoteMsid.stream] = new window.MediaStream();
+            }
+            streams[remoteMsid.stream].addTrack(track);
+            receiverList.push([track, rtpReceiver, streams[remoteMsid.stream]]);
+          } else {
+            if (!streams.default) {
+              streams.default = new window.MediaStream();
+            }
+            streams.default.addTrack(track);
+            receiverList.push([track, rtpReceiver, streams.default]);
+          }
+        } else {
+          // FIXME: actually the receiver should be created later.
+          delete transceiver.rtpReceiver;
+        }
+      }
+    });
+
+    if (this._dtlsRole === undefined) {
+      this._dtlsRole = description.type === 'offer' ? 'active' : 'passive';
+    }
+
+    this.remoteDescription = {
+      type: description.type,
+      sdp: description.sdp
+    };
+    switch (description.type) {
+      case 'offer':
+        this._updateSignalingState('have-remote-offer');
+        break;
+      case 'answer':
+        this._updateSignalingState('stable');
+        break;
+      default:
+        throw new TypeError('unsupported type "' + description.type +
+            '"');
+    }
+    Object.keys(streams).forEach(function(sid) {
+      var stream = streams[sid];
+      if (stream.getTracks().length) {
+        if (self.remoteStreams.indexOf(stream) === -1) {
+          self.remoteStreams.push(stream);
+          var event = new Event('addstream');
+          event.stream = stream;
+          window.setTimeout(function() {
+            self.dispatchEvent(event);
+            if (typeof self.onaddstream === 'function') {
+              self.onaddstream(event);
+            }
+          });
+        }
+
+        receiverList.forEach(function(item) {
+          var track = item[0];
+          var receiver = item[1];
+          if (stream.id !== item[2].id) {
+            return;
+          }
+          var trackEvent = new Event('track');
+          trackEvent.track = track;
+          trackEvent.receiver = receiver;
+          trackEvent.transceiver = {receiver: receiver};
+          trackEvent.streams = [stream];
+          window.setTimeout(function() {
+            self.dispatchEvent(trackEvent);
+            if (typeof self.ontrack === 'function') {
+              self.ontrack(trackEvent);
+            }
+          });
+        });
+      }
+    });
+
+    // check whether addIceCandidate({}) was called within four seconds after
+    // setRemoteDescription.
+    window.setTimeout(function() {
+      if (!(self && self.transceivers)) {
+        return;
+      }
+      self.transceivers.forEach(function(transceiver) {
+        if (transceiver.iceTransport &&
+            transceiver.iceTransport.state === 'new' &&
+            transceiver.iceTransport.getRemoteCandidates().length > 0) {
+          console.warn('Timeout for addRemoteCandidate. Consider sending ' +
+              'an end-of-candidates notification');
+          transceiver.iceTransport.addRemoteCandidate({});
+        }
+      });
+    }, 4000);
+
+    return new Promise(function(resolve) {
+      if (args.length > 1 && typeof args[1] === 'function') {
+        args[1].apply(null);
+      }
+      resolve();
+    });
+  };
+
+  RTCPeerConnection.prototype.close = function() {
+    this.transceivers.forEach(function(transceiver) {
+      /* not yet
+      if (transceiver.iceGatherer) {
+        transceiver.iceGatherer.close();
+      }
+      */
+      if (transceiver.iceTransport) {
+        transceiver.iceTransport.stop();
+      }
+      if (transceiver.dtlsTransport) {
+        transceiver.dtlsTransport.stop();
+      }
+      if (transceiver.rtpSender) {
+        transceiver.rtpSender.stop();
+      }
+      if (transceiver.rtpReceiver) {
+        transceiver.rtpReceiver.stop();
+      }
+    });
+    // FIXME: clean up tracks, local streams, remote streams, etc
+    this._updateSignalingState('closed');
+  };
+
+  // Update the signaling state.
+  RTCPeerConnection.prototype._updateSignalingState = function(newState) {
+    this.signalingState = newState;
+    var event = new Event('signalingstatechange');
+    this.dispatchEvent(event);
+    if (typeof this.onsignalingstatechange === 'function') {
+      this.onsignalingstatechange(event);
+    }
+  };
+
+  // Determine whether to fire the negotiationneeded event.
+  RTCPeerConnection.prototype._maybeFireNegotiationNeeded = function() {
+    var self = this;
+    if (this.signalingState !== 'stable' || this.needNegotiation === true) {
+      return;
+    }
+    this.needNegotiation = true;
+    window.setTimeout(function() {
+      if (self.needNegotiation === false) {
+        return;
+      }
+      self.needNegotiation = false;
+      var event = new Event('negotiationneeded');
+      self.dispatchEvent(event);
+      if (typeof self.onnegotiationneeded === 'function') {
+        self.onnegotiationneeded(event);
+      }
+    }, 0);
+  };
+
+  // Update the connection state.
+  RTCPeerConnection.prototype._updateConnectionState = function() {
+    var newState;
+    var states = {
+      'new': 0,
+      closed: 0,
+      connecting: 0,
+      checking: 0,
+      connected: 0,
+      completed: 0,
+      disconnected: 0,
+      failed: 0
+    };
+    this.transceivers.forEach(function(transceiver) {
+      states[transceiver.iceTransport.state]++;
+      states[transceiver.dtlsTransport.state]++;
+    });
+    // ICETransport.completed and connected are the same for this purpose.
+    states.connected += states.completed;
+
+    newState = 'new';
+    if (states.failed > 0) {
+      newState = 'failed';
+    } else if (states.connecting > 0 || states.checking > 0) {
+      newState = 'connecting';
+    } else if (states.disconnected > 0) {
+      newState = 'disconnected';
+    } else if (states.new > 0) {
+      newState = 'new';
+    } else if (states.connected > 0 || states.completed > 0) {
+      newState = 'connected';
+    }
+
+    if (newState !== this.iceConnectionState) {
+      this.iceConnectionState = newState;
+      var event = new Event('iceconnectionstatechange');
+      this.dispatchEvent(event);
+      if (typeof this.oniceconnectionstatechange === 'function') {
+        this.oniceconnectionstatechange(event);
+      }
+    }
+  };
+
+  RTCPeerConnection.prototype.createOffer = function() {
+    var self = this;
+    var args = arguments;
+
+    var offerOptions;
+    if (arguments.length === 1 && typeof arguments[0] !== 'function') {
+      offerOptions = arguments[0];
+    } else if (arguments.length === 3) {
+      offerOptions = arguments[2];
+    }
+
+    var numAudioTracks = this.transceivers.filter(function(t) {
+      return t.kind === 'audio';
+    }).length;
+    var numVideoTracks = this.transceivers.filter(function(t) {
+      return t.kind === 'video';
+    }).length;
+
+    // Determine number of audio and video tracks we need to send/recv.
+    if (offerOptions) {
+      // Reject Chrome legacy constraints.
+      if (offerOptions.mandatory || offerOptions.optional) {
+        throw new TypeError(
+            'Legacy mandatory/optional constraints not supported.');
+      }
+      if (offerOptions.offerToReceiveAudio !== undefined) {
+        if (offerOptions.offerToReceiveAudio === true) {
+          numAudioTracks = 1;
+        } else if (offerOptions.offerToReceiveAudio === false) {
+          numAudioTracks = 0;
+        } else {
+          numAudioTracks = offerOptions.offerToReceiveAudio;
+        }
+      }
+      if (offerOptions.offerToReceiveVideo !== undefined) {
+        if (offerOptions.offerToReceiveVideo === true) {
+          numVideoTracks = 1;
+        } else if (offerOptions.offerToReceiveVideo === false) {
+          numVideoTracks = 0;
+        } else {
+          numVideoTracks = offerOptions.offerToReceiveVideo;
+        }
+      }
+    }
+
+    this.transceivers.forEach(function(transceiver) {
+      if (transceiver.kind === 'audio') {
+        numAudioTracks--;
+        if (numAudioTracks < 0) {
+          transceiver.wantReceive = false;
+        }
+      } else if (transceiver.kind === 'video') {
+        numVideoTracks--;
+        if (numVideoTracks < 0) {
+          transceiver.wantReceive = false;
+        }
+      }
+    });
+
+    // Create M-lines for recvonly streams.
+    while (numAudioTracks > 0 || numVideoTracks > 0) {
+      if (numAudioTracks > 0) {
+        this._createTransceiver('audio');
+        numAudioTracks--;
+      }
+      if (numVideoTracks > 0) {
+        this._createTransceiver('video');
+        numVideoTracks--;
+      }
+    }
+
+    var sdp = SDPUtils.writeSessionBoilerplate(this._sdpSessionId,
+        this._sdpSessionVersion++);
+    this.transceivers.forEach(function(transceiver, sdpMLineIndex) {
+      // For each track, create an ice gatherer, ice transport,
+      // dtls transport, potentially rtpsender and rtpreceiver.
+      var track = transceiver.track;
+      var kind = transceiver.kind;
+      var mid = SDPUtils.generateIdentifier();
+      transceiver.mid = mid;
+
+      if (!transceiver.iceGatherer) {
+        transceiver.iceGatherer = self._createIceGatherer(sdpMLineIndex,
+            self.usingBundle);
+      }
+
+      var localCapabilities = window.RTCRtpSender.getCapabilities(kind);
+      // filter RTX until additional stuff needed for RTX is implemented
+      // in adapter.js
+      if (edgeVersion < 15019) {
+        localCapabilities.codecs = localCapabilities.codecs.filter(
+            function(codec) {
+              return codec.name !== 'rtx';
+            });
+      }
+      localCapabilities.codecs.forEach(function(codec) {
+        // work around https://bugs.chromium.org/p/webrtc/issues/detail?id=6552
+        // by adding level-asymmetry-allowed=1
+        if (codec.name === 'H264' &&
+            codec.parameters['level-asymmetry-allowed'] === undefined) {
+          codec.parameters['level-asymmetry-allowed'] = '1';
+        }
+      });
+
+      // generate an ssrc now, to be used later in rtpSender.send
+      var sendEncodingParameters = transceiver.sendEncodingParameters || [{
+        ssrc: (2 * sdpMLineIndex + 1) * 1001
+      }];
+      if (track) {
+        // add RTX
+        if (edgeVersion >= 15019 && kind === 'video' &&
+            !sendEncodingParameters[0].rtx) {
+          sendEncodingParameters[0].rtx = {
+            ssrc: sendEncodingParameters[0].ssrc + 1
+          };
+        }
+      }
+
+      if (transceiver.wantReceive) {
+        transceiver.rtpReceiver = new window.RTCRtpReceiver(
+            transceiver.dtlsTransport, kind);
+      }
+
+      transceiver.localCapabilities = localCapabilities;
+      transceiver.sendEncodingParameters = sendEncodingParameters;
+    });
+
+    // always offer BUNDLE and dispose on return if not supported.
+    if (this._config.bundlePolicy !== 'max-compat') {
+      sdp += 'a=group:BUNDLE ' + this.transceivers.map(function(t) {
+        return t.mid;
+      }).join(' ') + '\r\n';
+    }
+    sdp += 'a=ice-options:trickle\r\n';
+
+    this.transceivers.forEach(function(transceiver, sdpMLineIndex) {
+      sdp += writeMediaSection(transceiver, transceiver.localCapabilities,
+          'offer', transceiver.stream, self._dtlsRole);
+      sdp += 'a=rtcp-rsize\r\n';
+
+      if (transceiver.iceGatherer && self.iceGatheringState !== 'new' &&
+          (sdpMLineIndex === 0 || !self.usingBundle)) {
+        transceiver.iceGatherer.getLocalCandidates().forEach(function(cand) {
+          cand.component = 1;
+          sdp += 'a=' + SDPUtils.writeCandidate(cand) + '\r\n';
+        });
+
+        if (transceiver.iceGatherer.state === 'completed') {
+          sdp += 'a=end-of-candidates\r\n';
+        }
+      }
+    });
+
+    var desc = new window.RTCSessionDescription({
+      type: 'offer',
+      sdp: sdp
+    });
+    return new Promise(function(resolve) {
+      if (args.length > 0 && typeof args[0] === 'function') {
+        args[0].apply(null, [desc]);
+        resolve();
+        return;
+      }
+      resolve(desc);
+    });
+  };
+
+  RTCPeerConnection.prototype.createAnswer = function() {
+    var self = this;
+    var args = arguments;
+
+    var sdp = SDPUtils.writeSessionBoilerplate(this._sdpSessionId,
+        this._sdpSessionVersion++);
+    if (this.usingBundle) {
+      sdp += 'a=group:BUNDLE ' + this.transceivers.map(function(t) {
+        return t.mid;
+      }).join(' ') + '\r\n';
+    }
+    var mediaSectionsInOffer = SDPUtils.splitSections(
+        this.remoteDescription.sdp).length - 1;
+    this.transceivers.forEach(function(transceiver, sdpMLineIndex) {
+      if (sdpMLineIndex + 1 > mediaSectionsInOffer) {
+        return;
+      }
+      if (transceiver.isDatachannel) {
+        sdp += 'm=application 0 DTLS/SCTP 5000\r\n' +
+            'c=IN IP4 0.0.0.0\r\n' +
+            'a=mid:' + transceiver.mid + '\r\n';
+        return;
+      }
+
+      // FIXME: look at direction.
+      if (transceiver.stream) {
+        var localTrack;
+        if (transceiver.kind === 'audio') {
+          localTrack = transceiver.stream.getAudioTracks()[0];
+        } else if (transceiver.kind === 'video') {
+          localTrack = transceiver.stream.getVideoTracks()[0];
+        }
+        if (localTrack) {
+          // add RTX
+          if (edgeVersion >= 15019 && transceiver.kind === 'video' &&
+              !transceiver.sendEncodingParameters[0].rtx) {
+            transceiver.sendEncodingParameters[0].rtx = {
+              ssrc: transceiver.sendEncodingParameters[0].ssrc + 1
+            };
+          }
+        }
+      }
+
+      // Calculate intersection of capabilities.
+      var commonCapabilities = getCommonCapabilities(
+          transceiver.localCapabilities,
+          transceiver.remoteCapabilities);
+
+      var hasRtx = commonCapabilities.codecs.filter(function(c) {
+        return c.name.toLowerCase() === 'rtx';
+      }).length;
+      if (!hasRtx && transceiver.sendEncodingParameters[0].rtx) {
+        delete transceiver.sendEncodingParameters[0].rtx;
+      }
+
+      sdp += writeMediaSection(transceiver, commonCapabilities,
+          'answer', transceiver.stream, self._dtlsRole);
+      if (transceiver.rtcpParameters &&
+          transceiver.rtcpParameters.reducedSize) {
+        sdp += 'a=rtcp-rsize\r\n';
+      }
+    });
+
+    var desc = new window.RTCSessionDescription({
+      type: 'answer',
+      sdp: sdp
+    });
+    return new Promise(function(resolve) {
+      if (args.length > 0 && typeof args[0] === 'function') {
+        args[0].apply(null, [desc]);
+        resolve();
+        return;
+      }
+      resolve(desc);
+    });
+  };
+
+  RTCPeerConnection.prototype.addIceCandidate = function(candidate) {
+    var err;
+    var sections;
+    if (!candidate || candidate.candidate === '') {
+      for (var j = 0; j < this.transceivers.length; j++) {
+        if (this.transceivers[j].isDatachannel) {
+          continue;
+        }
+        this.transceivers[j].iceTransport.addRemoteCandidate({});
+        sections = SDPUtils.splitSections(this.remoteDescription.sdp);
+        sections[j + 1] += 'a=end-of-candidates\r\n';
+        this.remoteDescription.sdp = sections.join('');
+        if (this.usingBundle) {
+          break;
+        }
+      }
+    } else if (!(candidate.sdpMLineIndex !== undefined || candidate.sdpMid)) {
+      throw new TypeError('sdpMLineIndex or sdpMid required');
+    } else if (!this.remoteDescription) {
+      err = new Error('Can not add ICE candidate without ' +
+          'a remote description');
+      err.name = 'InvalidStateError';
+    } else {
+      var sdpMLineIndex = candidate.sdpMLineIndex;
+      if (candidate.sdpMid) {
+        for (var i = 0; i < this.transceivers.length; i++) {
+          if (this.transceivers[i].mid === candidate.sdpMid) {
+            sdpMLineIndex = i;
+            break;
+          }
+        }
+      }
+      var transceiver = this.transceivers[sdpMLineIndex];
+      if (transceiver) {
+        if (transceiver.isDatachannel) {
+          return Promise.resolve();
+        }
+        var cand = Object.keys(candidate.candidate).length > 0 ?
+            SDPUtils.parseCandidate(candidate.candidate) : {};
+        // Ignore Chrome's invalid candidates since Edge does not like them.
+        if (cand.protocol === 'tcp' && (cand.port === 0 || cand.port === 9)) {
+          return Promise.resolve();
+        }
+        // Ignore RTCP candidates, we assume RTCP-MUX.
+        if (cand.component && cand.component !== 1) {
+          return Promise.resolve();
+        }
+        // when using bundle, avoid adding candidates to the wrong
+        // ice transport. And avoid adding candidates added in the SDP.
+        if (sdpMLineIndex === 0 || (sdpMLineIndex > 0 &&
+            transceiver.iceTransport !== this.transceivers[0].iceTransport)) {
+          if (!maybeAddCandidate(transceiver.iceTransport, cand)) {
+            err = new Error('Can not add ICE candidate');
+            err.name = 'OperationError';
+          }
+        }
+
+        if (!err) {
+          // update the remoteDescription.
+          var candidateString = candidate.candidate.trim();
+          if (candidateString.indexOf('a=') === 0) {
+            candidateString = candidateString.substr(2);
+          }
+          sections = SDPUtils.splitSections(this.remoteDescription.sdp);
+          sections[sdpMLineIndex + 1] += 'a=' +
+              (cand.type ? candidateString : 'end-of-candidates')
+              + '\r\n';
+          this.remoteDescription.sdp = sections.join('');
+        }
+      } else {
+        err = new Error('Can not add ICE candidate');
+        err.name = 'OperationError';
+      }
+    }
+    var args = arguments;
+    return new Promise(function(resolve, reject) {
+      if (err) {
+        if (args.length > 2 && typeof args[2] === 'function') {
+          args[2].apply(null, [err]);
+        }
+        reject(err);
+      } else {
+        if (args.length > 1 && typeof args[1] === 'function') {
+          args[1].apply(null);
+        }
+        resolve();
+      }
+    });
+  };
+
+  RTCPeerConnection.prototype.getStats = function() {
+    var promises = [];
+    this.transceivers.forEach(function(transceiver) {
+      ['rtpSender', 'rtpReceiver', 'iceGatherer', 'iceTransport',
+          'dtlsTransport'].forEach(function(method) {
+            if (transceiver[method]) {
+              promises.push(transceiver[method].getStats());
+            }
+          });
+    });
+    var cb = arguments.length > 1 && typeof arguments[1] === 'function' &&
+        arguments[1];
+    var fixStatsType = function(stat) {
+      return {
+        inboundrtp: 'inbound-rtp',
+        outboundrtp: 'outbound-rtp',
+        candidatepair: 'candidate-pair',
+        localcandidate: 'local-candidate',
+        remotecandidate: 'remote-candidate'
+      }[stat.type] || stat.type;
+    };
+    return new Promise(function(resolve) {
+      // shim getStats with maplike support
+      var results = new Map();
+      Promise.all(promises).then(function(res) {
+        res.forEach(function(result) {
+          Object.keys(result).forEach(function(id) {
+            result[id].type = fixStatsType(result[id]);
+            results.set(id, result[id]);
+          });
+        });
+        if (cb) {
+          cb.apply(null, results);
+        }
+        resolve(results);
+      });
+    });
+  };
+  return RTCPeerConnection;
+};
+
+
+/***/ }),
+/* 138 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+
+// Expose public methods.
+module.exports = function(window) {
+  var navigator = window && window.navigator;
+
+  var shimError_ = function(e) {
+    return {
+      name: {PermissionDeniedError: 'NotAllowedError'}[e.name] || e.name,
+      message: e.message,
+      constraint: e.constraint,
+      toString: function() {
+        return this.name;
+      }
+    };
+  };
+
+  // getUserMedia error shim.
+  var origGetUserMedia = navigator.mediaDevices.getUserMedia.
+      bind(navigator.mediaDevices);
+  navigator.mediaDevices.getUserMedia = function(c) {
+    return origGetUserMedia(c).catch(function(e) {
+      return Promise.reject(shimError_(e));
+    });
+  };
+};
+
+
+/***/ }),
+/* 139 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+
+var utils = __webpack_require__(3);
+
+var firefoxShim = {
+  shimOnTrack: function(window) {
+    if (typeof window === 'object' && window.RTCPeerConnection && !('ontrack' in
+        window.RTCPeerConnection.prototype)) {
+      Object.defineProperty(window.RTCPeerConnection.prototype, 'ontrack', {
+        get: function() {
+          return this._ontrack;
+        },
+        set: function(f) {
+          if (this._ontrack) {
+            this.removeEventListener('track', this._ontrack);
+            this.removeEventListener('addstream', this._ontrackpoly);
+          }
+          this.addEventListener('track', this._ontrack = f);
+          this.addEventListener('addstream', this._ontrackpoly = function(e) {
+            e.stream.getTracks().forEach(function(track) {
+              var event = new Event('track');
+              event.track = track;
+              event.receiver = {track: track};
+              event.transceiver = {receiver: event.receiver};
+              event.streams = [e.stream];
+              this.dispatchEvent(event);
+            }.bind(this));
+          }.bind(this));
+        }
+      });
+    }
+    if (typeof window === 'object' && window.RTCTrackEvent &&
+        ('receiver' in window.RTCTrackEvent.prototype) &&
+        !('transceiver' in window.RTCTrackEvent.prototype)) {
+      Object.defineProperty(window.RTCTrackEvent.prototype, 'transceiver', {
+        get: function() {
+          return {receiver: this.receiver};
+        }
+      });
+    }
+  },
+
+  shimSourceObject: function(window) {
+    // Firefox has supported mozSrcObject since FF22, unprefixed in 42.
+    if (typeof window === 'object') {
+      if (window.HTMLMediaElement &&
+        !('srcObject' in window.HTMLMediaElement.prototype)) {
+        // Shim the srcObject property, once, when HTMLMediaElement is found.
+        Object.defineProperty(window.HTMLMediaElement.prototype, 'srcObject', {
+          get: function() {
+            return this.mozSrcObject;
+          },
+          set: function(stream) {
+            this.mozSrcObject = stream;
+          }
+        });
+      }
+    }
+  },
+
+  shimPeerConnection: function(window) {
+    var browserDetails = utils.detectBrowser(window);
+
+    if (typeof window !== 'object' || !(window.RTCPeerConnection ||
+        window.mozRTCPeerConnection)) {
+      return; // probably media.peerconnection.enabled=false in about:config
+    }
+    // The RTCPeerConnection object.
+    if (!window.RTCPeerConnection) {
+      window.RTCPeerConnection = function(pcConfig, pcConstraints) {
+        if (browserDetails.version < 38) {
+          // .urls is not supported in FF < 38.
+          // create RTCIceServers with a single url.
+          if (pcConfig && pcConfig.iceServers) {
+            var newIceServers = [];
+            for (var i = 0; i < pcConfig.iceServers.length; i++) {
+              var server = pcConfig.iceServers[i];
+              if (server.hasOwnProperty('urls')) {
+                for (var j = 0; j < server.urls.length; j++) {
+                  var newServer = {
+                    url: server.urls[j]
+                  };
+                  if (server.urls[j].indexOf('turn') === 0) {
+                    newServer.username = server.username;
+                    newServer.credential = server.credential;
+                  }
+                  newIceServers.push(newServer);
+                }
+              } else {
+                newIceServers.push(pcConfig.iceServers[i]);
+              }
+            }
+            pcConfig.iceServers = newIceServers;
+          }
+        }
+        return new window.mozRTCPeerConnection(pcConfig, pcConstraints);
+      };
+      window.RTCPeerConnection.prototype =
+          window.mozRTCPeerConnection.prototype;
+
+      // wrap static methods. Currently just generateCertificate.
+      if (window.mozRTCPeerConnection.generateCertificate) {
+        Object.defineProperty(window.RTCPeerConnection, 'generateCertificate', {
+          get: function() {
+            return window.mozRTCPeerConnection.generateCertificate;
+          }
+        });
+      }
+
+      window.RTCSessionDescription = window.mozRTCSessionDescription;
+      window.RTCIceCandidate = window.mozRTCIceCandidate;
+    }
+
+    // shim away need for obsolete RTCIceCandidate/RTCSessionDescription.
+    ['setLocalDescription', 'setRemoteDescription', 'addIceCandidate']
+        .forEach(function(method) {
+          var nativeMethod = window.RTCPeerConnection.prototype[method];
+          window.RTCPeerConnection.prototype[method] = function() {
+            arguments[0] = new ((method === 'addIceCandidate') ?
+                window.RTCIceCandidate :
+                window.RTCSessionDescription)(arguments[0]);
+            return nativeMethod.apply(this, arguments);
+          };
+        });
+
+    // support for addIceCandidate(null or undefined)
+    var nativeAddIceCandidate =
+        window.RTCPeerConnection.prototype.addIceCandidate;
+    window.RTCPeerConnection.prototype.addIceCandidate = function() {
+      if (!arguments[0]) {
+        if (arguments[1]) {
+          arguments[1].apply(null);
+        }
+        return Promise.resolve();
+      }
+      return nativeAddIceCandidate.apply(this, arguments);
+    };
+
+    // shim getStats with maplike support
+    var makeMapStats = function(stats) {
+      var map = new Map();
+      Object.keys(stats).forEach(function(key) {
+        map.set(key, stats[key]);
+        map[key] = stats[key];
+      });
+      return map;
+    };
+
+    var modernStatsTypes = {
+      inboundrtp: 'inbound-rtp',
+      outboundrtp: 'outbound-rtp',
+      candidatepair: 'candidate-pair',
+      localcandidate: 'local-candidate',
+      remotecandidate: 'remote-candidate'
+    };
+
+    var nativeGetStats = window.RTCPeerConnection.prototype.getStats;
+    window.RTCPeerConnection.prototype.getStats = function(
+      selector,
+      onSucc,
+      onErr
+    ) {
+      return nativeGetStats.apply(this, [selector || null])
+        .then(function(stats) {
+          if (browserDetails.version < 48) {
+            stats = makeMapStats(stats);
+          }
+          if (browserDetails.version < 53 && !onSucc) {
+            // Shim only promise getStats with spec-hyphens in type names
+            // Leave callback version alone; misc old uses of forEach before Map
+            try {
+              stats.forEach(function(stat) {
+                stat.type = modernStatsTypes[stat.type] || stat.type;
+              });
+            } catch (e) {
+              if (e.name !== 'TypeError') {
+                throw e;
+              }
+              // Avoid TypeError: "type" is read-only, in old versions. 34-43ish
+              stats.forEach(function(stat, i) {
+                stats.set(i, Object.assign({}, stat, {
+                  type: modernStatsTypes[stat.type] || stat.type
+                }));
+              });
+            }
+          }
+          return stats;
+        })
+        .then(onSucc, onErr);
+    };
+  }
+};
+
+// Expose public methods.
+module.exports = {
+  shimOnTrack: firefoxShim.shimOnTrack,
+  shimSourceObject: firefoxShim.shimSourceObject,
+  shimPeerConnection: firefoxShim.shimPeerConnection,
+  shimGetUserMedia: __webpack_require__(140)
+};
+
+
+/***/ }),
+/* 140 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+
+var utils = __webpack_require__(3);
+var logging = utils.log;
+
+// Expose public methods.
+module.exports = function(window) {
+  var browserDetails = utils.detectBrowser(window);
+  var navigator = window && window.navigator;
+  var MediaStreamTrack = window && window.MediaStreamTrack;
+
+  var shimError_ = function(e) {
+    return {
+      name: {
+        InternalError: 'NotReadableError',
+        NotSupportedError: 'TypeError',
+        PermissionDeniedError: 'NotAllowedError',
+        SecurityError: 'NotAllowedError'
+      }[e.name] || e.name,
+      message: {
+        'The operation is insecure.': 'The request is not allowed by the ' +
+        'user agent or the platform in the current context.'
+      }[e.message] || e.message,
+      constraint: e.constraint,
+      toString: function() {
+        return this.name + (this.message && ': ') + this.message;
+      }
+    };
+  };
+
+  // getUserMedia constraints shim.
+  var getUserMedia_ = function(constraints, onSuccess, onError) {
+    var constraintsToFF37_ = function(c) {
+      if (typeof c !== 'object' || c.require) {
+        return c;
+      }
+      var require = [];
+      Object.keys(c).forEach(function(key) {
+        if (key === 'require' || key === 'advanced' || key === 'mediaSource') {
+          return;
+        }
+        var r = c[key] = (typeof c[key] === 'object') ?
+            c[key] : {ideal: c[key]};
+        if (r.min !== undefined ||
+            r.max !== undefined || r.exact !== undefined) {
+          require.push(key);
+        }
+        if (r.exact !== undefined) {
+          if (typeof r.exact === 'number') {
+            r. min = r.max = r.exact;
+          } else {
+            c[key] = r.exact;
+          }
+          delete r.exact;
+        }
+        if (r.ideal !== undefined) {
+          c.advanced = c.advanced || [];
+          var oc = {};
+          if (typeof r.ideal === 'number') {
+            oc[key] = {min: r.ideal, max: r.ideal};
+          } else {
+            oc[key] = r.ideal;
+          }
+          c.advanced.push(oc);
+          delete r.ideal;
+          if (!Object.keys(r).length) {
+            delete c[key];
+          }
+        }
+      });
+      if (require.length) {
+        c.require = require;
+      }
+      return c;
+    };
+    constraints = JSON.parse(JSON.stringify(constraints));
+    if (browserDetails.version < 38) {
+      logging('spec: ' + JSON.stringify(constraints));
+      if (constraints.audio) {
+        constraints.audio = constraintsToFF37_(constraints.audio);
+      }
+      if (constraints.video) {
+        constraints.video = constraintsToFF37_(constraints.video);
+      }
+      logging('ff37: ' + JSON.stringify(constraints));
+    }
+    return navigator.mozGetUserMedia(constraints, onSuccess, function(e) {
+      onError(shimError_(e));
+    });
+  };
+
+  // Returns the result of getUserMedia as a Promise.
+  var getUserMediaPromise_ = function(constraints) {
+    return new Promise(function(resolve, reject) {
+      getUserMedia_(constraints, resolve, reject);
+    });
+  };
+
+  // Shim for mediaDevices on older versions.
+  if (!navigator.mediaDevices) {
+    navigator.mediaDevices = {getUserMedia: getUserMediaPromise_,
+      addEventListener: function() { },
+      removeEventListener: function() { }
+    };
+  }
+  navigator.mediaDevices.enumerateDevices =
+      navigator.mediaDevices.enumerateDevices || function() {
+        return new Promise(function(resolve) {
+          var infos = [
+            {kind: 'audioinput', deviceId: 'default', label: '', groupId: ''},
+            {kind: 'videoinput', deviceId: 'default', label: '', groupId: ''}
+          ];
+          resolve(infos);
+        });
+      };
+
+  if (browserDetails.version < 41) {
+    // Work around http://bugzil.la/1169665
+    var orgEnumerateDevices =
+        navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
+    navigator.mediaDevices.enumerateDevices = function() {
+      return orgEnumerateDevices().then(undefined, function(e) {
+        if (e.name === 'NotFoundError') {
+          return [];
+        }
+        throw e;
+      });
+    };
+  }
+  if (browserDetails.version < 49) {
+    var origGetUserMedia = navigator.mediaDevices.getUserMedia.
+        bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = function(c) {
+      return origGetUserMedia(c).then(function(stream) {
+        // Work around https://bugzil.la/802326
+        if (c.audio && !stream.getAudioTracks().length ||
+            c.video && !stream.getVideoTracks().length) {
+          stream.getTracks().forEach(function(track) {
+            track.stop();
+          });
+          throw new DOMException('The object can not be found here.',
+                                 'NotFoundError');
+        }
+        return stream;
+      }, function(e) {
+        return Promise.reject(shimError_(e));
+      });
+    };
+  }
+  if (!(browserDetails.version > 55 &&
+      'autoGainControl' in navigator.mediaDevices.getSupportedConstraints())) {
+    var remap = function(obj, a, b) {
+      if (a in obj && !(b in obj)) {
+        obj[b] = obj[a];
+        delete obj[a];
+      }
+    };
+
+    var nativeGetUserMedia = navigator.mediaDevices.getUserMedia.
+        bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = function(c) {
+      if (typeof c === 'object' && typeof c.audio === 'object') {
+        c = JSON.parse(JSON.stringify(c));
+        remap(c.audio, 'autoGainControl', 'mozAutoGainControl');
+        remap(c.audio, 'noiseSuppression', 'mozNoiseSuppression');
+      }
+      return nativeGetUserMedia(c);
+    };
+
+    if (MediaStreamTrack && MediaStreamTrack.prototype.getSettings) {
+      var nativeGetSettings = MediaStreamTrack.prototype.getSettings;
+      MediaStreamTrack.prototype.getSettings = function() {
+        var obj = nativeGetSettings.apply(this, arguments);
+        remap(obj, 'mozAutoGainControl', 'autoGainControl');
+        remap(obj, 'mozNoiseSuppression', 'noiseSuppression');
+        return obj;
+      };
+    }
+
+    if (MediaStreamTrack && MediaStreamTrack.prototype.applyConstraints) {
+      var nativeApplyConstraints = MediaStreamTrack.prototype.applyConstraints;
+      MediaStreamTrack.prototype.applyConstraints = function(c) {
+        if (this.kind === 'audio' && typeof c === 'object') {
+          c = JSON.parse(JSON.stringify(c));
+          remap(c, 'autoGainControl', 'mozAutoGainControl');
+          remap(c, 'noiseSuppression', 'mozNoiseSuppression');
+        }
+        return nativeApplyConstraints.apply(this, [c]);
+      };
+    }
+  }
+  navigator.getUserMedia = function(constraints, onSuccess, onError) {
+    if (browserDetails.version < 44) {
+      return getUserMedia_(constraints, onSuccess, onError);
+    }
+    // Replace Firefox 44+'s deprecation warning with unprefixed version.
+    utils.deprecated('navigator.getUserMedia',
+        'navigator.mediaDevices.getUserMedia');
+    navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
+  };
+};
+
+
+/***/ }),
+/* 141 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+
+var utils = __webpack_require__(3);
+
+var safariShim = {
+  // TODO: DrAlex, should be here, double check against LayoutTests
+
+  // TODO: once the back-end for the mac port is done, add.
+  // TODO: check for webkitGTK+
+  // shimPeerConnection: function() { },
+
+  shimLocalStreamsAPI: function(window) {
+    if (typeof window !== 'object' || !window.RTCPeerConnection) {
+      return;
+    }
+    if (!('getLocalStreams' in window.RTCPeerConnection.prototype)) {
+      window.RTCPeerConnection.prototype.getLocalStreams = function() {
+        if (!this._localStreams) {
+          this._localStreams = [];
+        }
+        return this._localStreams;
+      };
+    }
+    if (!('getStreamById' in window.RTCPeerConnection.prototype)) {
+      window.RTCPeerConnection.prototype.getStreamById = function(id) {
+        var result = null;
+        if (this._localStreams) {
+          this._localStreams.forEach(function(stream) {
+            if (stream.id === id) {
+              result = stream;
+            }
+          });
+        }
+        if (this._remoteStreams) {
+          this._remoteStreams.forEach(function(stream) {
+            if (stream.id === id) {
+              result = stream;
+            }
+          });
+        }
+        return result;
+      };
+    }
+    if (!('addStream' in window.RTCPeerConnection.prototype)) {
+      var _addTrack = window.RTCPeerConnection.prototype.addTrack;
+      window.RTCPeerConnection.prototype.addStream = function(stream) {
+        if (!this._localStreams) {
+          this._localStreams = [];
+        }
+        if (this._localStreams.indexOf(stream) === -1) {
+          this._localStreams.push(stream);
+        }
+        var self = this;
+        stream.getTracks().forEach(function(track) {
+          _addTrack.call(self, track, stream);
+        });
+      };
+
+      window.RTCPeerConnection.prototype.addTrack = function(track, stream) {
+        if (stream) {
+          if (!this._localStreams) {
+            this._localStreams = [stream];
+          } else if (this._localStreams.indexOf(stream) === -1) {
+            this._localStreams.push(stream);
+          }
+        }
+        _addTrack.call(this, track, stream);
+      };
+    }
+    if (!('removeStream' in window.RTCPeerConnection.prototype)) {
+      window.RTCPeerConnection.prototype.removeStream = function(stream) {
+        if (!this._localStreams) {
+          this._localStreams = [];
+        }
+        var index = this._localStreams.indexOf(stream);
+        if (index === -1) {
+          return;
+        }
+        this._localStreams.splice(index, 1);
+        var self = this;
+        var tracks = stream.getTracks();
+        this.getSenders().forEach(function(sender) {
+          if (tracks.indexOf(sender.track) !== -1) {
+            self.removeTrack(sender);
+          }
+        });
+      };
+    }
+  },
+  shimRemoteStreamsAPI: function(window) {
+    if (typeof window !== 'object' || !window.RTCPeerConnection) {
+      return;
+    }
+    if (!('getRemoteStreams' in window.RTCPeerConnection.prototype)) {
+      window.RTCPeerConnection.prototype.getRemoteStreams = function() {
+        return this._remoteStreams ? this._remoteStreams : [];
+      };
+    }
+    if (!('onaddstream' in window.RTCPeerConnection.prototype)) {
+      Object.defineProperty(window.RTCPeerConnection.prototype, 'onaddstream', {
+        get: function() {
+          return this._onaddstream;
+        },
+        set: function(f) {
+          if (this._onaddstream) {
+            this.removeEventListener('addstream', this._onaddstream);
+            this.removeEventListener('track', this._onaddstreampoly);
+          }
+          this.addEventListener('addstream', this._onaddstream = f);
+          this.addEventListener('track', this._onaddstreampoly = function(e) {
+            var stream = e.streams[0];
+            if (!this._remoteStreams) {
+              this._remoteStreams = [];
+            }
+            if (this._remoteStreams.indexOf(stream) >= 0) {
+              return;
+            }
+            this._remoteStreams.push(stream);
+            var event = new Event('addstream');
+            event.stream = e.streams[0];
+            this.dispatchEvent(event);
+          }.bind(this));
+        }
+      });
+    }
+  },
+  shimCallbacksAPI: function(window) {
+    if (typeof window !== 'object' || !window.RTCPeerConnection) {
+      return;
+    }
+    var prototype = window.RTCPeerConnection.prototype;
+    var createOffer = prototype.createOffer;
+    var createAnswer = prototype.createAnswer;
+    var setLocalDescription = prototype.setLocalDescription;
+    var setRemoteDescription = prototype.setRemoteDescription;
+    var addIceCandidate = prototype.addIceCandidate;
+
+    prototype.createOffer = function(successCallback, failureCallback) {
+      var options = (arguments.length >= 2) ? arguments[2] : arguments[0];
+      var promise = createOffer.apply(this, [options]);
+      if (!failureCallback) {
+        return promise;
+      }
+      promise.then(successCallback, failureCallback);
+      return Promise.resolve();
+    };
+
+    prototype.createAnswer = function(successCallback, failureCallback) {
+      var options = (arguments.length >= 2) ? arguments[2] : arguments[0];
+      var promise = createAnswer.apply(this, [options]);
+      if (!failureCallback) {
+        return promise;
+      }
+      promise.then(successCallback, failureCallback);
+      return Promise.resolve();
+    };
+
+    var withCallback = function(description, successCallback, failureCallback) {
+      var promise = setLocalDescription.apply(this, [description]);
+      if (!failureCallback) {
+        return promise;
+      }
+      promise.then(successCallback, failureCallback);
+      return Promise.resolve();
+    };
+    prototype.setLocalDescription = withCallback;
+
+    withCallback = function(description, successCallback, failureCallback) {
+      var promise = setRemoteDescription.apply(this, [description]);
+      if (!failureCallback) {
+        return promise;
+      }
+      promise.then(successCallback, failureCallback);
+      return Promise.resolve();
+    };
+    prototype.setRemoteDescription = withCallback;
+
+    withCallback = function(candidate, successCallback, failureCallback) {
+      var promise = addIceCandidate.apply(this, [candidate]);
+      if (!failureCallback) {
+        return promise;
+      }
+      promise.then(successCallback, failureCallback);
+      return Promise.resolve();
+    };
+    prototype.addIceCandidate = withCallback;
+  },
+  shimGetUserMedia: function(window) {
+    var navigator = window && window.navigator;
+
+    if (!navigator.getUserMedia) {
+      if (navigator.webkitGetUserMedia) {
+        navigator.getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
+      } else if (navigator.mediaDevices &&
+          navigator.mediaDevices.getUserMedia) {
+        navigator.getUserMedia = function(constraints, cb, errcb) {
+          navigator.mediaDevices.getUserMedia(constraints)
+          .then(cb, errcb);
+        }.bind(navigator);
+      }
+    }
+  },
+  shimRTCIceServerUrls: function(window) {
+    // migrate from non-spec RTCIceServer.url to RTCIceServer.urls
+    var OrigPeerConnection = window.RTCPeerConnection;
+    window.RTCPeerConnection = function(pcConfig, pcConstraints) {
+      if (pcConfig && pcConfig.iceServers) {
+        var newIceServers = [];
+        for (var i = 0; i < pcConfig.iceServers.length; i++) {
+          var server = pcConfig.iceServers[i];
+          if (!server.hasOwnProperty('urls') &&
+              server.hasOwnProperty('url')) {
+            utils.deprecated('RTCIceServer.url', 'RTCIceServer.urls');
+            server = JSON.parse(JSON.stringify(server));
+            server.urls = server.url;
+            delete server.url;
+            newIceServers.push(server);
+          } else {
+            newIceServers.push(pcConfig.iceServers[i]);
+          }
+        }
+        pcConfig.iceServers = newIceServers;
+      }
+      return new OrigPeerConnection(pcConfig, pcConstraints);
+    };
+    window.RTCPeerConnection.prototype = OrigPeerConnection.prototype;
+    // wrap static methods. Currently just generateCertificate.
+    if ('generateCertificate' in window.RTCPeerConnection) {
+      Object.defineProperty(window.RTCPeerConnection, 'generateCertificate', {
+        get: function() {
+          return OrigPeerConnection.generateCertificate;
+        }
+      });
+    }
+  },
+  shimTrackEventTransceiver: function(window) {
+    // Add event.transceiver member over deprecated event.receiver
+    if (typeof window === 'object' && window.RTCPeerConnection &&
+        ('receiver' in window.RTCTrackEvent.prototype) &&
+        // can't check 'transceiver' in window.RTCTrackEvent.prototype, as it is
+        // defined for some reason even when window.RTCTransceiver is not.
+        !window.RTCTransceiver) {
+      Object.defineProperty(window.RTCTrackEvent.prototype, 'transceiver', {
+        get: function() {
+          return {receiver: this.receiver};
+        }
+      });
+    }
+  }
+};
+
+// Expose public methods.
+module.exports = {
+  shimCallbacksAPI: safariShim.shimCallbacksAPI,
+  shimLocalStreamsAPI: safariShim.shimLocalStreamsAPI,
+  shimRemoteStreamsAPI: safariShim.shimRemoteStreamsAPI,
+  shimGetUserMedia: safariShim.shimGetUserMedia,
+  shimRTCIceServerUrls: safariShim.shimRTCIceServerUrls,
+  shimTrackEventTransceiver: safariShim.shimTrackEventTransceiver
+  // TODO
+  // shimPeerConnection: safariShim.shimPeerConnection
+};
+
+
+/***/ }),
+/* 142 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*
+ *  Copyright (c) 2017 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+
+var SDPUtils = __webpack_require__(7);
+var utils = __webpack_require__(3);
+
+// Wraps the peerconnection event eventNameToWrap in a function
+// which returns the modified event object.
+function wrapPeerConnectionEvent(window, eventNameToWrap, wrapper) {
+  if (!window.RTCPeerConnection) {
+    return;
+  }
+  var proto = window.RTCPeerConnection.prototype;
+  var nativeAddEventListener = proto.addEventListener;
+  proto.addEventListener = function(nativeEventName, cb) {
+    if (nativeEventName !== eventNameToWrap) {
+      return nativeAddEventListener.apply(this, arguments);
+    }
+    var wrappedCallback = function(e) {
+      cb(wrapper(e));
+    };
+    this._eventMap = this._eventMap || {};
+    this._eventMap[cb] = wrappedCallback;
+    return nativeAddEventListener.apply(this, [nativeEventName,
+      wrappedCallback]);
+  };
+
+  var nativeRemoveEventListener = proto.removeEventListener;
+  proto.removeEventListener = function(nativeEventName, cb) {
+    if (nativeEventName !== eventNameToWrap || !this._eventMap
+        || !this._eventMap[cb]) {
+      return nativeRemoveEventListener.apply(this, arguments);
+    }
+    var unwrappedCb = this._eventMap[cb];
+    delete this._eventMap[cb];
+    return nativeRemoveEventListener.apply(this, [nativeEventName,
+      unwrappedCb]);
+  };
+
+  Object.defineProperty(proto, 'on' + eventNameToWrap, {
+    get: function() {
+      return this['_on' + eventNameToWrap];
+    },
+    set: function(cb) {
+      if (this['_on' + eventNameToWrap]) {
+        this.removeEventListener(eventNameToWrap,
+            this['_on' + eventNameToWrap]);
+        delete this['_on' + eventNameToWrap];
+      }
+      if (cb) {
+        this.addEventListener(eventNameToWrap,
+            this['_on' + eventNameToWrap] = cb);
+      }
+    }
+  });
+}
+
+module.exports = {
+  shimRTCIceCandidate: function(window) {
+    // foundation is arbitrarily chosen as an indicator for full support for
+    // https://w3c.github.io/webrtc-pc/#rtcicecandidate-interface
+    if (window.RTCIceCandidate && 'foundation' in
+        window.RTCIceCandidate.prototype) {
+      return;
+    }
+
+    var NativeRTCIceCandidate = window.RTCIceCandidate;
+    window.RTCIceCandidate = function(args) {
+      // Remove the a= which shouldn't be part of the candidate string.
+      if (typeof args === 'object' && args.candidate &&
+          args.candidate.indexOf('a=') === 0) {
+        args = JSON.parse(JSON.stringify(args));
+        args.candidate = args.candidate.substr(2);
+      }
+
+      // Augment the native candidate with the parsed fields.
+      var nativeCandidate = new NativeRTCIceCandidate(args);
+      var parsedCandidate = SDPUtils.parseCandidate(args.candidate);
+      var augmentedCandidate = Object.assign(nativeCandidate,
+          parsedCandidate);
+
+      // Add a serializer that does not serialize the extra attributes.
+      augmentedCandidate.toJSON = function() {
+        return {
+          candidate: augmentedCandidate.candidate,
+          sdpMid: augmentedCandidate.sdpMid,
+          sdpMLineIndex: augmentedCandidate.sdpMLineIndex,
+          usernameFragment: augmentedCandidate.usernameFragment,
+        };
+      };
+      return augmentedCandidate;
+    };
+
+    // Hook up the augmented candidate in onicecandidate and
+    // addEventListener('icecandidate', ...)
+    wrapPeerConnectionEvent(window, 'icecandidate', function(e) {
+      if (e.candidate) {
+        Object.defineProperty(e, 'candidate', {
+          value: new window.RTCIceCandidate(e.candidate),
+          writable: 'false'
+        });
+      }
+      return e;
+    });
+  },
+
+  // shimCreateObjectURL must be called before shimSourceObject to avoid loop.
+
+  shimCreateObjectURL: function(window) {
+    var URL = window && window.URL;
+
+    if (!(typeof window === 'object' && window.HTMLMediaElement &&
+          'srcObject' in window.HTMLMediaElement.prototype &&
+        URL.createObjectURL && URL.revokeObjectURL)) {
+      // Only shim CreateObjectURL using srcObject if srcObject exists.
+      return undefined;
+    }
+
+    var nativeCreateObjectURL = URL.createObjectURL.bind(URL);
+    var nativeRevokeObjectURL = URL.revokeObjectURL.bind(URL);
+    var streams = new Map(), newId = 0;
+
+    URL.createObjectURL = function(stream) {
+      if ('getTracks' in stream) {
+        var url = 'polyblob:' + (++newId);
+        streams.set(url, stream);
+        utils.deprecated('URL.createObjectURL(stream)',
+            'elem.srcObject = stream');
+        return url;
+      }
+      return nativeCreateObjectURL(stream);
+    };
+    URL.revokeObjectURL = function(url) {
+      nativeRevokeObjectURL(url);
+      streams.delete(url);
+    };
+
+    var dsc = Object.getOwnPropertyDescriptor(window.HTMLMediaElement.prototype,
+                                              'src');
+    Object.defineProperty(window.HTMLMediaElement.prototype, 'src', {
+      get: function() {
+        return dsc.get.apply(this);
+      },
+      set: function(url) {
+        this.srcObject = streams.get(url) || null;
+        return dsc.set.apply(this, [url]);
+      }
+    });
+
+    var nativeSetAttribute = window.HTMLMediaElement.prototype.setAttribute;
+    window.HTMLMediaElement.prototype.setAttribute = function() {
+      if (arguments.length === 2 &&
+          ('' + arguments[0]).toLowerCase() === 'src') {
+        this.srcObject = streams.get(arguments[1]) || null;
+      }
+      return nativeSetAttribute.apply(this, arguments);
+    };
+  }
+};
+
+
+/***/ }),
+/* 143 */
 /***/ (function(module, exports) {
 
 window.Util = {
@@ -33978,7 +38186,7 @@ window.Util = {
 };
 
 /***/ }),
-/* 132 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/**
@@ -58820,4666 +63028,243 @@ return videojs;
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
-
-/***/ }),
-/* 133 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {var require;var require;/*! adapterjs - v0.15.0 - 2017-09-05 */
-var AdapterJS=AdapterJS||{};AdapterJS.options=AdapterJS.options||{},AdapterJS.options.getAllCams=!!AdapterJS.options.getAllCams,AdapterJS.options.hidePluginInstallPrompt=!!AdapterJS.options.hidePluginInstallPrompt,AdapterJS.options.forceSafariPlugin=!!AdapterJS.options.forceSafariPlugin,AdapterJS.VERSION="0.15.0",AdapterJS.onwebrtcready=AdapterJS.onwebrtcready||function(isUsingPlugin){},AdapterJS._onwebrtcreadies=[],AdapterJS.webRTCReady=function(baseCallback){if("function"!=typeof baseCallback)throw new Error("Callback provided is not a function");var callback=function(){"function"==typeof window.require&&"function"==typeof AdapterJS._defineMediaSourcePolyfill&&AdapterJS._defineMediaSourcePolyfill(),baseCallback(null!==AdapterJS.WebRTCPlugin.plugin)};!0===AdapterJS.onwebrtcreadyDone?callback():AdapterJS._onwebrtcreadies.push(callback)},AdapterJS.WebRTCPlugin=AdapterJS.WebRTCPlugin||{},AdapterJS.WebRTCPlugin.pluginInfo=AdapterJS.WebRTCPlugin.pluginInfo||{prefix:"Tem",plugName:"TemWebRTCPlugin",pluginId:"plugin0",type:"application/x-temwebrtcplugin",onload:"__TemWebRTCReady0",portalLink:"https://skylink.io/plugin/",downloadLink:null,companyName:"Temasys",downloadLinks:{mac:"https://bit.ly/webrtcpluginpkg",win:"https://bit.ly/webrtcpluginmsi"}},void 0!==AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks&&null!==AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks&&(navigator.platform.match(/^Mac/i)?AdapterJS.WebRTCPlugin.pluginInfo.downloadLink=AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks.mac:navigator.platform.match(/^Win/i)&&(AdapterJS.WebRTCPlugin.pluginInfo.downloadLink=AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks.win)),AdapterJS.WebRTCPlugin.TAGS={NONE:"none",AUDIO:"audio",VIDEO:"video"},AdapterJS.WebRTCPlugin.pageId=Math.random().toString(36).slice(2),AdapterJS.WebRTCPlugin.plugin=null,AdapterJS.WebRTCPlugin.setLogLevel=null,AdapterJS.WebRTCPlugin.defineWebRTCInterface=null,AdapterJS.WebRTCPlugin.isPluginInstalled=null,AdapterJS.WebRTCPlugin.pluginInjectionInterval=null,AdapterJS.WebRTCPlugin.injectPlugin=null,AdapterJS.WebRTCPlugin.PLUGIN_STATES={NONE:0,INITIALIZING:1,INJECTING:2,INJECTED:3,READY:4},AdapterJS.WebRTCPlugin.pluginState=AdapterJS.WebRTCPlugin.PLUGIN_STATES.NONE,AdapterJS.onwebrtcreadyDone=!1,AdapterJS.WebRTCPlugin.PLUGIN_LOG_LEVELS={NONE:"NONE",ERROR:"ERROR",WARNING:"WARNING",INFO:"INFO",VERBOSE:"VERBOSE",SENSITIVE:"SENSITIVE"},AdapterJS.WebRTCPlugin.WaitForPluginReady=null,AdapterJS.WebRTCPlugin.callWhenPluginReady=null,__TemWebRTCReady0=function(){"interactive"===document.readyState||"complete"===document.readyState?(AdapterJS.WebRTCPlugin.pluginState=AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY,AdapterJS.maybeThroughWebRTCReady()):setTimeout(__TemWebRTCReady0,100)},AdapterJS.maybeThroughWebRTCReady=function(){AdapterJS.onwebrtcreadyDone||(AdapterJS.onwebrtcreadyDone=!0,AdapterJS._onwebrtcreadies.length?AdapterJS._onwebrtcreadies.forEach(function(callback){"function"==typeof callback&&callback(null!==AdapterJS.WebRTCPlugin.plugin)}):"function"==typeof AdapterJS.onwebrtcready&&AdapterJS.onwebrtcready(null!==AdapterJS.WebRTCPlugin.plugin))},AdapterJS.TEXT={PLUGIN:{REQUIRE_INSTALLATION:"This website requires you to install a WebRTC-enabling plugin to work on this browser.",NOT_SUPPORTED:"Your browser does not support WebRTC.",BUTTON:"Install Now"},REFRESH:{REQUIRE_REFRESH:"Please refresh page",BUTTON:"Refresh Page"}},AdapterJS._iceConnectionStates={starting:"starting",checking:"checking",connected:"connected",completed:"connected",done:"completed",disconnected:"disconnected",failed:"failed",closed:"closed"},AdapterJS._iceConnectionFiredStates=[],AdapterJS.isDefined=null,AdapterJS.parseWebrtcDetectedBrowser=function(){var hasMatch=null;if(window.opr&&opr.addons||window.opera||navigator.userAgent.indexOf(" OPR/")>=0)hasMatch=navigator.userAgent.match(/OPR\/(\d+)/i)||[],webrtcDetectedBrowser="opera",webrtcDetectedVersion=parseInt(hasMatch[1]||"0",10),webrtcMinimumVersion=26,webrtcDetectedType="webkit",webrtcDetectedDCSupport="SCTP";else if(navigator.userAgent.match(/Bowser\/[0-9.]*/g)){hasMatch=navigator.userAgent.match(/Bowser\/[0-9.]*/g)||[];var chromiumVersion=parseInt((navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./i)||[])[2]||"0",10);webrtcDetectedBrowser="bowser",webrtcDetectedVersion=parseFloat((hasMatch[0]||"0/0").split("/")[1],10),webrtcMinimumVersion=0,webrtcDetectedType="webkit",webrtcDetectedDCSupport=chromiumVersion>30?"SCTP":"RTP"}else if(navigator.userAgent.indexOf("OPiOS")>0)hasMatch=navigator.userAgent.match(/OPiOS\/([0-9]+)\./),webrtcDetectedBrowser="opera",webrtcDetectedVersion=parseInt(hasMatch[1]||"0",10),webrtcMinimumVersion=0,webrtcDetectedType=null,webrtcDetectedDCSupport=null;else if(navigator.userAgent.indexOf("CriOS")>0)hasMatch=navigator.userAgent.match(/CriOS\/([0-9]+)\./)||[],webrtcDetectedBrowser="chrome",webrtcDetectedVersion=parseInt(hasMatch[1]||"0",10),webrtcMinimumVersion=0,webrtcDetectedType=null,webrtcDetectedDCSupport=null;else if(navigator.userAgent.indexOf("FxiOS")>0)hasMatch=navigator.userAgent.match(/FxiOS\/([0-9]+)\./)||[],webrtcDetectedBrowser="firefox",webrtcDetectedVersion=parseInt(hasMatch[1]||"0",10),webrtcMinimumVersion=0,webrtcDetectedType=null,webrtcDetectedDCSupport=null;else if(document.documentMode)hasMatch=/\brv[ :]+(\d+)/g.exec(navigator.userAgent)||[],webrtcDetectedBrowser="IE",webrtcDetectedVersion=parseInt(hasMatch[1],10),webrtcMinimumVersion=9,webrtcDetectedType="plugin",webrtcDetectedDCSupport="SCTP",webrtcDetectedVersion||(hasMatch=/\bMSIE[ :]+(\d+)/g.exec(navigator.userAgent)||[],webrtcDetectedVersion=parseInt(hasMatch[1]||"0",10));else if(window.StyleMedia||navigator.userAgent.match(/Edge\/(\d+).(\d+)$/))hasMatch=navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)||[],webrtcDetectedBrowser="edge",webrtcDetectedVersion=parseFloat((hasMatch[0]||"0/0").split("/")[1],10),webrtcMinimumVersion=13.10547,webrtcDetectedType="ms",webrtcDetectedDCSupport=null;else if("undefined"!=typeof InstallTrigger||navigator.userAgent.indexOf("irefox")>0)hasMatch=navigator.userAgent.match(/Firefox\/([0-9]+)\./)||[],webrtcDetectedBrowser="firefox",webrtcDetectedVersion=parseInt(hasMatch[1]||"0",10),webrtcMinimumVersion=33,webrtcDetectedType="moz",webrtcDetectedDCSupport="SCTP";else if(window.chrome&&window.chrome.webstore||navigator.userAgent.indexOf("Chrom")>0)hasMatch=navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./i)||[],webrtcDetectedBrowser="chrome",webrtcDetectedVersion=parseInt(hasMatch[2]||"0",10),webrtcMinimumVersion=38,webrtcDetectedType="webkit",webrtcDetectedDCSupport=webrtcDetectedVersion>30?"SCTP":"RTP";else if(/constructor/i.test(window.HTMLElement)||function(p){return"[object SafariRemoteNotification]"===p.toString()}(!window.safari||safari.pushNotification)||navigator.userAgent.match(/AppleWebKit\/(\d+)\./)||navigator.userAgent.match(/Version\/(\d+).(\d+)/)){hasMatch=navigator.userAgent.match(/version\/(\d+)/i)||[],AppleWebKitBuild=navigator.userAgent.match(/AppleWebKit\/(\d+)/i)||[];var isMobile=navigator.userAgent.match(/(iPhone|iPad)/gi),hasNativeImpl=AppleWebKitBuild.length>=1&&AppleWebKitBuild[1]>=604;webrtcDetectedBrowser="safari",webrtcDetectedVersion=parseInt(hasMatch[1]||"0",10),webrtcMinimumVersion=7,webrtcDetectedType=isMobile?hasNativeImpl?"AppleWebKit":null:hasNativeImpl&&!AdapterJS.options.forceSafariPlugin?"AppleWebKit":"plugin",webrtcDetectedDCSupport="SCTP"}AdapterJS.webrtcDetectedBrowser=window.webrtcDetectedBrowser=webrtcDetectedBrowser,AdapterJS.webrtcDetectedVersion=window.webrtcDetectedVersion=webrtcDetectedVersion,AdapterJS.webrtcMinimumVersion=window.webrtcMinimumVersion=webrtcMinimumVersion,AdapterJS.webrtcDetectedType=window.webrtcDetectedType=webrtcDetectedType,AdapterJS.webrtcDetectedDCSupport=window.webrtcDetectedDCSupport=webrtcDetectedDCSupport},AdapterJS.addEvent=function(elem,evnt,func){elem.addEventListener?elem.addEventListener(evnt,func,!1):elem.attachEvent?elem.attachEvent("on"+evnt,func):elem[evnt]=func},AdapterJS.renderNotificationBar=function(message,buttonText,buttonCallback){if("interactive"===document.readyState||"complete"===document.readyState){var w=window,i=document.createElement("iframe");i.name="adapterjs-alert",i.style.position="fixed",i.style.top="-41px",i.style.left=0,i.style.right=0,i.style.width="100%",i.style.height="40px",i.style.backgroundColor="#ffffe1",i.style.border="none",i.style.borderBottom="1px solid #888888",i.style.zIndex="9999999","string"==typeof i.style.webkitTransition?i.style.webkitTransition="all .5s ease-out":"string"==typeof i.style.transition&&(i.style.transition="all .5s ease-out"),document.body.appendChild(i);var c=i.contentWindow?i.contentWindow:i.contentDocument.document?i.contentDocument.document:i.contentDocument;c.document.open(),c.document.write('<span style="display: inline-block; font-family: Helvetica, Arial,sans-serif; font-size: .9rem; padding: 4px; vertical-align: middle; cursor: default;">'+message+"</span>"),buttonText&&"function"==typeof buttonCallback?(c.document.write('<button id="okay">'+buttonText+'</button><button id="cancel">Cancel</button>'),c.document.close(),AdapterJS.addEvent(c.document.getElementById("okay"),"click",function(e){e.preventDefault();try{e.cancelBubble=!0}catch(error){}buttonCallback(e)}),AdapterJS.addEvent(c.document.getElementById("cancel"),"click",function(e){w.document.body.removeChild(i)})):c.document.close(),setTimeout(function(){"string"==typeof i.style.webkitTransform?i.style.webkitTransform="translateY(40px)":"string"==typeof i.style.transform?i.style.transform="translateY(40px)":i.style.top="0px"},300)}},webrtcDetectedType=null,checkMediaDataChannelSettings=function(peerBrowserAgent,peerBrowserVersion,callback,constraints){if("function"==typeof callback){var beOfferer=!0,isLocalFirefox="firefox"===AdapterJS.webrtcDetectedBrowser,isLocalFirefoxInterop="moz"===AdapterJS.webrtcDetectedType&&AdapterJS.webrtcDetectedVersion>30,isPeerFirefox="firefox"===peerBrowserAgent;if(isLocalFirefox&&isPeerFirefox||isLocalFirefoxInterop)try{delete constraints.mandatory.MozDontOfferDataChannel}catch(error){}else isLocalFirefox&&!isPeerFirefox&&(constraints.mandatory.MozDontOfferDataChannel=!0);if(!isLocalFirefox)for(var prop in constraints.mandatory)constraints.mandatory.hasOwnProperty(prop)&&-1!==prop.indexOf("Moz")&&delete constraints.mandatory[prop];!isLocalFirefox||isPeerFirefox||isLocalFirefoxInterop||(beOfferer=!1),callback(beOfferer,constraints)}},checkIceConnectionState=function(peerId,iceConnectionState,callback){"function"==typeof callback&&(peerId=peerId||"peer",AdapterJS._iceConnectionFiredStates[peerId]&&iceConnectionState!==AdapterJS._iceConnectionStates.disconnected&&iceConnectionState!==AdapterJS._iceConnectionStates.failed&&iceConnectionState!==AdapterJS._iceConnectionStates.closed||(AdapterJS._iceConnectionFiredStates[peerId]=[]),iceConnectionState=AdapterJS._iceConnectionStates[iceConnectionState],AdapterJS._iceConnectionFiredStates[peerId].indexOf(iceConnectionState)<0&&(AdapterJS._iceConnectionFiredStates[peerId].push(iceConnectionState),iceConnectionState===AdapterJS._iceConnectionStates.connected&&setTimeout(function(){AdapterJS._iceConnectionFiredStates[peerId].push(AdapterJS._iceConnectionStates.done),callback(AdapterJS._iceConnectionStates.done)},1e3),callback(iceConnectionState)))},createIceServer=null,createIceServers=null,MediaStream="function"==typeof MediaStream?MediaStream:null,RTCPeerConnection="function"==typeof RTCPeerConnection?RTCPeerConnection:null,RTCSessionDescription="function"==typeof RTCSessionDescription?RTCSessionDescription:null,RTCIceCandidate="function"==typeof RTCIceCandidate?RTCIceCandidate:null,getUserMedia=null,attachMediaStream=null,reattachMediaStream=null,webrtcDetectedBrowser=null,webrtcDetectedVersion=null,webrtcMinimumVersion=null,webrtcDetectedDCSupport=null,requestUserMedia=null,AdapterJS.parseWebrtcDetectedBrowser(),["webkit","moz","ms","AppleWebKit"].indexOf(AdapterJS.webrtcDetectedType)>-1?(navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)&&window.RTCPeerConnection&&(window.msRTCPeerConnection=window.RTCPeerConnection),function(f){if(true)module.exports=f();else if("function"==typeof define&&define.amd)define([],f);else{var g;g="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:this,g.adapter=f()}}(function(){return function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a="function"==typeof require&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n||e)},l,l.exports,e,t,n,r)}return n[o].exports}for(var i="function"==typeof require&&require,o=0;o<r.length;o++)s(r[o]);return s}({1:[function(requirecopy,module,exports){"use strict";function writeMediaSection(transceiver,caps,type,stream){var sdp=SDPUtils.writeRtpDescription(transceiver.kind,caps);if(sdp+=SDPUtils.writeIceParameters(transceiver.iceGatherer.getLocalParameters()),sdp+=SDPUtils.writeDtlsParameters(transceiver.dtlsTransport.getLocalParameters(),"offer"===type?"actpass":"active"),sdp+="a=mid:"+transceiver.mid+"\r\n",transceiver.direction?sdp+="a="+transceiver.direction+"\r\n":transceiver.rtpSender&&transceiver.rtpReceiver?sdp+="a=sendrecv\r\n":transceiver.rtpSender?sdp+="a=sendonly\r\n":transceiver.rtpReceiver?sdp+="a=recvonly\r\n":sdp+="a=inactive\r\n",transceiver.rtpSender){var msid="msid:"+stream.id+" "+transceiver.rtpSender.track.id+"\r\n";sdp+="a="+msid,sdp+="a=ssrc:"+transceiver.sendEncodingParameters[0].ssrc+" "+msid,transceiver.sendEncodingParameters[0].rtx&&(sdp+="a=ssrc:"+transceiver.sendEncodingParameters[0].rtx.ssrc+" "+msid,sdp+="a=ssrc-group:FID "+transceiver.sendEncodingParameters[0].ssrc+" "+transceiver.sendEncodingParameters[0].rtx.ssrc+"\r\n")}return sdp+="a=ssrc:"+transceiver.sendEncodingParameters[0].ssrc+" cname:"+SDPUtils.localCName+"\r\n",transceiver.rtpSender&&transceiver.sendEncodingParameters[0].rtx&&(sdp+="a=ssrc:"+transceiver.sendEncodingParameters[0].rtx.ssrc+" cname:"+SDPUtils.localCName+"\r\n"),sdp}function filterIceServers(iceServers,edgeVersion){var hasTurn=!1;return iceServers=JSON.parse(JSON.stringify(iceServers)),iceServers.filter(function(server){if(server&&(server.urls||server.url)){var urls=server.urls||server.url;server.url&&server.urls;var isString="string"==typeof urls;return isString&&(urls=[urls]),urls=urls.filter(function(url){return 0!==url.indexOf("turn:")||-1===url.indexOf("transport=udp")||-1!==url.indexOf("turn:[")||hasTurn?0===url.indexOf("stun:")&&edgeVersion>=14393&&-1===url.indexOf("?transport=udp"):(hasTurn=!0,!0)}),delete server.url,server.urls=isString?urls[0]:urls,!!urls.length}return!1})}function getCommonCapabilities(localCapabilities,remoteCapabilities){var commonCapabilities={codecs:[],headerExtensions:[],fecMechanisms:[]},findCodecByPayloadType=function(pt,codecs){pt=parseInt(pt,10);for(var i=0;i<codecs.length;i++)if(codecs[i].payloadType===pt||codecs[i].preferredPayloadType===pt)return codecs[i]},rtxCapabilityMatches=function(lRtx,rRtx,lCodecs,rCodecs){var lCodec=findCodecByPayloadType(lRtx.parameters.apt,lCodecs),rCodec=findCodecByPayloadType(rRtx.parameters.apt,rCodecs);return lCodec&&rCodec&&lCodec.name.toLowerCase()===rCodec.name.toLowerCase()};return localCapabilities.codecs.forEach(function(lCodec){for(var i=0;i<remoteCapabilities.codecs.length;i++){var rCodec=remoteCapabilities.codecs[i];if(lCodec.name.toLowerCase()===rCodec.name.toLowerCase()&&lCodec.clockRate===rCodec.clockRate){if("rtx"===lCodec.name.toLowerCase()&&lCodec.parameters&&rCodec.parameters.apt&&!rtxCapabilityMatches(lCodec,rCodec,localCapabilities.codecs,remoteCapabilities.codecs))continue;rCodec=JSON.parse(JSON.stringify(rCodec)),rCodec.numChannels=Math.min(lCodec.numChannels,rCodec.numChannels),commonCapabilities.codecs.push(rCodec),rCodec.rtcpFeedback=rCodec.rtcpFeedback.filter(function(fb){for(var j=0;j<lCodec.rtcpFeedback.length;j++)if(lCodec.rtcpFeedback[j].type===fb.type&&lCodec.rtcpFeedback[j].parameter===fb.parameter)return!0;return!1});break}}}),localCapabilities.headerExtensions.forEach(function(lHeaderExtension){for(var i=0;i<remoteCapabilities.headerExtensions.length;i++){var rHeaderExtension=remoteCapabilities.headerExtensions[i];if(lHeaderExtension.uri===rHeaderExtension.uri){commonCapabilities.headerExtensions.push(rHeaderExtension);break}}}),commonCapabilities}function isActionAllowedInSignalingState(action,type,signalingState){return-1!=={offer:{setLocalDescription:["stable","have-local-offer"],setRemoteDescription:["stable","have-remote-offer"]},answer:{setLocalDescription:["have-remote-offer","have-local-pranswer"],setRemoteDescription:["have-local-offer","have-remote-pranswer"]}}[type][action].indexOf(signalingState)}function maybeAddCandidate(iceTransport,candidate){iceTransport.getRemoteCandidates().find(function(remoteCandidate){return candidate.foundation===remoteCandidate.foundation&&candidate.ip===remoteCandidate.ip&&candidate.port===remoteCandidate.port&&candidate.priority===remoteCandidate.priority&&candidate.protocol===remoteCandidate.protocol&&candidate.type===remoteCandidate.type})||iceTransport.addRemoteCandidate(candidate)}var SDPUtils=requirecopy("sdp");module.exports=function(window,edgeVersion){var RTCPeerConnection=function(config){var self=this,_eventTarget=document.createDocumentFragment();if(["addEventListener","removeEventListener","dispatchEvent"].forEach(function(method){self[method]=_eventTarget[method].bind(_eventTarget)}),this.onicecandidate=null,this.onaddstream=null,this.ontrack=null,this.onremovestream=null,this.onsignalingstatechange=null,this.oniceconnectionstatechange=null,this.onicegatheringstatechange=null,this.onnegotiationneeded=null,this.ondatachannel=null,this.canTrickleIceCandidates=null,this.needNegotiation=!1,this.localStreams=[],this.remoteStreams=[],this.localDescription=null,this.remoteDescription=null,this.signalingState="stable",this.iceConnectionState="new",this.iceGatheringState="new",config=JSON.parse(JSON.stringify(config||{})),this.usingBundle="max-bundle"===config.bundlePolicy,"negotiate"===config.rtcpMuxPolicy){var e=new Error("rtcpMuxPolicy 'negotiate' is not supported");throw e.name="NotSupportedError",e}switch(config.rtcpMuxPolicy||(config.rtcpMuxPolicy="require"),config.iceTransportPolicy){case"all":case"relay":break;default:config.iceTransportPolicy="all"}switch(config.bundlePolicy){case"balanced":case"max-compat":case"max-bundle":break;default:config.bundlePolicy="balanced"}if(config.iceServers=filterIceServers(config.iceServers||[],edgeVersion),this._iceGatherers=[],config.iceCandidatePoolSize)for(var i=config.iceCandidatePoolSize;i>0;i--)this._iceGatherers=new window.RTCIceGatherer({iceServers:config.iceServers,gatherPolicy:config.iceTransportPolicy});else config.iceCandidatePoolSize=0;this._config=config,this.transceivers=[],this._sdpSessionId=SDPUtils.generateSessionId(),this._sdpSessionVersion=0};return RTCPeerConnection.prototype._emitGatheringStateChange=function(){var event=new Event("icegatheringstatechange");this.dispatchEvent(event),null!==this.onicegatheringstatechange&&this.onicegatheringstatechange(event)},RTCPeerConnection.prototype.getConfiguration=function(){return this._config},RTCPeerConnection.prototype.getLocalStreams=function(){return this.localStreams},RTCPeerConnection.prototype.getRemoteStreams=function(){return this.remoteStreams},RTCPeerConnection.prototype._createTransceiver=function(kind){var hasBundleTransport=this.transceivers.length>0,transceiver={track:null,iceGatherer:null,iceTransport:null,dtlsTransport:null,localCapabilities:null,remoteCapabilities:null,rtpSender:null,rtpReceiver:null,kind:kind,mid:null,sendEncodingParameters:null,recvEncodingParameters:null,stream:null,wantReceive:!0};if(this.usingBundle&&hasBundleTransport)transceiver.iceTransport=this.transceivers[0].iceTransport,transceiver.dtlsTransport=this.transceivers[0].dtlsTransport;else{var transports=this._createIceAndDtlsTransports();transceiver.iceTransport=transports.iceTransport,transceiver.dtlsTransport=transports.dtlsTransport}return this.transceivers.push(transceiver),transceiver},RTCPeerConnection.prototype.addTrack=function(track,stream){for(var transceiver,i=0;i<this.transceivers.length;i++)this.transceivers[i].track||this.transceivers[i].kind!==track.kind||(transceiver=this.transceivers[i]);return transceiver||(transceiver=this._createTransceiver(track.kind)),this._maybeFireNegotiationNeeded(),-1===this.localStreams.indexOf(stream)&&this.localStreams.push(stream),transceiver.track=track,transceiver.stream=stream,transceiver.rtpSender=new window.RTCRtpSender(track,transceiver.dtlsTransport),transceiver.rtpSender},RTCPeerConnection.prototype.addStream=function(stream){var self=this;if(edgeVersion>=15025)stream.getTracks().forEach(function(track){self.addTrack(track,stream)});else{var clonedStream=stream.clone();stream.getTracks().forEach(function(track,idx){var clonedTrack=clonedStream.getTracks()[idx];track.addEventListener("enabled",function(event){clonedTrack.enabled=event.enabled})}),clonedStream.getTracks().forEach(function(track){self.addTrack(track,clonedStream)})}},RTCPeerConnection.prototype.removeStream=function(stream){var idx=this.localStreams.indexOf(stream);idx>-1&&(this.localStreams.splice(idx,1),this._maybeFireNegotiationNeeded())},RTCPeerConnection.prototype.getSenders=function(){return this.transceivers.filter(function(transceiver){return!!transceiver.rtpSender}).map(function(transceiver){return transceiver.rtpSender})},RTCPeerConnection.prototype.getReceivers=function(){return this.transceivers.filter(function(transceiver){return!!transceiver.rtpReceiver}).map(function(transceiver){return transceiver.rtpReceiver})},RTCPeerConnection.prototype._createIceGatherer=function(sdpMLineIndex,usingBundle){var self=this;if(usingBundle&&sdpMLineIndex>0)return this.transceivers[0].iceGatherer;if(this._iceGatherers.length)return this._iceGatherers.shift();var iceGatherer=new window.RTCIceGatherer({iceServers:this._config.iceServers,gatherPolicy:this._config.iceTransportPolicy});return Object.defineProperty(iceGatherer,"state",{value:"new",writable:!0}),this.transceivers[sdpMLineIndex].candidates=[],this.transceivers[sdpMLineIndex].bufferCandidates=function(event){var end=!event.candidate||0===Object.keys(event.candidate).length;iceGatherer.state=end?"completed":"gathering",null!==self.transceivers[sdpMLineIndex].candidates&&self.transceivers[sdpMLineIndex].candidates.push(event.candidate)},iceGatherer.addEventListener("localcandidate",this.transceivers[sdpMLineIndex].bufferCandidates),iceGatherer},RTCPeerConnection.prototype._gather=function(mid,sdpMLineIndex){var self=this,iceGatherer=this.transceivers[sdpMLineIndex].iceGatherer;if(!iceGatherer.onlocalcandidate){var candidates=this.transceivers[sdpMLineIndex].candidates;this.transceivers[sdpMLineIndex].candidates=null,iceGatherer.removeEventListener("localcandidate",this.transceivers[sdpMLineIndex].bufferCandidates),iceGatherer.onlocalcandidate=function(evt){if(!(self.usingBundle&&sdpMLineIndex>0)){var event=new Event("icecandidate");event.candidate={sdpMid:mid,sdpMLineIndex:sdpMLineIndex};var cand=evt.candidate,end=!cand||0===Object.keys(cand).length;end?"new"!==iceGatherer.state&&"gathering"!==iceGatherer.state||(iceGatherer.state="completed"):("new"===iceGatherer.state&&(iceGatherer.state="gathering"),cand.component=1,event.candidate.candidate=SDPUtils.writeCandidate(cand));var sections=SDPUtils.splitSections(self.localDescription.sdp);sections[event.candidate.sdpMLineIndex+1]+=end?"a=end-of-candidates\r\n":"a="+event.candidate.candidate+"\r\n",self.localDescription.sdp=sections.join("");var complete=self.transceivers.every(function(transceiver){return transceiver.iceGatherer&&"completed"===transceiver.iceGatherer.state});"gathering"!==self.iceGatheringState&&(self.iceGatheringState="gathering",self._emitGatheringStateChange()),end||(self.dispatchEvent(event),null!==self.onicecandidate&&self.onicecandidate(event)),complete&&(self.dispatchEvent(new Event("icecandidate")),null!==self.onicecandidate&&self.onicecandidate(new Event("icecandidate")),self.iceGatheringState="complete",self._emitGatheringStateChange())}},window.setTimeout(function(){candidates.forEach(function(candidate){var e=new Event("RTCIceGatherEvent");e.candidate=candidate,iceGatherer.onlocalcandidate(e)})},0)}},RTCPeerConnection.prototype._createIceAndDtlsTransports=function(){var self=this,iceTransport=new window.RTCIceTransport(null);iceTransport.onicestatechange=function(){self._updateConnectionState()};var dtlsTransport=new window.RTCDtlsTransport(iceTransport);return dtlsTransport.ondtlsstatechange=function(){self._updateConnectionState()},dtlsTransport.onerror=function(){Object.defineProperty(dtlsTransport,"state",{value:"failed",writable:!0}),self._updateConnectionState()},{iceTransport:iceTransport,dtlsTransport:dtlsTransport}},RTCPeerConnection.prototype._disposeIceAndDtlsTransports=function(sdpMLineIndex){var iceGatherer=this.transceivers[sdpMLineIndex].iceGatherer;iceGatherer&&(delete iceGatherer.onlocalcandidate,delete this.transceivers[sdpMLineIndex].iceGatherer);var iceTransport=this.transceivers[sdpMLineIndex].iceTransport;iceTransport&&(delete iceTransport.onicestatechange,delete this.transceivers[sdpMLineIndex].iceTransport);var dtlsTransport=this.transceivers[sdpMLineIndex].dtlsTransport;dtlsTransport&&(delete dtlsTransport.ondtlsstatechange,delete dtlsTransport.onerror,delete this.transceivers[sdpMLineIndex].dtlsTransport)},RTCPeerConnection.prototype._transceive=function(transceiver,send,recv){var params=getCommonCapabilities(transceiver.localCapabilities,transceiver.remoteCapabilities);send&&transceiver.rtpSender&&(params.encodings=transceiver.sendEncodingParameters,params.rtcp={cname:SDPUtils.localCName,compound:transceiver.rtcpParameters.compound},transceiver.recvEncodingParameters.length&&(params.rtcp.ssrc=transceiver.recvEncodingParameters[0].ssrc),transceiver.rtpSender.send(params)),recv&&transceiver.rtpReceiver&&("video"===transceiver.kind&&transceiver.recvEncodingParameters&&edgeVersion<15019&&transceiver.recvEncodingParameters.forEach(function(p){delete p.rtx}),params.encodings=transceiver.recvEncodingParameters,params.rtcp={cname:transceiver.rtcpParameters.cname,compound:transceiver.rtcpParameters.compound},transceiver.sendEncodingParameters.length&&(params.rtcp.ssrc=transceiver.sendEncodingParameters[0].ssrc),transceiver.rtpReceiver.receive(params))},RTCPeerConnection.prototype.setLocalDescription=function(description){var self=this,args=arguments;if(!isActionAllowedInSignalingState("setLocalDescription",description.type,this.signalingState))return new Promise(function(resolve,reject){var e=new Error("Can not set remote "+description.type+" in state "+self.signalingState);e.name="InvalidStateError",args.length>2&&"function"==typeof args[2]&&args[2].apply(null,[e]),reject(e)});var sections,sessionpart;if("offer"===description.type)sections=SDPUtils.splitSections(description.sdp),sessionpart=sections.shift(),sections.forEach(function(mediaSection,sdpMLineIndex){var caps=SDPUtils.parseRtpParameters(mediaSection);self.transceivers[sdpMLineIndex].localCapabilities=caps}),this.transceivers.forEach(function(transceiver,sdpMLineIndex){self._gather(transceiver.mid,sdpMLineIndex)});else if("answer"===description.type){sections=SDPUtils.splitSections(self.remoteDescription.sdp),sessionpart=sections.shift();var isIceLite=SDPUtils.matchPrefix(sessionpart,"a=ice-lite").length>0;sections.forEach(function(mediaSection,sdpMLineIndex){var transceiver=self.transceivers[sdpMLineIndex],iceGatherer=transceiver.iceGatherer,iceTransport=transceiver.iceTransport,dtlsTransport=transceiver.dtlsTransport,localCapabilities=transceiver.localCapabilities,remoteCapabilities=transceiver.remoteCapabilities;if(!SDPUtils.isRejected(mediaSection)&&!transceiver.isDatachannel){var remoteIceParameters=SDPUtils.getIceParameters(mediaSection,sessionpart),remoteDtlsParameters=SDPUtils.getDtlsParameters(mediaSection,sessionpart);isIceLite&&(remoteDtlsParameters.role="server"),self.usingBundle&&0!==sdpMLineIndex||(self._gather(transceiver.mid,sdpMLineIndex),"new"===iceTransport.state&&iceTransport.start(iceGatherer,remoteIceParameters,isIceLite?"controlling":"controlled"),"new"===dtlsTransport.state&&dtlsTransport.start(remoteDtlsParameters));var params=getCommonCapabilities(localCapabilities,remoteCapabilities);self._transceive(transceiver,params.codecs.length>0,!1)}})}switch(this.localDescription={type:description.type,sdp:description.sdp},description.type){case"offer":this._updateSignalingState("have-local-offer");break;case"answer":this._updateSignalingState("stable");break;default:throw new TypeError('unsupported type "'+description.type+'"')}var cb=arguments.length>1&&"function"==typeof arguments[1]&&arguments[1];return new Promise(function(resolve){cb&&cb.apply(null),resolve()})},RTCPeerConnection.prototype.setRemoteDescription=function(description){var self=this,args=arguments;if(!isActionAllowedInSignalingState("setRemoteDescription",description.type,this.signalingState))return new Promise(function(resolve,reject){var e=new Error("Can not set remote "+description.type+" in state "+self.signalingState);e.name="InvalidStateError",args.length>2&&"function"==typeof args[2]&&args[2].apply(null,[e]),reject(e)});var streams={};this.remoteStreams.forEach(function(stream){streams[stream.id]=stream});var receiverList=[],sections=SDPUtils.splitSections(description.sdp),sessionpart=sections.shift(),isIceLite=SDPUtils.matchPrefix(sessionpart,"a=ice-lite").length>0,usingBundle=SDPUtils.matchPrefix(sessionpart,"a=group:BUNDLE ").length>0;this.usingBundle=usingBundle;var iceOptions=SDPUtils.matchPrefix(sessionpart,"a=ice-options:")[0];switch(this.canTrickleIceCandidates=!!iceOptions&&iceOptions.substr(14).split(" ").indexOf("trickle")>=0,sections.forEach(function(mediaSection,sdpMLineIndex){var lines=SDPUtils.splitLines(mediaSection),kind=SDPUtils.getKind(mediaSection),rejected=SDPUtils.isRejected(mediaSection),protocol=lines[0].substr(2).split(" ")[2],direction=SDPUtils.getDirection(mediaSection,sessionpart),remoteMsid=SDPUtils.parseMsid(mediaSection),mid=SDPUtils.getMid(mediaSection)||SDPUtils.generateIdentifier();if("application"===kind&&"DTLS/SCTP"===protocol)return void(self.transceivers[sdpMLineIndex]={mid:mid,isDatachannel:!0});var transceiver,iceGatherer,iceTransport,dtlsTransport,rtpReceiver,sendEncodingParameters,recvEncodingParameters,localCapabilities,track,remoteIceParameters,remoteDtlsParameters,remoteCapabilities=SDPUtils.parseRtpParameters(mediaSection);rejected||(remoteIceParameters=SDPUtils.getIceParameters(mediaSection,sessionpart),remoteDtlsParameters=SDPUtils.getDtlsParameters(mediaSection,sessionpart),remoteDtlsParameters.role="client"),recvEncodingParameters=SDPUtils.parseRtpEncodingParameters(mediaSection);var rtcpParameters=SDPUtils.parseRtcpParameters(mediaSection),isComplete=SDPUtils.matchPrefix(mediaSection,"a=end-of-candidates",sessionpart).length>0,cands=SDPUtils.matchPrefix(mediaSection,"a=candidate:").map(function(cand){return SDPUtils.parseCandidate(cand)}).filter(function(cand){return 1===cand.component});if(("offer"===description.type||"answer"===description.type)&&!rejected&&usingBundle&&sdpMLineIndex>0&&self.transceivers[sdpMLineIndex]&&(self._disposeIceAndDtlsTransports(sdpMLineIndex),self.transceivers[sdpMLineIndex].iceGatherer=self.transceivers[0].iceGatherer,self.transceivers[sdpMLineIndex].iceTransport=self.transceivers[0].iceTransport,self.transceivers[sdpMLineIndex].dtlsTransport=self.transceivers[0].dtlsTransport,self.transceivers[sdpMLineIndex].rtpSender&&self.transceivers[sdpMLineIndex].rtpSender.setTransport(self.transceivers[0].dtlsTransport),
-self.transceivers[sdpMLineIndex].rtpReceiver&&self.transceivers[sdpMLineIndex].rtpReceiver.setTransport(self.transceivers[0].dtlsTransport)),"offer"!==description.type||rejected)"answer"!==description.type||rejected||(transceiver=self.transceivers[sdpMLineIndex],iceGatherer=transceiver.iceGatherer,iceTransport=transceiver.iceTransport,dtlsTransport=transceiver.dtlsTransport,rtpReceiver=transceiver.rtpReceiver,sendEncodingParameters=transceiver.sendEncodingParameters,localCapabilities=transceiver.localCapabilities,self.transceivers[sdpMLineIndex].recvEncodingParameters=recvEncodingParameters,self.transceivers[sdpMLineIndex].remoteCapabilities=remoteCapabilities,self.transceivers[sdpMLineIndex].rtcpParameters=rtcpParameters,cands.length&&(!isIceLite&&!isComplete||usingBundle&&0!==sdpMLineIndex||"new"!==iceTransport.state?cands.forEach(function(candidate){maybeAddCandidate(transceiver.iceTransport,candidate)}):iceTransport.setRemoteCandidates(cands)),usingBundle&&0!==sdpMLineIndex||("new"===iceTransport.state&&iceTransport.start(iceGatherer,remoteIceParameters,"controlling"),"new"===dtlsTransport.state&&dtlsTransport.start(remoteDtlsParameters)),self._transceive(transceiver,"sendrecv"===direction||"recvonly"===direction,"sendrecv"===direction||"sendonly"===direction),!rtpReceiver||"sendrecv"!==direction&&"sendonly"!==direction?delete transceiver.rtpReceiver:(track=rtpReceiver.track,remoteMsid?(streams[remoteMsid.stream]||(streams[remoteMsid.stream]=new window.MediaStream),streams[remoteMsid.stream].addTrack(track),receiverList.push([track,rtpReceiver,streams[remoteMsid.stream]])):(streams.default||(streams.default=new window.MediaStream),streams.default.addTrack(track),receiverList.push([track,rtpReceiver,streams.default]))));else{if(transceiver=self.transceivers[sdpMLineIndex]||self._createTransceiver(kind),transceiver.mid=mid,transceiver.iceGatherer||(transceiver.iceGatherer=self._createIceGatherer(sdpMLineIndex,usingBundle)),cands.length&&(!isComplete||usingBundle&&0!==sdpMLineIndex||"new"!==transceiver.iceTransport.state?cands.forEach(function(candidate){maybeAddCandidate(transceiver.iceTransport,candidate)}):transceiver.iceTransport.setRemoteCandidates(cands)),localCapabilities=window.RTCRtpReceiver.getCapabilities(kind),edgeVersion<15019&&(localCapabilities.codecs=localCapabilities.codecs.filter(function(codec){return"rtx"!==codec.name})),sendEncodingParameters=[{ssrc:1001*(2*sdpMLineIndex+2)}],"sendrecv"===direction||"sendonly"===direction){var isNewTrack=!transceiver.rtpReceiver;if(rtpReceiver=transceiver.rtpReceiver||new window.RTCRtpReceiver(transceiver.dtlsTransport,kind),isNewTrack){var stream;track=rtpReceiver.track,remoteMsid?(streams[remoteMsid.stream]||(streams[remoteMsid.stream]=new window.MediaStream,Object.defineProperty(streams[remoteMsid.stream],"id",{get:function(){return remoteMsid.stream}})),Object.defineProperty(track,"id",{get:function(){return remoteMsid.track}}),stream=streams[remoteMsid.stream]):(streams.default||(streams.default=new window.MediaStream),stream=streams.default),stream.addTrack(track),receiverList.push([track,rtpReceiver,stream])}}transceiver.localCapabilities=localCapabilities,transceiver.remoteCapabilities=remoteCapabilities,transceiver.rtpReceiver=rtpReceiver,transceiver.rtcpParameters=rtcpParameters,transceiver.sendEncodingParameters=sendEncodingParameters,transceiver.recvEncodingParameters=recvEncodingParameters,self._transceive(self.transceivers[sdpMLineIndex],!1,"sendrecv"===direction||"sendonly"===direction)}}),this.remoteDescription={type:description.type,sdp:description.sdp},description.type){case"offer":this._updateSignalingState("have-remote-offer");break;case"answer":this._updateSignalingState("stable");break;default:throw new TypeError('unsupported type "'+description.type+'"')}return Object.keys(streams).forEach(function(sid){var stream=streams[sid];if(stream.getTracks().length){if(-1===self.remoteStreams.indexOf(stream)){self.remoteStreams.push(stream);var event=new Event("addstream");event.stream=stream,window.setTimeout(function(){self.dispatchEvent(event),null!==self.onaddstream&&self.onaddstream(event)})}receiverList.forEach(function(item){var track=item[0],receiver=item[1];if(stream.id===item[2].id){var trackEvent=new Event("track");trackEvent.track=track,trackEvent.receiver=receiver,trackEvent.transceiver={receiver:receiver},trackEvent.streams=[stream],window.setTimeout(function(){self.dispatchEvent(trackEvent),null!==self.ontrack&&self.ontrack(trackEvent)})}})}}),window.setTimeout(function(){self&&self.transceivers&&self.transceivers.forEach(function(transceiver){transceiver.iceTransport&&"new"===transceiver.iceTransport.state&&transceiver.iceTransport.getRemoteCandidates().length>0&&transceiver.iceTransport.addRemoteCandidate({})})},4e3),new Promise(function(resolve){args.length>1&&"function"==typeof args[1]&&args[1].apply(null),resolve()})},RTCPeerConnection.prototype.close=function(){this.transceivers.forEach(function(transceiver){transceiver.iceTransport&&transceiver.iceTransport.stop(),transceiver.dtlsTransport&&transceiver.dtlsTransport.stop(),transceiver.rtpSender&&transceiver.rtpSender.stop(),transceiver.rtpReceiver&&transceiver.rtpReceiver.stop()}),this._updateSignalingState("closed")},RTCPeerConnection.prototype._updateSignalingState=function(newState){this.signalingState=newState;var event=new Event("signalingstatechange");this.dispatchEvent(event),null!==this.onsignalingstatechange&&this.onsignalingstatechange(event)},RTCPeerConnection.prototype._maybeFireNegotiationNeeded=function(){var self=this;"stable"===this.signalingState&&!0!==this.needNegotiation&&(this.needNegotiation=!0,window.setTimeout(function(){if(!1!==self.needNegotiation){self.needNegotiation=!1;var event=new Event("negotiationneeded");self.dispatchEvent(event),null!==self.onnegotiationneeded&&self.onnegotiationneeded(event)}},0))},RTCPeerConnection.prototype._updateConnectionState=function(){var newState,self=this,states={new:0,closed:0,connecting:0,checking:0,connected:0,completed:0,disconnected:0,failed:0};if(this.transceivers.forEach(function(transceiver){states[transceiver.iceTransport.state]++,states[transceiver.dtlsTransport.state]++}),states.connected+=states.completed,newState="new",states.failed>0?newState="failed":states.connecting>0||states.checking>0?newState="connecting":states.disconnected>0?newState="disconnected":states.new>0?newState="new":(states.connected>0||states.completed>0)&&(newState="connected"),newState!==self.iceConnectionState){self.iceConnectionState=newState;var event=new Event("iceconnectionstatechange");this.dispatchEvent(event),null!==this.oniceconnectionstatechange&&this.oniceconnectionstatechange(event)}},RTCPeerConnection.prototype.createOffer=function(){var offerOptions,self=this,args=arguments;1===arguments.length&&"function"!=typeof arguments[0]?offerOptions=arguments[0]:3===arguments.length&&(offerOptions=arguments[2]);var numAudioTracks=this.transceivers.filter(function(t){return"audio"===t.kind}).length,numVideoTracks=this.transceivers.filter(function(t){return"video"===t.kind}).length;if(offerOptions){if(offerOptions.mandatory||offerOptions.optional)throw new TypeError("Legacy mandatory/optional constraints not supported.");void 0!==offerOptions.offerToReceiveAudio&&(numAudioTracks=!0===offerOptions.offerToReceiveAudio?1:!1===offerOptions.offerToReceiveAudio?0:offerOptions.offerToReceiveAudio),void 0!==offerOptions.offerToReceiveVideo&&(numVideoTracks=!0===offerOptions.offerToReceiveVideo?1:!1===offerOptions.offerToReceiveVideo?0:offerOptions.offerToReceiveVideo)}for(this.transceivers.forEach(function(transceiver){"audio"===transceiver.kind?--numAudioTracks<0&&(transceiver.wantReceive=!1):"video"===transceiver.kind&&--numVideoTracks<0&&(transceiver.wantReceive=!1)});numAudioTracks>0||numVideoTracks>0;)numAudioTracks>0&&(this._createTransceiver("audio"),numAudioTracks--),numVideoTracks>0&&(this._createTransceiver("video"),numVideoTracks--);var sdp=SDPUtils.writeSessionBoilerplate(this._sdpSessionId,this._sdpSessionVersion++);this.transceivers.forEach(function(transceiver,sdpMLineIndex){var track=transceiver.track,kind=transceiver.kind,mid=SDPUtils.generateIdentifier();transceiver.mid=mid,transceiver.iceGatherer||(transceiver.iceGatherer=self._createIceGatherer(sdpMLineIndex,self.usingBundle));var localCapabilities=window.RTCRtpSender.getCapabilities(kind);edgeVersion<15019&&(localCapabilities.codecs=localCapabilities.codecs.filter(function(codec){return"rtx"!==codec.name})),localCapabilities.codecs.forEach(function(codec){"H264"===codec.name&&void 0===codec.parameters["level-asymmetry-allowed"]&&(codec.parameters["level-asymmetry-allowed"]="1")});var sendEncodingParameters=[{ssrc:1001*(2*sdpMLineIndex+1)}];track&&edgeVersion>=15019&&"video"===kind&&(sendEncodingParameters[0].rtx={ssrc:1001*(2*sdpMLineIndex+1)+1}),transceiver.wantReceive&&(transceiver.rtpReceiver=new window.RTCRtpReceiver(transceiver.dtlsTransport,kind)),transceiver.localCapabilities=localCapabilities,transceiver.sendEncodingParameters=sendEncodingParameters}),"max-compat"!==this._config.bundlePolicy&&(sdp+="a=group:BUNDLE "+this.transceivers.map(function(t){return t.mid}).join(" ")+"\r\n"),sdp+="a=ice-options:trickle\r\n",this.transceivers.forEach(function(transceiver,sdpMLineIndex){sdp+=writeMediaSection(transceiver,transceiver.localCapabilities,"offer",transceiver.stream),sdp+="a=rtcp-rsize\r\n",!transceiver.iceGatherer||"new"===self.iceGatheringState||0!==sdpMLineIndex&&self.usingBundle||(transceiver.iceGatherer.getLocalCandidates().forEach(function(cand){cand.component=1,sdp+="a="+SDPUtils.writeCandidate(cand)+"\r\n"}),"completed"===transceiver.iceGatherer.state&&(sdp+="a=end-of-candidates\r\n"))});var desc=new window.RTCSessionDescription({type:"offer",sdp:sdp});return new Promise(function(resolve){if(args.length>0&&"function"==typeof args[0])return args[0].apply(null,[desc]),void resolve();resolve(desc)})},RTCPeerConnection.prototype.createAnswer=function(){var args=arguments,sdp=SDPUtils.writeSessionBoilerplate(this._sdpSessionId,this._sdpSessionVersion++);this.usingBundle&&(sdp+="a=group:BUNDLE "+this.transceivers.map(function(t){return t.mid}).join(" ")+"\r\n");var mediaSectionsInOffer=SDPUtils.splitSections(this.remoteDescription.sdp).length-1;this.transceivers.forEach(function(transceiver,sdpMLineIndex){if(!(sdpMLineIndex+1>mediaSectionsInOffer)){if(transceiver.isDatachannel)return void(sdp+="m=application 0 DTLS/SCTP 5000\r\nc=IN IP4 0.0.0.0\r\na=mid:"+transceiver.mid+"\r\n");if(transceiver.stream){var localTrack;"audio"===transceiver.kind?localTrack=transceiver.stream.getAudioTracks()[0]:"video"===transceiver.kind&&(localTrack=transceiver.stream.getVideoTracks()[0]),localTrack&&edgeVersion>=15019&&"video"===transceiver.kind&&(transceiver.sendEncodingParameters[0].rtx={ssrc:1001*(2*sdpMLineIndex+2)+1})}var commonCapabilities=getCommonCapabilities(transceiver.localCapabilities,transceiver.remoteCapabilities);!commonCapabilities.codecs.filter(function(c){return"rtx"===c.name.toLowerCase()}).length&&transceiver.sendEncodingParameters[0].rtx&&delete transceiver.sendEncodingParameters[0].rtx,sdp+=writeMediaSection(transceiver,commonCapabilities,"answer",transceiver.stream),transceiver.rtcpParameters&&transceiver.rtcpParameters.reducedSize&&(sdp+="a=rtcp-rsize\r\n")}});var desc=new window.RTCSessionDescription({type:"answer",sdp:sdp});return new Promise(function(resolve){if(args.length>0&&"function"==typeof args[0])return args[0].apply(null,[desc]),void resolve();resolve(desc)})},RTCPeerConnection.prototype.addIceCandidate=function(candidate){var err,sections;if(candidate&&""!==candidate.candidate){if(!candidate.sdpMLineIndex&&!candidate.sdpMid)throw new TypeError("sdpMLineIndex or sdpMid required");if(this.remoteDescription){var sdpMLineIndex=candidate.sdpMLineIndex;if(candidate.sdpMid)for(var i=0;i<this.transceivers.length;i++)if(this.transceivers[i].mid===candidate.sdpMid){sdpMLineIndex=i;break}var transceiver=this.transceivers[sdpMLineIndex];if(transceiver){if(transceiver.isDatachannel)return Promise.resolve();var cand=Object.keys(candidate.candidate).length>0?SDPUtils.parseCandidate(candidate.candidate):{};if("tcp"===cand.protocol&&(0===cand.port||9===cand.port))return Promise.resolve();if(cand.component&&1!==cand.component)return Promise.resolve();(0===sdpMLineIndex||sdpMLineIndex>0&&transceiver.iceTransport!==this.transceivers[0].iceTransport)&&transceiver.iceTransport.addRemoteCandidate(cand);var candidateString=candidate.candidate.trim();0===candidateString.indexOf("a=")&&(candidateString=candidateString.substr(2)),sections=SDPUtils.splitSections(this.remoteDescription.sdp),sections[sdpMLineIndex+1]+="a="+(cand.type?candidateString:"end-of-candidates")+"\r\n",this.remoteDescription.sdp=sections.join("")}else err=new Error("Can not add ICE candidate"),err.name="OperationError"}else err=new Error("Can not add ICE candidate without a remote description"),err.name="InvalidStateError"}else for(var j=0;j<this.transceivers.length&&(this.transceivers[j].isDatachannel||(this.transceivers[j].iceTransport.addRemoteCandidate({}),sections=SDPUtils.splitSections(this.remoteDescription.sdp),sections[j+1]+="a=end-of-candidates\r\n",this.remoteDescription.sdp=sections.join(""),!this.usingBundle));j++);var args=arguments;return new Promise(function(resolve,reject){err?(args.length>2&&"function"==typeof args[2]&&args[2].apply(null,[err]),reject(err)):(args.length>1&&"function"==typeof args[1]&&args[1].apply(null),resolve())})},RTCPeerConnection.prototype.getStats=function(){var promises=[];this.transceivers.forEach(function(transceiver){["rtpSender","rtpReceiver","iceGatherer","iceTransport","dtlsTransport"].forEach(function(method){transceiver[method]&&promises.push(transceiver[method].getStats())})});var cb=arguments.length>1&&"function"==typeof arguments[1]&&arguments[1],fixStatsType=function(stat){return{inboundrtp:"inbound-rtp",outboundrtp:"outbound-rtp",candidatepair:"candidate-pair",localcandidate:"local-candidate",remotecandidate:"remote-candidate"}[stat.type]||stat.type};return new Promise(function(resolve){var results=new Map;Promise.all(promises).then(function(res){res.forEach(function(result){Object.keys(result).forEach(function(id){result[id].type=fixStatsType(result[id]),results.set(id,result[id])})}),cb&&cb.apply(null,results),resolve(results)})})},RTCPeerConnection}},{sdp:2}],2:[function(requirecopy,module,exports){"use strict";var SDPUtils={};SDPUtils.generateIdentifier=function(){return Math.random().toString(36).substr(2,10)},SDPUtils.localCName=SDPUtils.generateIdentifier(),SDPUtils.splitLines=function(blob){return blob.trim().split("\n").map(function(line){return line.trim()})},SDPUtils.splitSections=function(blob){return blob.split("\nm=").map(function(part,index){return(index>0?"m="+part:part).trim()+"\r\n"})},SDPUtils.matchPrefix=function(blob,prefix){return SDPUtils.splitLines(blob).filter(function(line){return 0===line.indexOf(prefix)})},SDPUtils.parseCandidate=function(line){var parts;parts=0===line.indexOf("a=candidate:")?line.substring(12).split(" "):line.substring(10).split(" ");for(var candidate={foundation:parts[0],component:parseInt(parts[1],10),protocol:parts[2].toLowerCase(),priority:parseInt(parts[3],10),ip:parts[4],port:parseInt(parts[5],10),type:parts[7]},i=8;i<parts.length;i+=2)switch(parts[i]){case"raddr":candidate.relatedAddress=parts[i+1];break;case"rport":candidate.relatedPort=parseInt(parts[i+1],10);break;case"tcptype":candidate.tcpType=parts[i+1];break;case"ufrag":candidate.ufrag=parts[i+1],candidate.usernameFragment=parts[i+1];break;default:candidate[parts[i]]=parts[i+1]}return candidate},SDPUtils.writeCandidate=function(candidate){var sdp=[];sdp.push(candidate.foundation),sdp.push(candidate.component),sdp.push(candidate.protocol.toUpperCase()),sdp.push(candidate.priority),sdp.push(candidate.ip),sdp.push(candidate.port);var type=candidate.type;return sdp.push("typ"),sdp.push(type),"host"!==type&&candidate.relatedAddress&&candidate.relatedPort&&(sdp.push("raddr"),sdp.push(candidate.relatedAddress),sdp.push("rport"),sdp.push(candidate.relatedPort)),candidate.tcpType&&"tcp"===candidate.protocol.toLowerCase()&&(sdp.push("tcptype"),sdp.push(candidate.tcpType)),candidate.ufrag&&(sdp.push("ufrag"),sdp.push(candidate.ufrag)),"candidate:"+sdp.join(" ")},SDPUtils.parseIceOptions=function(line){return line.substr(14).split(" ")},SDPUtils.parseRtpMap=function(line){var parts=line.substr(9).split(" "),parsed={payloadType:parseInt(parts.shift(),10)};return parts=parts[0].split("/"),parsed.name=parts[0],parsed.clockRate=parseInt(parts[1],10),parsed.numChannels=3===parts.length?parseInt(parts[2],10):1,parsed},SDPUtils.writeRtpMap=function(codec){var pt=codec.payloadType;return void 0!==codec.preferredPayloadType&&(pt=codec.preferredPayloadType),"a=rtpmap:"+pt+" "+codec.name+"/"+codec.clockRate+(1!==codec.numChannels?"/"+codec.numChannels:"")+"\r\n"},SDPUtils.parseExtmap=function(line){var parts=line.substr(9).split(" ");return{id:parseInt(parts[0],10),direction:parts[0].indexOf("/")>0?parts[0].split("/")[1]:"sendrecv",uri:parts[1]}},SDPUtils.writeExtmap=function(headerExtension){return"a=extmap:"+(headerExtension.id||headerExtension.preferredId)+(headerExtension.direction&&"sendrecv"!==headerExtension.direction?"/"+headerExtension.direction:"")+" "+headerExtension.uri+"\r\n"},SDPUtils.parseFmtp=function(line){for(var kv,parsed={},parts=line.substr(line.indexOf(" ")+1).split(";"),j=0;j<parts.length;j++)kv=parts[j].trim().split("="),parsed[kv[0].trim()]=kv[1];return parsed},SDPUtils.writeFmtp=function(codec){var line="",pt=codec.payloadType;if(void 0!==codec.preferredPayloadType&&(pt=codec.preferredPayloadType),codec.parameters&&Object.keys(codec.parameters).length){var params=[];Object.keys(codec.parameters).forEach(function(param){params.push(param+"="+codec.parameters[param])}),line+="a=fmtp:"+pt+" "+params.join(";")+"\r\n"}return line},SDPUtils.parseRtcpFb=function(line){var parts=line.substr(line.indexOf(" ")+1).split(" ");return{type:parts.shift(),parameter:parts.join(" ")}},SDPUtils.writeRtcpFb=function(codec){var lines="",pt=codec.payloadType;return void 0!==codec.preferredPayloadType&&(pt=codec.preferredPayloadType),codec.rtcpFeedback&&codec.rtcpFeedback.length&&codec.rtcpFeedback.forEach(function(fb){lines+="a=rtcp-fb:"+pt+" "+fb.type+(fb.parameter&&fb.parameter.length?" "+fb.parameter:"")+"\r\n"}),lines},SDPUtils.parseSsrcMedia=function(line){var sp=line.indexOf(" "),parts={ssrc:parseInt(line.substr(7,sp-7),10)},colon=line.indexOf(":",sp);return colon>-1?(parts.attribute=line.substr(sp+1,colon-sp-1),parts.value=line.substr(colon+1)):parts.attribute=line.substr(sp+1),parts},SDPUtils.getMid=function(mediaSection){var mid=SDPUtils.matchPrefix(mediaSection,"a=mid:")[0];if(mid)return mid.substr(6)},SDPUtils.parseFingerprint=function(line){var parts=line.substr(14).split(" ");return{algorithm:parts[0].toLowerCase(),value:parts[1]}},SDPUtils.getDtlsParameters=function(mediaSection,sessionpart){return{role:"auto",fingerprints:SDPUtils.matchPrefix(mediaSection+sessionpart,"a=fingerprint:").map(SDPUtils.parseFingerprint)}},SDPUtils.writeDtlsParameters=function(params,setupType){var sdp="a=setup:"+setupType+"\r\n";return params.fingerprints.forEach(function(fp){sdp+="a=fingerprint:"+fp.algorithm+" "+fp.value+"\r\n"}),sdp},SDPUtils.getIceParameters=function(mediaSection,sessionpart){var lines=SDPUtils.splitLines(mediaSection);return lines=lines.concat(SDPUtils.splitLines(sessionpart)),{usernameFragment:lines.filter(function(line){return 0===line.indexOf("a=ice-ufrag:")})[0].substr(12),password:lines.filter(function(line){return 0===line.indexOf("a=ice-pwd:")})[0].substr(10)}},SDPUtils.writeIceParameters=function(params){return"a=ice-ufrag:"+params.usernameFragment+"\r\na=ice-pwd:"+params.password+"\r\n"},SDPUtils.parseRtpParameters=function(mediaSection){for(var description={codecs:[],headerExtensions:[],fecMechanisms:[],rtcp:[]},lines=SDPUtils.splitLines(mediaSection),mline=lines[0].split(" "),i=3;i<mline.length;i++){var pt=mline[i],rtpmapline=SDPUtils.matchPrefix(mediaSection,"a=rtpmap:"+pt+" ")[0];if(rtpmapline){var codec=SDPUtils.parseRtpMap(rtpmapline),fmtps=SDPUtils.matchPrefix(mediaSection,"a=fmtp:"+pt+" ");switch(codec.parameters=fmtps.length?SDPUtils.parseFmtp(fmtps[0]):{},codec.rtcpFeedback=SDPUtils.matchPrefix(mediaSection,"a=rtcp-fb:"+pt+" ").map(SDPUtils.parseRtcpFb),description.codecs.push(codec),codec.name.toUpperCase()){case"RED":case"ULPFEC":description.fecMechanisms.push(codec.name.toUpperCase())}}}return SDPUtils.matchPrefix(mediaSection,"a=extmap:").forEach(function(line){description.headerExtensions.push(SDPUtils.parseExtmap(line))}),description},SDPUtils.writeRtpDescription=function(kind,caps){var sdp="";sdp+="m="+kind+" ",sdp+=caps.codecs.length>0?"9":"0",sdp+=" UDP/TLS/RTP/SAVPF ",sdp+=caps.codecs.map(function(codec){return void 0!==codec.preferredPayloadType?codec.preferredPayloadType:codec.payloadType}).join(" ")+"\r\n",sdp+="c=IN IP4 0.0.0.0\r\n",sdp+="a=rtcp:9 IN IP4 0.0.0.0\r\n",caps.codecs.forEach(function(codec){sdp+=SDPUtils.writeRtpMap(codec),sdp+=SDPUtils.writeFmtp(codec),sdp+=SDPUtils.writeRtcpFb(codec)});var maxptime=0;return caps.codecs.forEach(function(codec){codec.maxptime>maxptime&&(maxptime=codec.maxptime)}),maxptime>0&&(sdp+="a=maxptime:"+maxptime+"\r\n"),sdp+="a=rtcp-mux\r\n",caps.headerExtensions.forEach(function(extension){sdp+=SDPUtils.writeExtmap(extension)}),sdp},SDPUtils.parseRtpEncodingParameters=function(mediaSection){var secondarySsrc,encodingParameters=[],description=SDPUtils.parseRtpParameters(mediaSection),hasRed=-1!==description.fecMechanisms.indexOf("RED"),hasUlpfec=-1!==description.fecMechanisms.indexOf("ULPFEC"),ssrcs=SDPUtils.matchPrefix(mediaSection,"a=ssrc:").map(function(line){return SDPUtils.parseSsrcMedia(line)}).filter(function(parts){return"cname"===parts.attribute}),primarySsrc=ssrcs.length>0&&ssrcs[0].ssrc,flows=SDPUtils.matchPrefix(mediaSection,"a=ssrc-group:FID").map(function(line){var parts=line.split(" ");return parts.shift(),parts.map(function(part){return parseInt(part,10)})});flows.length>0&&flows[0].length>1&&flows[0][0]===primarySsrc&&(secondarySsrc=flows[0][1]),description.codecs.forEach(function(codec){if("RTX"===codec.name.toUpperCase()&&codec.parameters.apt){var encParam={ssrc:primarySsrc,codecPayloadType:parseInt(codec.parameters.apt,10),rtx:{ssrc:secondarySsrc}};encodingParameters.push(encParam),hasRed&&(encParam=JSON.parse(JSON.stringify(encParam)),encParam.fec={ssrc:secondarySsrc,mechanism:hasUlpfec?"red+ulpfec":"red"},encodingParameters.push(encParam))}}),0===encodingParameters.length&&primarySsrc&&encodingParameters.push({ssrc:primarySsrc});var bandwidth=SDPUtils.matchPrefix(mediaSection,"b=");return bandwidth.length&&(bandwidth=0===bandwidth[0].indexOf("b=TIAS:")?parseInt(bandwidth[0].substr(7),10):0===bandwidth[0].indexOf("b=AS:")?1e3*parseInt(bandwidth[0].substr(5),10)*.95-16e3:void 0,encodingParameters.forEach(function(params){params.maxBitrate=bandwidth})),encodingParameters},SDPUtils.parseRtcpParameters=function(mediaSection){var rtcpParameters={},remoteSsrc=SDPUtils.matchPrefix(mediaSection,"a=ssrc:").map(function(line){return SDPUtils.parseSsrcMedia(line)}).filter(function(obj){return"cname"===obj.attribute})[0];remoteSsrc&&(rtcpParameters.cname=remoteSsrc.value,rtcpParameters.ssrc=remoteSsrc.ssrc);var rsize=SDPUtils.matchPrefix(mediaSection,"a=rtcp-rsize");rtcpParameters.reducedSize=rsize.length>0,rtcpParameters.compound=0===rsize.length;var mux=SDPUtils.matchPrefix(mediaSection,"a=rtcp-mux");return rtcpParameters.mux=mux.length>0,rtcpParameters},SDPUtils.parseMsid=function(mediaSection){var parts,spec=SDPUtils.matchPrefix(mediaSection,"a=msid:");if(1===spec.length)return parts=spec[0].substr(7).split(" "),{stream:parts[0],track:parts[1]};var planB=SDPUtils.matchPrefix(mediaSection,"a=ssrc:").map(function(line){return SDPUtils.parseSsrcMedia(line)}).filter(function(parts){return"msid"===parts.attribute});return planB.length>0?(parts=planB[0].value.split(" "),{stream:parts[0],track:parts[1]}):void 0},SDPUtils.generateSessionId=function(){return Math.random().toString().substr(2,21)},SDPUtils.writeSessionBoilerplate=function(sessId,sessVer){var version=void 0!==sessVer?sessVer:2;return"v=0\r\no=thisisadapterortc "+(sessId||SDPUtils.generateSessionId())+" "+version+" IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\n"},SDPUtils.writeMediaSection=function(transceiver,caps,type,stream){var sdp=SDPUtils.writeRtpDescription(transceiver.kind,caps);if(sdp+=SDPUtils.writeIceParameters(transceiver.iceGatherer.getLocalParameters()),sdp+=SDPUtils.writeDtlsParameters(transceiver.dtlsTransport.getLocalParameters(),"offer"===type?"actpass":"active"),sdp+="a=mid:"+transceiver.mid+"\r\n",transceiver.direction?sdp+="a="+transceiver.direction+"\r\n":transceiver.rtpSender&&transceiver.rtpReceiver?sdp+="a=sendrecv\r\n":transceiver.rtpSender?sdp+="a=sendonly\r\n":transceiver.rtpReceiver?sdp+="a=recvonly\r\n":sdp+="a=inactive\r\n",transceiver.rtpSender){var msid="msid:"+stream.id+" "+transceiver.rtpSender.track.id+"\r\n";sdp+="a="+msid,sdp+="a=ssrc:"+transceiver.sendEncodingParameters[0].ssrc+" "+msid,transceiver.sendEncodingParameters[0].rtx&&(sdp+="a=ssrc:"+transceiver.sendEncodingParameters[0].rtx.ssrc+" "+msid,sdp+="a=ssrc-group:FID "+transceiver.sendEncodingParameters[0].ssrc+" "+transceiver.sendEncodingParameters[0].rtx.ssrc+"\r\n")}return sdp+="a=ssrc:"+transceiver.sendEncodingParameters[0].ssrc+" cname:"+SDPUtils.localCName+"\r\n",transceiver.rtpSender&&transceiver.sendEncodingParameters[0].rtx&&(sdp+="a=ssrc:"+transceiver.sendEncodingParameters[0].rtx.ssrc+" cname:"+SDPUtils.localCName+"\r\n"),sdp},SDPUtils.getDirection=function(mediaSection,sessionpart){for(var lines=SDPUtils.splitLines(mediaSection),i=0;i<lines.length;i++)switch(lines[i]){case"a=sendrecv":case"a=sendonly":case"a=recvonly":case"a=inactive":return lines[i].substr(2)}return sessionpart?SDPUtils.getDirection(sessionpart):"sendrecv"},SDPUtils.getKind=function(mediaSection){return SDPUtils.splitLines(mediaSection)[0].split(" ")[0].substr(2)},SDPUtils.isRejected=function(mediaSection){return"0"===mediaSection.split(" ",2)[1]},module.exports=SDPUtils},{}],3:[function(requirecopy,module,exports){(function(global){"use strict";var adapterFactory=requirecopy("./adapter_factory.js");module.exports=adapterFactory({window:global.window})}).call(this,"undefined"!=typeof global?global:"undefined"!=typeof self?self:"undefined"!=typeof window?window:{})},{"./adapter_factory.js":4}],4:[function(requirecopy,module,exports){"use strict";module.exports=function(dependencies,opts){var window=dependencies&&dependencies.window,options={shimChrome:!0,shimFirefox:!0,shimEdge:!0,shimSafari:!0};for(var key in opts)hasOwnProperty.call(opts,key)&&(options[key]=opts[key]);var utils=requirecopy("./utils"),logging=utils.log,browserDetails=utils.detectBrowser(window),adapter={browserDetails:browserDetails,extractVersion:utils.extractVersion,disableLog:utils.disableLog,disableWarnings:utils.disableWarnings},chromeShim=requirecopy("./chrome/chrome_shim")||null,edgeShim=requirecopy("./edge/edge_shim")||null,firefoxShim=requirecopy("./firefox/firefox_shim")||null,safariShim=requirecopy("./safari/safari_shim")||null,commonShim=requirecopy("./common_shim")||null;switch(browserDetails.browser){case"chrome":if(!chromeShim||!chromeShim.shimPeerConnection||!options.shimChrome)return logging("Chrome shim is not included in this adapter release."),adapter;logging("adapter.js shimming chrome."),adapter.browserShim=chromeShim,chromeShim.shimGetUserMedia(window),chromeShim.shimMediaStream(window),utils.shimCreateObjectURL(window),chromeShim.shimSourceObject(window),chromeShim.shimPeerConnection(window),chromeShim.shimOnTrack(window),chromeShim.shimAddTrackRemoveTrack(window),chromeShim.shimGetSendersWithDtmf(window),commonShim.shimRTCIceCandidate(window);break;case"firefox":if(!firefoxShim||!firefoxShim.shimPeerConnection||!options.shimFirefox)return logging("Firefox shim is not included in this adapter release."),adapter;logging("adapter.js shimming firefox."),adapter.browserShim=firefoxShim,firefoxShim.shimGetUserMedia(window),utils.shimCreateObjectURL(window),firefoxShim.shimSourceObject(window),firefoxShim.shimPeerConnection(window),firefoxShim.shimOnTrack(window),commonShim.shimRTCIceCandidate(window);break;case"edge":if(!edgeShim||!edgeShim.shimPeerConnection||!options.shimEdge)return logging("MS edge shim is not included in this adapter release."),adapter;logging("adapter.js shimming edge."),adapter.browserShim=edgeShim,edgeShim.shimGetUserMedia(window),utils.shimCreateObjectURL(window),edgeShim.shimPeerConnection(window),edgeShim.shimReplaceTrack(window);break;case"safari":if(!safariShim||!options.shimSafari)return logging("Safari shim is not included in this adapter release."),adapter;logging("adapter.js shimming safari."),adapter.browserShim=safariShim,utils.shimCreateObjectURL(window),safariShim.shimRTCIceServerUrls(window),safariShim.shimCallbacksAPI(window),safariShim.shimLocalStreamsAPI(window),safariShim.shimRemoteStreamsAPI(window),safariShim.shimTrackEventTransceiver(window),safariShim.shimGetUserMedia(window),commonShim.shimRTCIceCandidate(window);break;default:logging("Unsupported browser!")}return adapter}},{"./chrome/chrome_shim":5,"./common_shim":7,"./edge/edge_shim":8,"./firefox/firefox_shim":10,"./safari/safari_shim":12,"./utils":13}],5:[function(requirecopy,module,exports){"use strict";var utils=requirecopy("../utils.js"),logging=utils.log,chromeShim={shimMediaStream:function(window){window.MediaStream=window.MediaStream||window.webkitMediaStream},shimOnTrack:function(window){if("object"==typeof window&&window.RTCPeerConnection&&!("ontrack"in window.RTCPeerConnection.prototype)){Object.defineProperty(window.RTCPeerConnection.prototype,"ontrack",{get:function(){return this._ontrack},set:function(f){this._ontrack&&this.removeEventListener("track",this._ontrack),this.addEventListener("track",this._ontrack=f)}});var origSetRemoteDescription=window.RTCPeerConnection.prototype.setRemoteDescription;window.RTCPeerConnection.prototype.setRemoteDescription=function(){var pc=this;return pc._ontrackpoly||(pc._ontrackpoly=function(e){e.stream.addEventListener("addtrack",function(te){var receiver;receiver=window.RTCPeerConnection.prototype.getReceivers?pc.getReceivers().find(function(r){return r.track&&r.track.id===te.track.id}):{track:te.track};var event=new Event("track");event.track=te.track,event.receiver=receiver,event.transceiver={receiver:receiver},event.streams=[e.stream],pc.dispatchEvent(event)}),e.stream.getTracks().forEach(function(track){var receiver;receiver=window.RTCPeerConnection.prototype.getReceivers?pc.getReceivers().find(function(r){return r.track&&r.track.id===track.id}):{track:track};var event=new Event("track");event.track=track,event.receiver=receiver,event.transceiver={receiver:receiver},event.streams=[e.stream],pc.dispatchEvent(event)})},pc.addEventListener("addstream",pc._ontrackpoly)),origSetRemoteDescription.apply(pc,arguments)}}},shimGetSendersWithDtmf:function(window){if("object"==typeof window&&window.RTCPeerConnection&&!("getSenders"in window.RTCPeerConnection.prototype)&&"createDTMFSender"in window.RTCPeerConnection.prototype){var shimSenderWithDtmf=function(pc,track){return{track:track,get dtmf(){return void 0===this._dtmf&&("audio"===track.kind?this._dtmf=pc.createDTMFSender(track):this._dtmf=null),this._dtmf},_pc:pc}};if(!window.RTCPeerConnection.prototype.getSenders){window.RTCPeerConnection.prototype.getSenders=function(){return this._senders=this._senders||[],this._senders.slice()};var origAddTrack=window.RTCPeerConnection.prototype.addTrack;window.RTCPeerConnection.prototype.addTrack=function(track,stream){var pc=this,sender=origAddTrack.apply(pc,arguments);return sender||(sender=shimSenderWithDtmf(pc,track),pc._senders.push(sender)),sender}
-;var origRemoveTrack=window.RTCPeerConnection.prototype.removeTrack;window.RTCPeerConnection.prototype.removeTrack=function(sender){var pc=this;origRemoveTrack.apply(pc,arguments);var idx=pc._senders.indexOf(sender);-1!==idx&&pc._senders.splice(idx,1)}}var origAddStream=window.RTCPeerConnection.prototype.addStream;window.RTCPeerConnection.prototype.addStream=function(stream){var pc=this;pc._senders=pc._senders||[],origAddStream.apply(pc,[stream]),stream.getTracks().forEach(function(track){pc._senders.push(shimSenderWithDtmf(pc,track))})};var origRemoveStream=window.RTCPeerConnection.prototype.removeStream;window.RTCPeerConnection.prototype.removeStream=function(stream){var pc=this;pc._senders=pc._senders||[],origRemoveStream.apply(pc,[pc._streams[stream.id]||stream]),stream.getTracks().forEach(function(track){var sender=pc._senders.find(function(s){return s.track===track});sender&&pc._senders.splice(pc._senders.indexOf(sender),1)})}}else if("object"==typeof window&&window.RTCPeerConnection&&"getSenders"in window.RTCPeerConnection.prototype&&"createDTMFSender"in window.RTCPeerConnection.prototype&&window.RTCRtpSender&&!("dtmf"in window.RTCRtpSender.prototype)){var origGetSenders=window.RTCPeerConnection.prototype.getSenders;window.RTCPeerConnection.prototype.getSenders=function(){var pc=this,senders=origGetSenders.apply(pc,[]);return senders.forEach(function(sender){sender._pc=pc}),senders},Object.defineProperty(window.RTCRtpSender.prototype,"dtmf",{get:function(){return void 0===this._dtmf&&("audio"===this.track.kind?this._dtmf=this._pc.createDTMFSender(this.track):this._dtmf=null),this._dtmf}})}},shimSourceObject:function(window){var URL=window&&window.URL;"object"==typeof window&&(!window.HTMLMediaElement||"srcObject"in window.HTMLMediaElement.prototype||Object.defineProperty(window.HTMLMediaElement.prototype,"srcObject",{get:function(){return this._srcObject},set:function(stream){var self=this;if(this._srcObject=stream,this.src&&URL.revokeObjectURL(this.src),!stream)return void(this.src="");this.src=URL.createObjectURL(stream),stream.addEventListener("addtrack",function(){self.src&&URL.revokeObjectURL(self.src),self.src=URL.createObjectURL(stream)}),stream.addEventListener("removetrack",function(){self.src&&URL.revokeObjectURL(self.src),self.src=URL.createObjectURL(stream)})}}))},shimAddTrackRemoveTrack:function(window){function replaceInternalStreamId(pc,description){var sdp=description.sdp;return Object.keys(pc._reverseStreams||[]).forEach(function(internalId){var externalStream=pc._reverseStreams[internalId],internalStream=pc._streams[externalStream.id];sdp=sdp.replace(new RegExp(internalStream.id,"g"),externalStream.id)}),new RTCSessionDescription({type:description.type,sdp:sdp})}function replaceExternalStreamId(pc,description){var sdp=description.sdp;return Object.keys(pc._reverseStreams||[]).forEach(function(internalId){var externalStream=pc._reverseStreams[internalId],internalStream=pc._streams[externalStream.id];sdp=sdp.replace(new RegExp(externalStream.id,"g"),internalStream.id)}),new RTCSessionDescription({type:description.type,sdp:sdp})}if(!window.RTCPeerConnection.prototype.addTrack){var origGetLocalStreams=window.RTCPeerConnection.prototype.getLocalStreams;window.RTCPeerConnection.prototype.getLocalStreams=function(){var self=this,nativeStreams=origGetLocalStreams.apply(this);return self._reverseStreams=self._reverseStreams||{},nativeStreams.map(function(stream){return self._reverseStreams[stream.id]})};var origAddStream=window.RTCPeerConnection.prototype.addStream;window.RTCPeerConnection.prototype.addStream=function(stream){var pc=this;if(pc._streams=pc._streams||{},pc._reverseStreams=pc._reverseStreams||{},stream.getTracks().forEach(function(track){if(pc.getSenders().find(function(s){return s.track===track}))throw new DOMException("Track already exists.","InvalidAccessError")}),!pc._reverseStreams[stream.id]){var newStream=new window.MediaStream(stream.getTracks());pc._streams[stream.id]=newStream,pc._reverseStreams[newStream.id]=stream,stream=newStream}origAddStream.apply(pc,[stream])};var origRemoveStream=window.RTCPeerConnection.prototype.removeStream;window.RTCPeerConnection.prototype.removeStream=function(stream){var pc=this;pc._streams=pc._streams||{},pc._reverseStreams=pc._reverseStreams||{},origRemoveStream.apply(pc,[pc._streams[stream.id]||stream]),delete pc._reverseStreams[pc._streams[stream.id]?pc._streams[stream.id].id:stream.id],delete pc._streams[stream.id]},window.RTCPeerConnection.prototype.addTrack=function(track,stream){var pc=this;if("closed"===pc.signalingState)throw new DOMException("The RTCPeerConnection's signalingState is 'closed'.","InvalidStateError");var streams=[].slice.call(arguments,1);if(1!==streams.length||!streams[0].getTracks().find(function(t){return t===track}))throw new DOMException("The adapter.js addTrack polyfill only supports a single  stream which is associated with the specified track.","NotSupportedError");if(pc.getSenders().find(function(s){return s.track===track}))throw new DOMException("Track already exists.","InvalidAccessError");pc._streams=pc._streams||{},pc._reverseStreams=pc._reverseStreams||{};var oldStream=pc._streams[stream.id];if(oldStream)oldStream.addTrack(track),Promise.resolve().then(function(){pc.dispatchEvent(new Event("negotiationneeded"))});else{var newStream=new window.MediaStream([track]);pc._streams[stream.id]=newStream,pc._reverseStreams[newStream.id]=stream,pc.addStream(newStream)}return pc.getSenders().find(function(s){return s.track===track})},["createOffer","createAnswer"].forEach(function(method){var nativeMethod=window.RTCPeerConnection.prototype[method];window.RTCPeerConnection.prototype[method]=function(){var pc=this,args=arguments;return arguments.length&&"function"==typeof arguments[0]?nativeMethod.apply(pc,[function(description){var desc=replaceInternalStreamId(pc,description);args[0].apply(null,[desc])},function(err){args[1]&&args[1].apply(null,err)},arguments[2]]):nativeMethod.apply(pc,arguments).then(function(description){return replaceInternalStreamId(pc,description)})}});var origSetLocalDescription=window.RTCPeerConnection.prototype.setLocalDescription;window.RTCPeerConnection.prototype.setLocalDescription=function(){var pc=this;return arguments.length&&arguments[0].type?(arguments[0]=replaceExternalStreamId(pc,arguments[0]),origSetLocalDescription.apply(pc,arguments)):origSetLocalDescription.apply(pc,arguments)};var origLocalDescription=Object.getOwnPropertyDescriptor(window.RTCPeerConnection.prototype,"localDescription");Object.defineProperty(window.RTCPeerConnection.prototype,"localDescription",{get:function(){var pc=this,description=origLocalDescription.get.apply(this);return""===description.type?description:replaceInternalStreamId(pc,description)}}),window.RTCPeerConnection.prototype.removeTrack=function(sender){var pc=this;if("closed"===pc.signalingState)throw new DOMException("The RTCPeerConnection's signalingState is 'closed'.","InvalidStateError");if(!sender._pc)throw new DOMException("Argument 1 of RTCPeerConnection.removeTrack does not implement interface RTCRtpSender.","TypeError");if(sender._pc!==pc)throw new DOMException("Sender was not created by this connection.","InvalidAccessError");pc._streams=pc._streams||{};var stream;Object.keys(pc._streams).forEach(function(streamid){pc._streams[streamid].getTracks().find(function(track){return sender.track===track})&&(stream=pc._streams[streamid])}),stream&&(1===stream.getTracks().length?pc.removeStream(stream):stream.removeTrack(sender.track),pc.dispatchEvent(new Event("negotiationneeded")))}}},shimPeerConnection:function(window){var browserDetails=utils.detectBrowser(window);if(window.RTCPeerConnection){var OrigPeerConnection=window.RTCPeerConnection;window.RTCPeerConnection=function(pcConfig,pcConstraints){if(pcConfig&&pcConfig.iceServers){for(var newIceServers=[],i=0;i<pcConfig.iceServers.length;i++){var server=pcConfig.iceServers[i];!server.hasOwnProperty("urls")&&server.hasOwnProperty("url")?(utils.deprecated("RTCIceServer.url","RTCIceServer.urls"),server=JSON.parse(JSON.stringify(server)),server.urls=server.url,newIceServers.push(server)):newIceServers.push(pcConfig.iceServers[i])}pcConfig.iceServers=newIceServers}return new OrigPeerConnection(pcConfig,pcConstraints)},window.RTCPeerConnection.prototype=OrigPeerConnection.prototype,Object.defineProperty(window.RTCPeerConnection,"generateCertificate",{get:function(){return OrigPeerConnection.generateCertificate}})}else window.RTCPeerConnection=function(pcConfig,pcConstraints){return logging("PeerConnection"),pcConfig&&pcConfig.iceTransportPolicy&&(pcConfig.iceTransports=pcConfig.iceTransportPolicy),new window.webkitRTCPeerConnection(pcConfig,pcConstraints)},window.RTCPeerConnection.prototype=window.webkitRTCPeerConnection.prototype,window.webkitRTCPeerConnection.generateCertificate&&Object.defineProperty(window.RTCPeerConnection,"generateCertificate",{get:function(){return window.webkitRTCPeerConnection.generateCertificate}});var origGetStats=window.RTCPeerConnection.prototype.getStats;window.RTCPeerConnection.prototype.getStats=function(selector,successCallback,errorCallback){var self=this,args=arguments;if(arguments.length>0&&"function"==typeof selector)return origGetStats.apply(this,arguments);if(0===origGetStats.length&&(0===arguments.length||"function"!=typeof arguments[0]))return origGetStats.apply(this,[]);var fixChromeStats_=function(response){var standardReport={};return response.result().forEach(function(report){var standardStats={id:report.id,timestamp:report.timestamp,type:{localcandidate:"local-candidate",remotecandidate:"remote-candidate"}[report.type]||report.type};report.names().forEach(function(name){standardStats[name]=report.stat(name)}),standardReport[standardStats.id]=standardStats}),standardReport},makeMapStats=function(stats){return new Map(Object.keys(stats).map(function(key){return[key,stats[key]]}))};if(arguments.length>=2){var successCallbackWrapper_=function(response){args[1](makeMapStats(fixChromeStats_(response)))};return origGetStats.apply(this,[successCallbackWrapper_,arguments[0]])}return new Promise(function(resolve,reject){origGetStats.apply(self,[function(response){resolve(makeMapStats(fixChromeStats_(response)))},reject])}).then(successCallback,errorCallback)},browserDetails.version<51&&["setLocalDescription","setRemoteDescription","addIceCandidate"].forEach(function(method){var nativeMethod=window.RTCPeerConnection.prototype[method];window.RTCPeerConnection.prototype[method]=function(){var args=arguments,self=this,promise=new Promise(function(resolve,reject){nativeMethod.apply(self,[args[0],resolve,reject])});return args.length<2?promise:promise.then(function(){args[1].apply(null,[])},function(err){args.length>=3&&args[2].apply(null,[err])})}}),browserDetails.version<52&&["createOffer","createAnswer"].forEach(function(method){var nativeMethod=window.RTCPeerConnection.prototype[method];window.RTCPeerConnection.prototype[method]=function(){var self=this;if(arguments.length<1||1===arguments.length&&"object"==typeof arguments[0]){var opts=1===arguments.length?arguments[0]:void 0;return new Promise(function(resolve,reject){nativeMethod.apply(self,[resolve,reject,opts])})}return nativeMethod.apply(this,arguments)}}),["setLocalDescription","setRemoteDescription","addIceCandidate"].forEach(function(method){var nativeMethod=window.RTCPeerConnection.prototype[method];window.RTCPeerConnection.prototype[method]=function(){return arguments[0]=new("addIceCandidate"===method?window.RTCIceCandidate:window.RTCSessionDescription)(arguments[0]),nativeMethod.apply(this,arguments)}});var nativeAddIceCandidate=window.RTCPeerConnection.prototype.addIceCandidate;window.RTCPeerConnection.prototype.addIceCandidate=function(){return arguments[0]?nativeAddIceCandidate.apply(this,arguments):(arguments[1]&&arguments[1].apply(null),Promise.resolve())}}};module.exports={shimMediaStream:chromeShim.shimMediaStream,shimOnTrack:chromeShim.shimOnTrack,shimAddTrackRemoveTrack:chromeShim.shimAddTrackRemoveTrack,shimGetSendersWithDtmf:chromeShim.shimGetSendersWithDtmf,shimSourceObject:chromeShim.shimSourceObject,shimPeerConnection:chromeShim.shimPeerConnection,shimGetUserMedia:requirecopy("./getusermedia")}},{"../utils.js":13,"./getusermedia":6}],6:[function(requirecopy,module,exports){"use strict";var utils=requirecopy("../utils.js"),logging=utils.log;module.exports=function(window){var browserDetails=utils.detectBrowser(window),navigator=window&&window.navigator,constraintsToChrome_=function(c){if("object"!=typeof c||c.mandatory||c.optional)return c;var cc={};return Object.keys(c).forEach(function(key){if("require"!==key&&"advanced"!==key&&"mediaSource"!==key){var r="object"==typeof c[key]?c[key]:{ideal:c[key]};void 0!==r.exact&&"number"==typeof r.exact&&(r.min=r.max=r.exact);var oldname_=function(prefix,name){return prefix?prefix+name.charAt(0).toUpperCase()+name.slice(1):"deviceId"===name?"sourceId":name};if(void 0!==r.ideal){cc.optional=cc.optional||[];var oc={};"number"==typeof r.ideal?(oc[oldname_("min",key)]=r.ideal,cc.optional.push(oc),oc={},oc[oldname_("max",key)]=r.ideal,cc.optional.push(oc)):(oc[oldname_("",key)]=r.ideal,cc.optional.push(oc))}void 0!==r.exact&&"number"!=typeof r.exact?(cc.mandatory=cc.mandatory||{},cc.mandatory[oldname_("",key)]=r.exact):["min","max"].forEach(function(mix){void 0!==r[mix]&&(cc.mandatory=cc.mandatory||{},cc.mandatory[oldname_(mix,key)]=r[mix])})}}),c.advanced&&(cc.optional=(cc.optional||[]).concat(c.advanced)),cc},shimConstraints_=function(constraints,func){if((constraints=JSON.parse(JSON.stringify(constraints)))&&"object"==typeof constraints.audio){var remap=function(obj,a,b){a in obj&&!(b in obj)&&(obj[b]=obj[a],delete obj[a])};constraints=JSON.parse(JSON.stringify(constraints)),remap(constraints.audio,"autoGainControl","googAutoGainControl"),remap(constraints.audio,"noiseSuppression","googNoiseSuppression"),constraints.audio=constraintsToChrome_(constraints.audio)}if(constraints&&"object"==typeof constraints.video){var face=constraints.video.facingMode;face=face&&("object"==typeof face?face:{ideal:face});var getSupportedFacingModeLies=browserDetails.version<61;if(face&&("user"===face.exact||"environment"===face.exact||"user"===face.ideal||"environment"===face.ideal)&&(!navigator.mediaDevices.getSupportedConstraints||!navigator.mediaDevices.getSupportedConstraints().facingMode||getSupportedFacingModeLies)){delete constraints.video.facingMode;var matches;if("environment"===face.exact||"environment"===face.ideal?matches=["back","rear"]:"user"!==face.exact&&"user"!==face.ideal||(matches=["front"]),matches)return navigator.mediaDevices.enumerateDevices().then(function(devices){devices=devices.filter(function(d){return"videoinput"===d.kind});var dev=devices.find(function(d){return matches.some(function(match){return-1!==d.label.toLowerCase().indexOf(match)})});return!dev&&devices.length&&-1!==matches.indexOf("back")&&(dev=devices[devices.length-1]),dev&&(constraints.video.deviceId=face.exact?{exact:dev.deviceId}:{ideal:dev.deviceId}),constraints.video=constraintsToChrome_(constraints.video),logging("chrome: "+JSON.stringify(constraints)),func(constraints)})}constraints.video=constraintsToChrome_(constraints.video)}return logging("chrome: "+JSON.stringify(constraints)),func(constraints)},shimError_=function(e){return{name:{PermissionDeniedError:"NotAllowedError",InvalidStateError:"NotReadableError",DevicesNotFoundError:"NotFoundError",ConstraintNotSatisfiedError:"OverconstrainedError",TrackStartError:"NotReadableError",MediaDeviceFailedDueToShutdown:"NotReadableError",MediaDeviceKillSwitchOn:"NotReadableError"}[e.name]||e.name,message:e.message,constraint:e.constraintName,toString:function(){return this.name+(this.message&&": ")+this.message}}},getUserMedia_=function(constraints,onSuccess,onError){shimConstraints_(constraints,function(c){navigator.webkitGetUserMedia(c,onSuccess,function(e){onError&&onError(shimError_(e))})})};navigator.getUserMedia=getUserMedia_;var getUserMediaPromise_=function(constraints){return new Promise(function(resolve,reject){navigator.getUserMedia(constraints,resolve,reject)})};if(navigator.mediaDevices||(navigator.mediaDevices={getUserMedia:getUserMediaPromise_,enumerateDevices:function(){return new Promise(function(resolve){var kinds={audio:"audioinput",video:"videoinput"};return window.MediaStreamTrack.getSources(function(devices){resolve(devices.map(function(device){return{label:device.label,kind:kinds[device.kind],deviceId:device.id,groupId:""}}))})})},getSupportedConstraints:function(){return{deviceId:!0,echoCancellation:!0,facingMode:!0,frameRate:!0,height:!0,width:!0}}}),navigator.mediaDevices.getUserMedia){var origGetUserMedia=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);navigator.mediaDevices.getUserMedia=function(cs){return shimConstraints_(cs,function(c){return origGetUserMedia(c).then(function(stream){if(c.audio&&!stream.getAudioTracks().length||c.video&&!stream.getVideoTracks().length)throw stream.getTracks().forEach(function(track){track.stop()}),new DOMException("","NotFoundError");return stream},function(e){return Promise.reject(shimError_(e))})})}}else navigator.mediaDevices.getUserMedia=function(constraints){return getUserMediaPromise_(constraints)};void 0===navigator.mediaDevices.addEventListener&&(navigator.mediaDevices.addEventListener=function(){logging("Dummy mediaDevices.addEventListener called.")}),void 0===navigator.mediaDevices.removeEventListener&&(navigator.mediaDevices.removeEventListener=function(){logging("Dummy mediaDevices.removeEventListener called.")})}},{"../utils.js":13}],7:[function(requirecopy,module,exports){"use strict";function wrapPeerConnectionEvent(window,eventNameToWrap,wrapper){if(window.RTCPeerConnection){var proto=window.RTCPeerConnection.prototype,nativeAddEventListener=proto.addEventListener;proto.addEventListener=function(nativeEventName,cb){if(nativeEventName!==eventNameToWrap)return nativeAddEventListener.apply(this,arguments);var wrappedCallback=function(e){cb(wrapper(e))};return this._eventMap=this._eventMap||{},this._eventMap[cb]=wrappedCallback,nativeAddEventListener.apply(this,[nativeEventName,wrappedCallback])};var nativeRemoveEventListener=proto.removeEventListener;proto.removeEventListener=function(nativeEventName,cb){if(nativeEventName!==eventNameToWrap||!this._eventMap||!this._eventMap[cb])return nativeRemoveEventListener.apply(this,arguments);var unwrappedCb=this._eventMap[cb];return delete this._eventMap[cb],nativeRemoveEventListener.apply(this,[nativeEventName,unwrappedCb])},Object.defineProperty(proto,"on"+eventNameToWrap,{get:function(){return this["_on"+eventNameToWrap]},set:function(cb){this["_on"+eventNameToWrap]&&(this.removeEventListener(eventNameToWrap,this["_on"+eventNameToWrap]),delete this["_on"+eventNameToWrap]),cb&&this.addEventListener(eventNameToWrap,this["_on"+eventNameToWrap]=cb)}})}}var SDPUtils=requirecopy("sdp");module.exports={shimRTCIceCandidate:function(window){if(!(window.RTCIceCandidate&&"foundation"in window.RTCIceCandidate.prototype)){var NativeRTCIceCandidate=window.RTCIceCandidate;window.RTCIceCandidate=function(args){"object"==typeof args&&args.candidate&&0===args.candidate.indexOf("a=")&&(args=JSON.parse(JSON.stringify(args)),args.candidate=args.candidate.substr(2));var nativeCandidate=new NativeRTCIceCandidate(args),parsedCandidate=SDPUtils.parseCandidate(args.candidate),augmentedCandidate=Object.assign(nativeCandidate,parsedCandidate);return augmentedCandidate.toJSON=function(){return{candidate:augmentedCandidate.candidate,sdpMid:augmentedCandidate.sdpMid,sdpMLineIndex:augmentedCandidate.sdpMLineIndex,usernameFragment:augmentedCandidate.usernameFragment}},augmentedCandidate},wrapPeerConnectionEvent(window,"icecandidate",function(e){return e.candidate&&Object.defineProperty(e,"candidate",{value:new window.RTCIceCandidate(e.candidate),writable:"false"}),e})}}}},{sdp:2}],8:[function(requirecopy,module,exports){"use strict";var utils=requirecopy("../utils"),shimRTCPeerConnection=requirecopy("rtcpeerconnection-shim");module.exports={shimGetUserMedia:requirecopy("./getusermedia"),shimPeerConnection:function(window){var browserDetails=utils.detectBrowser(window);if(window.RTCIceGatherer&&(window.RTCIceCandidate||(window.RTCIceCandidate=function(args){return args}),window.RTCSessionDescription||(window.RTCSessionDescription=function(args){return args}),browserDetails.version<15025)){var origMSTEnabled=Object.getOwnPropertyDescriptor(window.MediaStreamTrack.prototype,"enabled");Object.defineProperty(window.MediaStreamTrack.prototype,"enabled",{set:function(value){origMSTEnabled.set.call(this,value);var ev=new Event("enabled");ev.enabled=value,this.dispatchEvent(ev)}})}!window.RTCRtpSender||"dtmf"in window.RTCRtpSender.prototype||Object.defineProperty(window.RTCRtpSender.prototype,"dtmf",{get:function(){return void 0===this._dtmf&&("audio"===this.track.kind?this._dtmf=new window.RTCDtmfSender(this):"video"===this.track.kind&&(this._dtmf=null)),this._dtmf}}),window.RTCPeerConnection=shimRTCPeerConnection(window,browserDetails.version)},shimReplaceTrack:function(window){!window.RTCRtpSender||"replaceTrack"in window.RTCRtpSender.prototype||(window.RTCRtpSender.prototype.replaceTrack=window.RTCRtpSender.prototype.setTrack)}}},{"../utils":13,"./getusermedia":9,"rtcpeerconnection-shim":1}],9:[function(requirecopy,module,exports){"use strict";module.exports=function(window){var navigator=window&&window.navigator,shimError_=function(e){return{name:{PermissionDeniedError:"NotAllowedError"}[e.name]||e.name,message:e.message,constraint:e.constraint,toString:function(){return this.name}}},origGetUserMedia=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);navigator.mediaDevices.getUserMedia=function(c){return origGetUserMedia(c).catch(function(e){return Promise.reject(shimError_(e))})}}},{}],10:[function(requirecopy,module,exports){"use strict";var utils=requirecopy("../utils"),firefoxShim={shimOnTrack:function(window){"object"!=typeof window||!window.RTCPeerConnection||"ontrack"in window.RTCPeerConnection.prototype||Object.defineProperty(window.RTCPeerConnection.prototype,"ontrack",{get:function(){return this._ontrack},set:function(f){this._ontrack&&(this.removeEventListener("track",this._ontrack),this.removeEventListener("addstream",this._ontrackpoly)),this.addEventListener("track",this._ontrack=f),this.addEventListener("addstream",this._ontrackpoly=function(e){e.stream.getTracks().forEach(function(track){var event=new Event("track");event.track=track,event.receiver={track:track},event.transceiver={receiver:event.receiver},event.streams=[e.stream],this.dispatchEvent(event)}.bind(this))}.bind(this))}}),"object"==typeof window&&window.RTCPeerConnection&&"receiver"in window.RTCTrackEvent.prototype&&!("transceiver"in window.RTCTrackEvent.prototype)&&Object.defineProperty(window.RTCTrackEvent.prototype,"transceiver",{get:function(){return{receiver:this.receiver}}})},shimSourceObject:function(window){"object"==typeof window&&(!window.HTMLMediaElement||"srcObject"in window.HTMLMediaElement.prototype||Object.defineProperty(window.HTMLMediaElement.prototype,"srcObject",{get:function(){return this.mozSrcObject},set:function(stream){this.mozSrcObject=stream}}))},shimPeerConnection:function(window){var browserDetails=utils.detectBrowser(window);if("object"==typeof window&&(window.RTCPeerConnection||window.mozRTCPeerConnection)){window.RTCPeerConnection||(window.RTCPeerConnection=function(pcConfig,pcConstraints){if(browserDetails.version<38&&pcConfig&&pcConfig.iceServers){for(var newIceServers=[],i=0;i<pcConfig.iceServers.length;i++){var server=pcConfig.iceServers[i];if(server.hasOwnProperty("urls"))for(var j=0;j<server.urls.length;j++){var newServer={url:server.urls[j]};0===server.urls[j].indexOf("turn")&&(newServer.username=server.username,newServer.credential=server.credential),newIceServers.push(newServer)}else newIceServers.push(pcConfig.iceServers[i])}pcConfig.iceServers=newIceServers}return new window.mozRTCPeerConnection(pcConfig,pcConstraints)},window.RTCPeerConnection.prototype=window.mozRTCPeerConnection.prototype,window.mozRTCPeerConnection.generateCertificate&&Object.defineProperty(window.RTCPeerConnection,"generateCertificate",{get:function(){return window.mozRTCPeerConnection.generateCertificate}}),window.RTCSessionDescription=window.mozRTCSessionDescription,window.RTCIceCandidate=window.mozRTCIceCandidate),["setLocalDescription","setRemoteDescription","addIceCandidate"].forEach(function(method){var nativeMethod=window.RTCPeerConnection.prototype[method];window.RTCPeerConnection.prototype[method]=function(){return arguments[0]=new("addIceCandidate"===method?window.RTCIceCandidate:window.RTCSessionDescription)(arguments[0]),nativeMethod.apply(this,arguments)}});var nativeAddIceCandidate=window.RTCPeerConnection.prototype.addIceCandidate;window.RTCPeerConnection.prototype.addIceCandidate=function(){return arguments[0]?nativeAddIceCandidate.apply(this,arguments):(arguments[1]&&arguments[1].apply(null),Promise.resolve())};var makeMapStats=function(stats){var map=new Map;return Object.keys(stats).forEach(function(key){map.set(key,stats[key]),map[key]=stats[key]}),map},modernStatsTypes={inboundrtp:"inbound-rtp",outboundrtp:"outbound-rtp",candidatepair:"candidate-pair",localcandidate:"local-candidate",remotecandidate:"remote-candidate"},nativeGetStats=window.RTCPeerConnection.prototype.getStats;window.RTCPeerConnection.prototype.getStats=function(selector,onSucc,onErr){return nativeGetStats.apply(this,[selector||null]).then(function(stats){if(browserDetails.version<48&&(stats=makeMapStats(stats)),browserDetails.version<53&&!onSucc)try{stats.forEach(function(stat){stat.type=modernStatsTypes[stat.type]||stat.type})}catch(e){if("TypeError"!==e.name)throw e;stats.forEach(function(stat,i){stats.set(i,Object.assign({},stat,{type:modernStatsTypes[stat.type]||stat.type}))})}return stats}).then(onSucc,onErr)}}}};module.exports={shimOnTrack:firefoxShim.shimOnTrack,shimSourceObject:firefoxShim.shimSourceObject,shimPeerConnection:firefoxShim.shimPeerConnection,shimGetUserMedia:requirecopy("./getusermedia")}},{"../utils":13,"./getusermedia":11}],11:[function(requirecopy,module,exports){"use strict";var utils=requirecopy("../utils"),logging=utils.log;module.exports=function(window){var browserDetails=utils.detectBrowser(window),navigator=window&&window.navigator,MediaStreamTrack=window&&window.MediaStreamTrack,shimError_=function(e){return{name:{InternalError:"NotReadableError",NotSupportedError:"TypeError",PermissionDeniedError:"NotAllowedError",SecurityError:"NotAllowedError"}[e.name]||e.name,message:{"The operation is insecure.":"The request is not allowed by the user agent or the platform in the current context."}[e.message]||e.message,constraint:e.constraint,toString:function(){return this.name+(this.message&&": ")+this.message}}},getUserMedia_=function(constraints,onSuccess,onError){var constraintsToFF37_=function(c){if("object"!=typeof c||c.require)return c;var require=[];return Object.keys(c).forEach(function(key){if("require"!==key&&"advanced"!==key&&"mediaSource"!==key){var r=c[key]="object"==typeof c[key]?c[key]:{ideal:c[key]};if(void 0===r.min&&void 0===r.max&&void 0===r.exact||require.push(key),void 0!==r.exact&&("number"==typeof r.exact?r.min=r.max=r.exact:c[key]=r.exact,delete r.exact),void 0!==r.ideal){c.advanced=c.advanced||[];var oc={};"number"==typeof r.ideal?oc[key]={min:r.ideal,max:r.ideal}:oc[key]=r.ideal,c.advanced.push(oc),delete r.ideal,Object.keys(r).length||delete c[key]}}}),require.length&&(c.require=require),c};return constraints=JSON.parse(JSON.stringify(constraints)),browserDetails.version<38&&(logging("spec: "+JSON.stringify(constraints)),constraints.audio&&(constraints.audio=constraintsToFF37_(constraints.audio)),constraints.video&&(constraints.video=constraintsToFF37_(constraints.video)),logging("ff37: "+JSON.stringify(constraints))),navigator.mozGetUserMedia(constraints,onSuccess,function(e){onError(shimError_(e))})},getUserMediaPromise_=function(constraints){return new Promise(function(resolve,reject){getUserMedia_(constraints,resolve,reject)})};if(navigator.mediaDevices||(navigator.mediaDevices={getUserMedia:getUserMediaPromise_,addEventListener:function(){},removeEventListener:function(){}}),navigator.mediaDevices.enumerateDevices=navigator.mediaDevices.enumerateDevices||function(){return new Promise(function(resolve){resolve([{kind:"audioinput",deviceId:"default",label:"",groupId:""},{kind:"videoinput",deviceId:"default",label:"",groupId:""}])})},browserDetails.version<41){var orgEnumerateDevices=navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);navigator.mediaDevices.enumerateDevices=function(){return orgEnumerateDevices().then(void 0,function(e){if("NotFoundError"===e.name)return[];throw e})}}if(browserDetails.version<49){var origGetUserMedia=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);navigator.mediaDevices.getUserMedia=function(c){return origGetUserMedia(c).then(function(stream){if(c.audio&&!stream.getAudioTracks().length||c.video&&!stream.getVideoTracks().length)throw stream.getTracks().forEach(function(track){track.stop()}),new DOMException("The object can not be found here.","NotFoundError");return stream},function(e){return Promise.reject(shimError_(e))})}}if(!(browserDetails.version>55&&"autoGainControl"in navigator.mediaDevices.getSupportedConstraints())){var remap=function(obj,a,b){a in obj&&!(b in obj)&&(obj[b]=obj[a],delete obj[a])},nativeGetUserMedia=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);if(navigator.mediaDevices.getUserMedia=function(c){return"object"==typeof c&&"object"==typeof c.audio&&(c=JSON.parse(JSON.stringify(c)),remap(c.audio,"autoGainControl","mozAutoGainControl"),remap(c.audio,"noiseSuppression","mozNoiseSuppression")),nativeGetUserMedia(c)},MediaStreamTrack&&MediaStreamTrack.prototype.getSettings){var nativeGetSettings=MediaStreamTrack.prototype.getSettings;MediaStreamTrack.prototype.getSettings=function(){var obj=nativeGetSettings.apply(this,arguments);return remap(obj,"mozAutoGainControl","autoGainControl"),remap(obj,"mozNoiseSuppression","noiseSuppression"),obj}}if(MediaStreamTrack&&MediaStreamTrack.prototype.applyConstraints){var nativeApplyConstraints=MediaStreamTrack.prototype.applyConstraints;MediaStreamTrack.prototype.applyConstraints=function(c){return"audio"===this.kind&&"object"==typeof c&&(c=JSON.parse(JSON.stringify(c)),remap(c,"autoGainControl","mozAutoGainControl"),remap(c,"noiseSuppression","mozNoiseSuppression")),nativeApplyConstraints.apply(this,[c])}}}navigator.getUserMedia=function(constraints,onSuccess,onError){if(browserDetails.version<44)return getUserMedia_(constraints,onSuccess,onError);utils.deprecated("navigator.getUserMedia","navigator.mediaDevices.getUserMedia"),navigator.mediaDevices.getUserMedia(constraints).then(onSuccess,onError)}}},{"../utils":13}],12:[function(requirecopy,module,exports){"use strict";var utils=requirecopy("../utils"),safariShim={shimLocalStreamsAPI:function(window){if("object"==typeof window&&window.RTCPeerConnection){if("getLocalStreams"in window.RTCPeerConnection.prototype||(window.RTCPeerConnection.prototype.getLocalStreams=function(){return this._localStreams||(this._localStreams=[]),this._localStreams}),"getStreamById"in window.RTCPeerConnection.prototype||(window.RTCPeerConnection.prototype.getStreamById=function(id){var result=null;return this._localStreams&&this._localStreams.forEach(function(stream){stream.id===id&&(result=stream)}),this._remoteStreams&&this._remoteStreams.forEach(function(stream){stream.id===id&&(result=stream)}),result}),!("addStream"in window.RTCPeerConnection.prototype)){var _addTrack=window.RTCPeerConnection.prototype.addTrack;window.RTCPeerConnection.prototype.addStream=function(stream){this._localStreams||(this._localStreams=[]),
--1===this._localStreams.indexOf(stream)&&this._localStreams.push(stream);var self=this;stream.getTracks().forEach(function(track){_addTrack.call(self,track,stream)})},window.RTCPeerConnection.prototype.addTrack=function(track,stream){stream&&(this._localStreams?-1===this._localStreams.indexOf(stream)&&this._localStreams.push(stream):this._localStreams=[stream]),_addTrack.call(this,track,stream)}}"removeStream"in window.RTCPeerConnection.prototype||(window.RTCPeerConnection.prototype.removeStream=function(stream){this._localStreams||(this._localStreams=[]);var index=this._localStreams.indexOf(stream);if(-1!==index){this._localStreams.splice(index,1);var self=this,tracks=stream.getTracks();this.getSenders().forEach(function(sender){-1!==tracks.indexOf(sender.track)&&self.removeTrack(sender)})}})}},shimRemoteStreamsAPI:function(window){"object"==typeof window&&window.RTCPeerConnection&&("getRemoteStreams"in window.RTCPeerConnection.prototype||(window.RTCPeerConnection.prototype.getRemoteStreams=function(){return this._remoteStreams?this._remoteStreams:[]}),"onaddstream"in window.RTCPeerConnection.prototype||Object.defineProperty(window.RTCPeerConnection.prototype,"onaddstream",{get:function(){return this._onaddstream},set:function(f){this._onaddstream&&(this.removeEventListener("addstream",this._onaddstream),this.removeEventListener("track",this._onaddstreampoly)),this.addEventListener("addstream",this._onaddstream=f),this.addEventListener("track",this._onaddstreampoly=function(e){var stream=e.streams[0];if(this._remoteStreams||(this._remoteStreams=[]),!(this._remoteStreams.indexOf(stream)>=0)){this._remoteStreams.push(stream);var event=new Event("addstream");event.stream=e.streams[0],this.dispatchEvent(event)}}.bind(this))}}))},shimCallbacksAPI:function(window){if("object"==typeof window&&window.RTCPeerConnection){var prototype=window.RTCPeerConnection.prototype,createOffer=prototype.createOffer,createAnswer=prototype.createAnswer,setLocalDescription=prototype.setLocalDescription,setRemoteDescription=prototype.setRemoteDescription,addIceCandidate=prototype.addIceCandidate;prototype.createOffer=function(successCallback,failureCallback){var options=arguments.length>=2?arguments[2]:arguments[0],promise=createOffer.apply(this,[options]);return failureCallback?(promise.then(successCallback,failureCallback),Promise.resolve()):promise},prototype.createAnswer=function(successCallback,failureCallback){var options=arguments.length>=2?arguments[2]:arguments[0],promise=createAnswer.apply(this,[options]);return failureCallback?(promise.then(successCallback,failureCallback),Promise.resolve()):promise};var withCallback=function(description,successCallback,failureCallback){var promise=setLocalDescription.apply(this,[description]);return failureCallback?(promise.then(successCallback,failureCallback),Promise.resolve()):promise};prototype.setLocalDescription=withCallback,withCallback=function(description,successCallback,failureCallback){var promise=setRemoteDescription.apply(this,[description]);return failureCallback?(promise.then(successCallback,failureCallback),Promise.resolve()):promise},prototype.setRemoteDescription=withCallback,withCallback=function(candidate,successCallback,failureCallback){var promise=addIceCandidate.apply(this,[candidate]);return failureCallback?(promise.then(successCallback,failureCallback),Promise.resolve()):promise},prototype.addIceCandidate=withCallback}},shimGetUserMedia:function(window){var navigator=window&&window.navigator;navigator.getUserMedia||(navigator.webkitGetUserMedia?navigator.getUserMedia=navigator.webkitGetUserMedia.bind(navigator):navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&(navigator.getUserMedia=function(constraints,cb,errcb){navigator.mediaDevices.getUserMedia(constraints).then(cb,errcb)}.bind(navigator)))},shimRTCIceServerUrls:function(window){var OrigPeerConnection=window.RTCPeerConnection;window.RTCPeerConnection=function(pcConfig,pcConstraints){if(pcConfig&&pcConfig.iceServers){for(var newIceServers=[],i=0;i<pcConfig.iceServers.length;i++){var server=pcConfig.iceServers[i];!server.hasOwnProperty("urls")&&server.hasOwnProperty("url")?(utils.deprecated("RTCIceServer.url","RTCIceServer.urls"),server=JSON.parse(JSON.stringify(server)),server.urls=server.url,delete server.url,newIceServers.push(server)):newIceServers.push(pcConfig.iceServers[i])}pcConfig.iceServers=newIceServers}return new OrigPeerConnection(pcConfig,pcConstraints)},window.RTCPeerConnection.prototype=OrigPeerConnection.prototype,Object.defineProperty(window.RTCPeerConnection,"generateCertificate",{get:function(){return OrigPeerConnection.generateCertificate}})},shimTrackEventTransceiver:function(window){"object"==typeof window&&window.RTCPeerConnection&&"receiver"in window.RTCTrackEvent.prototype&&!window.RTCTransceiver&&Object.defineProperty(window.RTCTrackEvent.prototype,"transceiver",{get:function(){return{receiver:this.receiver}}})}};module.exports={shimCallbacksAPI:safariShim.shimCallbacksAPI,shimLocalStreamsAPI:safariShim.shimLocalStreamsAPI,shimRemoteStreamsAPI:safariShim.shimRemoteStreamsAPI,shimGetUserMedia:safariShim.shimGetUserMedia,shimRTCIceServerUrls:safariShim.shimRTCIceServerUrls,shimTrackEventTransceiver:safariShim.shimTrackEventTransceiver}},{"../utils":13}],13:[function(requirecopy,module,exports){"use strict";var logDisabled_=!0,deprecationWarnings_=!0,utils={disableLog:function(bool){return"boolean"!=typeof bool?new Error("Argument type: "+typeof bool+". Please use a boolean."):(logDisabled_=bool,bool?"adapter.js logging disabled":"adapter.js logging enabled")},disableWarnings:function(bool){return"boolean"!=typeof bool?new Error("Argument type: "+typeof bool+". Please use a boolean."):(deprecationWarnings_=!bool,"adapter.js deprecation warnings "+(bool?"disabled":"enabled"))},log:function(){if("object"==typeof window){if(logDisabled_)return;"undefined"!=typeof console&&console.log}},deprecated:function(oldMethod,newMethod){},extractVersion:function(uastring,expr,pos){var match=uastring.match(expr);return match&&match.length>=pos&&parseInt(match[pos],10)},detectBrowser:function(window){var navigator=window&&window.navigator,result={};if(result.browser=null,result.version=null,void 0===window||!window.navigator)return result.browser="Not a browser.",result;if(navigator.mozGetUserMedia)result.browser="firefox",result.version=this.extractVersion(navigator.userAgent,/Firefox\/(\d+)\./,1);else if(navigator.webkitGetUserMedia)if(window.webkitRTCPeerConnection)result.browser="chrome",result.version=this.extractVersion(navigator.userAgent,/Chrom(e|ium)\/(\d+)\./,2);else{if(!navigator.userAgent.match(/Version\/(\d+).(\d+)/))return result.browser="Unsupported webkit-based browser with GUM support but no WebRTC support.",result;result.browser="safari",result.version=this.extractVersion(navigator.userAgent,/AppleWebKit\/(\d+)\./,1)}else if(navigator.mediaDevices&&navigator.userAgent.match(/Edge\/(\d+).(\d+)$/))result.browser="edge",result.version=this.extractVersion(navigator.userAgent,/Edge\/(\d+).(\d+)$/,2);else{if(!navigator.mediaDevices||!navigator.userAgent.match(/AppleWebKit\/(\d+)\./))return result.browser="Not a supported browser.",result;result.browser="safari",result.version=this.extractVersion(navigator.userAgent,/AppleWebKit\/(\d+)\./,1)}return result},shimCreateObjectURL:function(window){var URL=window&&window.URL;if("object"==typeof window&&window.HTMLMediaElement&&"srcObject"in window.HTMLMediaElement.prototype&&URL.createObjectURL&&URL.revokeObjectURL){var nativeCreateObjectURL=URL.createObjectURL.bind(URL),nativeRevokeObjectURL=URL.revokeObjectURL.bind(URL),streams=new Map,newId=0;URL.createObjectURL=function(stream){if("getTracks"in stream){var url="polyblob:"+ ++newId;return streams.set(url,stream),utils.deprecated("URL.createObjectURL(stream)","elem.srcObject = stream"),url}return nativeCreateObjectURL(stream)},URL.revokeObjectURL=function(url){nativeRevokeObjectURL(url),streams.delete(url)};var dsc=Object.getOwnPropertyDescriptor(window.HTMLMediaElement.prototype,"src");Object.defineProperty(window.HTMLMediaElement.prototype,"src",{get:function(){return dsc.get.apply(this)},set:function(url){return this.srcObject=streams.get(url)||null,dsc.set.apply(this,[url])}});var nativeSetAttribute=window.HTMLMediaElement.prototype.setAttribute;window.HTMLMediaElement.prototype.setAttribute=function(){return 2===arguments.length&&"src"===(""+arguments[0]).toLowerCase()&&(this.srcObject=streams.get(arguments[1])||null),nativeSetAttribute.apply(this,arguments)}}}};module.exports={log:utils.log,deprecated:utils.deprecated,disableLog:utils.disableLog,disableWarnings:utils.disableWarnings,extractVersion:utils.extractVersion,shimCreateObjectURL:utils.shimCreateObjectURL,detectBrowser:utils.detectBrowser.bind(utils)}},{}]},{},[3])(3)}),navigator.mozGetUserMedia?(MediaStreamTrack.getSources=function(successCb){setTimeout(function(){successCb([{kind:"audio",id:"default",label:"",facing:""},{kind:"video",id:"default",label:"",facing:""}])},0)},attachMediaStream=function(element,stream){return element.srcObject=stream,element},reattachMediaStream=function(to,from){return to.srcObject=from.srcObject,to},createIceServer=function(url,username,password){var iceServer=null,urlParts=url.split(":");if(0===urlParts[0].indexOf("stun"))iceServer={urls:[url]};else if(0===urlParts[0].indexOf("turn"))if(AdapterJS.webrtcDetectedVersion<27){var turnUrlParts=url.split("?");1!==turnUrlParts.length&&0!==turnUrlParts[1].indexOf("transport=udp")||(iceServer={urls:[turnUrlParts[0]],credential:password,username:username})}else iceServer={urls:[url],credential:password,username:username};return iceServer},createIceServers=function(urls,username,password){var iceServers=[];for(i=0;i<urls.length;i++){var iceServer=createIceServer(urls[i],username,password);null!==iceServer&&iceServers.push(iceServer)}return iceServers}):navigator.webkitGetUserMedia?(attachMediaStream=function(element,stream){return AdapterJS.webrtcDetectedVersion>=43?element.srcObject=stream:void 0!==element.src&&(element.src=URL.createObjectURL(stream)),element},reattachMediaStream=function(to,from){return AdapterJS.webrtcDetectedVersion>=43?to.srcObject=from.srcObject:to.src=from.src,to},createIceServer=function(url,username,password){var iceServer=null,urlParts=url.split(":");return 0===urlParts[0].indexOf("stun")?iceServer={url:url}:0===urlParts[0].indexOf("turn")&&(iceServer={url:url,credential:password,username:username}),iceServer},createIceServers=function(urls,username,password){var iceServers=[];if(AdapterJS.webrtcDetectedVersion>=34)iceServers={urls:urls,credential:password,username:username};else for(i=0;i<urls.length;i++){var iceServer=createIceServer(urls[i],username,password);null!==iceServer&&iceServers.push(iceServer)}return iceServers}):"AppleWebKit"===AdapterJS.webrtcDetectedType?(attachMediaStream=function(element,stream){return element.srcObject=stream,element},reattachMediaStream=function(to,from){return to.srcObject=from.srcObject,to},navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&(navigator.getUserMedia=getUserMedia=function(constraints,successCb,errorCb){navigator.mediaDevices.getUserMedia(constraints).then(successCb).catch(errorCb)})):navigator.mediaDevices&&navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)&&(attachMediaStream=function(element,stream){return element.srcObject=stream,element},reattachMediaStream=function(to,from){return to.srcObject=from.srcObject,to}),attachMediaStream_base=attachMediaStream,"opera"===AdapterJS.webrtcDetectedBrowser&&(attachMediaStream_base=function(element,stream){AdapterJS.webrtcDetectedVersion>38?element.srcObject=stream:void 0!==element.src&&(element.src=URL.createObjectURL(stream))}),attachMediaStream=function(element,stream){return"chrome"!==AdapterJS.webrtcDetectedBrowser&&"opera"!==AdapterJS.webrtcDetectedBrowser||stream?attachMediaStream_base(element,stream):element.src="",element},reattachMediaStream_base=reattachMediaStream,reattachMediaStream=function(to,from){return reattachMediaStream_base(to,from),to},window.attachMediaStream=attachMediaStream,window.reattachMediaStream=reattachMediaStream,window.getUserMedia=function(constraints,onSuccess,onFailure){navigator.getUserMedia(constraints,onSuccess,onFailure)},AdapterJS.attachMediaStream=attachMediaStream,AdapterJS.reattachMediaStream=reattachMediaStream,AdapterJS.getUserMedia=getUserMedia,"undefined"==typeof Promise&&(requestUserMedia=null),AdapterJS.maybeThroughWebRTCReady()):("object"==typeof console&&"function"==typeof console.log||(console={}||console,console.log=function(arg){},console.info=function(arg){},console.error=function(arg){},console.dir=function(arg){},console.exception=function(arg){},console.trace=function(arg){},console.warn=function(arg){},console.count=function(arg){},console.debug=function(arg){},console.count=function(arg){},console.time=function(arg){},console.timeEnd=function(arg){},console.group=function(arg){},console.groupCollapsed=function(arg){},console.groupEnd=function(arg){}),AdapterJS.WebRTCPlugin.WaitForPluginReady=function(){for(;AdapterJS.WebRTCPlugin.pluginState!==AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;);},AdapterJS.WebRTCPlugin.callWhenPluginReady=function(callback){if(AdapterJS.WebRTCPlugin.pluginState===AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY)callback();else var checkPluginReadyState=setInterval(function(){AdapterJS.WebRTCPlugin.pluginState===AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY&&(clearInterval(checkPluginReadyState),callback())},100)},AdapterJS.WebRTCPlugin.setLogLevel=function(logLevel){AdapterJS.WebRTCPlugin.callWhenPluginReady(function(){AdapterJS.WebRTCPlugin.plugin.setLogLevel(logLevel)})},AdapterJS.WebRTCPlugin.injectPlugin=function(){if(("interactive"===document.readyState||"complete"===document.readyState)&&AdapterJS.WebRTCPlugin.pluginState===AdapterJS.WebRTCPlugin.PLUGIN_STATES.INITIALIZING){if(AdapterJS.WebRTCPlugin.pluginState=AdapterJS.WebRTCPlugin.PLUGIN_STATES.INJECTING,"IE"===AdapterJS.webrtcDetectedBrowser&&AdapterJS.webrtcDetectedVersion<=10){var frag=document.createDocumentFragment();for(AdapterJS.WebRTCPlugin.plugin=document.createElement("div"),AdapterJS.WebRTCPlugin.plugin.innerHTML='<object id="'+AdapterJS.WebRTCPlugin.pluginInfo.pluginId+'" type="'+AdapterJS.WebRTCPlugin.pluginInfo.type+'" width="1" height="1"><param name="pluginId" value="'+AdapterJS.WebRTCPlugin.pluginInfo.pluginId+'" /> <param name="windowless" value="false" /> <param name="pageId" value="'+AdapterJS.WebRTCPlugin.pageId+'" /> <param name="onload" value="'+AdapterJS.WebRTCPlugin.pluginInfo.onload+'" /><param name="tag" value="'+AdapterJS.WebRTCPlugin.TAGS.NONE+'" />'+(AdapterJS.options.getAllCams?'<param name="forceGetAllCams" value="True" />':"")+"</object>";AdapterJS.WebRTCPlugin.plugin.firstChild;)frag.appendChild(AdapterJS.WebRTCPlugin.plugin.firstChild);document.body.appendChild(frag),AdapterJS.WebRTCPlugin.plugin=document.getElementById(AdapterJS.WebRTCPlugin.pluginInfo.pluginId)}else AdapterJS.WebRTCPlugin.plugin=document.createElement("object"),AdapterJS.WebRTCPlugin.plugin.id=AdapterJS.WebRTCPlugin.pluginInfo.pluginId,"IE"===AdapterJS.webrtcDetectedBrowser?(AdapterJS.WebRTCPlugin.plugin.width="1px",AdapterJS.WebRTCPlugin.plugin.height="1px"):(AdapterJS.WebRTCPlugin.plugin.width="0px",AdapterJS.WebRTCPlugin.plugin.height="0px"),AdapterJS.WebRTCPlugin.plugin.type=AdapterJS.WebRTCPlugin.pluginInfo.type,AdapterJS.WebRTCPlugin.plugin.innerHTML='<param name="onload" value="'+AdapterJS.WebRTCPlugin.pluginInfo.onload+'"><param name="pluginId" value="'+AdapterJS.WebRTCPlugin.pluginInfo.pluginId+'"><param name="windowless" value="false" /> '+(AdapterJS.options.getAllCams?'<param name="forceGetAllCams" value="True" />':"")+'<param name="pageId" value="'+AdapterJS.WebRTCPlugin.pageId+'"><param name="tag" value="'+AdapterJS.WebRTCPlugin.TAGS.NONE+'" />',document.body.appendChild(AdapterJS.WebRTCPlugin.plugin);AdapterJS.WebRTCPlugin.pluginState=AdapterJS.WebRTCPlugin.PLUGIN_STATES.INJECTED}},AdapterJS.WebRTCPlugin.isPluginInstalled=function(comName,plugName,plugType,installedCb,notInstalledCb){if("IE"!==AdapterJS.webrtcDetectedBrowser){for(var pluginArray=navigator.mimeTypes,i=0;i<pluginArray.length;i++)if(pluginArray[i].type.indexOf(plugType)>=0)return void installedCb();notInstalledCb()}else{try{new ActiveXObject(comName+"."+plugName)}catch(e){return void notInstalledCb()}installedCb()}},AdapterJS.WebRTCPlugin.defineWebRTCInterface=function(){if(AdapterJS.WebRTCPlugin.pluginState!==AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY){AdapterJS.WebRTCPlugin.pluginState=AdapterJS.WebRTCPlugin.PLUGIN_STATES.INITIALIZING,AdapterJS.isDefined=function(variable){return null!==variable&&void 0!==variable},createIceServer=function(url,username,password){var iceServer=null,urlParts=url.split(":");return 0===urlParts[0].indexOf("stun")?iceServer={url:url,hasCredentials:!1}:0===urlParts[0].indexOf("turn")&&(iceServer={url:url,hasCredentials:!0,credential:password,username:username}),iceServer},createIceServers=function(urls,username,password){for(var iceServers=[],i=0;i<urls.length;++i)iceServers.push(createIceServer(urls[i],username,password));return iceServers},RTCSessionDescription=function(info){return AdapterJS.WebRTCPlugin.WaitForPluginReady(),AdapterJS.WebRTCPlugin.plugin.ConstructSessionDescription(info.type,info.sdp)},MediaStream=function(mediaStreamOrTracks){return AdapterJS.WebRTCPlugin.WaitForPluginReady(),AdapterJS.WebRTCPlugin.plugin.MediaStream(mediaStreamOrTracks)},RTCPeerConnection=function(servers,constraints){if(void 0!==servers&&null!==servers&&!Array.isArray(servers.iceServers))throw new Error("Failed to construct 'RTCPeerConnection': Malformed RTCConfiguration");if(void 0!==constraints&&null!==constraints){var invalidConstraits=!1;if(invalidConstraits|="object"!=typeof constraints,invalidConstraits|=constraints.hasOwnProperty("mandatory")&&void 0!==constraints.mandatory&&null!==constraints.mandatory&&constraints.mandatory.constructor!==Object,invalidConstraits|=constraints.hasOwnProperty("optional")&&void 0!==constraints.optional&&null!==constraints.optional&&!Array.isArray(constraints.optional))throw new Error("Failed to construct 'RTCPeerConnection': Malformed constraints object")}AdapterJS.WebRTCPlugin.WaitForPluginReady();var iceServers=null;if(servers&&Array.isArray(servers.iceServers)){iceServers=servers.iceServers;for(var i=0;i<iceServers.length;i++)iceServers[i].urls&&!iceServers[i].url&&(iceServers[i].url=iceServers[i].urls),iceServers[i].hasCredentials=AdapterJS.isDefined(iceServers[i].username)&&AdapterJS.isDefined(iceServers[i].credential)}if(AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION&&AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION>1)return iceServers&&(servers.iceServers=iceServers),AdapterJS.WebRTCPlugin.plugin.PeerConnection(servers);var mandatory=constraints&&constraints.mandatory?constraints.mandatory:null,optional=constraints&&constraints.optional?constraints.optional:null;return AdapterJS.WebRTCPlugin.plugin.PeerConnection(AdapterJS.WebRTCPlugin.pageId,iceServers,mandatory,optional)},MediaStreamTrack=function(){},MediaStreamTrack.getSources=function(callback){AdapterJS.WebRTCPlugin.callWhenPluginReady(function(){AdapterJS.WebRTCPlugin.plugin.GetSources(callback)})};var constraintsToPlugin=function(c){if("object"!=typeof c||c.mandatory||c.optional)return c;var cc={};return Object.keys(c).forEach(function(key){if("require"!==key&&"advanced"!==key){if("string"==typeof c[key])return void(cc[key]=c[key]);var r="object"==typeof c[key]?c[key]:{ideal:c[key]};void 0!==r.exact&&"number"==typeof r.exact&&(r.min=r.max=r.exact);var oldname=function(prefix,name){return prefix?prefix+name.charAt(0).toUpperCase()+name.slice(1):"deviceId"===name?"sourceId":name};if("sourceId"===oldname("",key)&&void 0!==r.exact&&(r.ideal=r.exact,r.exact=void 0),void 0!==r.ideal){cc.optional=cc.optional||[];var oc={};"number"==typeof r.ideal?(oc[oldname("min",key)]=r.ideal,cc.optional.push(oc),oc={},oc[oldname("max",key)]=r.ideal,cc.optional.push(oc)):(oc[oldname("",key)]=r.ideal,cc.optional.push(oc))}void 0!==r.exact&&"number"!=typeof r.exact?(cc.mandatory=cc.mandatory||{},cc.mandatory[oldname("",key)]=r.exact):["min","max"].forEach(function(mix){void 0!==r[mix]&&(cc.mandatory=cc.mandatory||{},cc.mandatory[oldname(mix,key)]=r[mix])})}}),c.advanced&&(cc.optional=(cc.optional||[]).concat(c.advanced)),cc};getUserMedia=function(constraints,successCallback,failureCallback){var cc={};cc.audio=!!constraints.audio&&constraintsToPlugin(constraints.audio),cc.video=!!constraints.video&&constraintsToPlugin(constraints.video),AdapterJS.WebRTCPlugin.callWhenPluginReady(function(){AdapterJS.WebRTCPlugin.plugin.getUserMedia(cc,successCallback,failureCallback)})},window.navigator.getUserMedia=getUserMedia,"undefined"!=typeof Promise&&(requestUserMedia=function(constraints){return new Promise(function(resolve,reject){try{getUserMedia(constraints,resolve,reject)}catch(error){reject(error)}})},navigator.mediaDevices={getUserMedia:requestUserMedia,enumerateDevices:function(){return new Promise(function(resolve){var kinds={audio:"audioinput",video:"videoinput"};return MediaStreamTrack.getSources(function(devices){resolve(devices.map(function(device){return{label:device.label,kind:kinds[device.kind],id:device.id,deviceId:device.id,groupId:""}}))})})}}),attachMediaStream=function(element,stream){if(element&&element.parentNode){var streamId;null===stream?streamId="":(void 0!==stream.enableSoundTracks&&stream.enableSoundTracks(!0),streamId=stream.id);var elementId=0===element.id.length?Math.random().toString(36).slice(2):element.id,nodeName=element.nodeName.toLowerCase();if("object"!==nodeName){var tag;switch(nodeName){case"audio":tag=AdapterJS.WebRTCPlugin.TAGS.AUDIO;break;case"video":tag=AdapterJS.WebRTCPlugin.TAGS.VIDEO;break;default:tag=AdapterJS.WebRTCPlugin.TAGS.NONE}var frag=document.createDocumentFragment(),temp=document.createElement("div"),classHTML="";for(element.className?classHTML='class="'+element.className+'" ':element.attributes&&element.attributes.class&&(classHTML='class="'+element.attributes.class.value+'" '),temp.innerHTML='<object id="'+elementId+'" '+classHTML+'type="'+AdapterJS.WebRTCPlugin.pluginInfo.type+'"><param name="pluginId" value="'+elementId+'" /> <param name="pageId" value="'+AdapterJS.WebRTCPlugin.pageId+'" /> <param name="windowless" value="true" /> <param name="streamId" value="'+streamId+'" /> <param name="tag" value="'+tag+'" /> </object>';temp.firstChild;)frag.appendChild(temp.firstChild);var height="",width="";element.clientWidth||element.clientHeight?(width=element.clientWidth,height=element.clientHeight):(element.width||element.height)&&(width=element.width,height=element.height),element.parentNode.insertBefore(frag,element),frag=document.getElementById(elementId),frag.width=width,frag.height=height,element.parentNode.removeChild(element)}else{for(var children=element.children,i=0;i!==children.length;++i)if("streamId"===children[i].name){children[i].value=streamId;break}element.setStreamId(streamId)}var newElement=document.getElementById(elementId);return AdapterJS.forwardEventHandlers(newElement,element,Object.getPrototypeOf(element)),newElement}},reattachMediaStream=function(to,from){for(var stream=null,children=from.children,i=0;i!==children.length;++i)if("streamId"===children[i].name){AdapterJS.WebRTCPlugin.WaitForPluginReady(),stream=AdapterJS.WebRTCPlugin.plugin.getStreamWithId(AdapterJS.WebRTCPlugin.pageId,children[i].value);break}if(null!==stream)return attachMediaStream(to,stream)},window.attachMediaStream=attachMediaStream,window.reattachMediaStream=reattachMediaStream,window.getUserMedia=getUserMedia,AdapterJS.attachMediaStream=attachMediaStream,AdapterJS.reattachMediaStream=reattachMediaStream,AdapterJS.getUserMedia=getUserMedia,AdapterJS.forwardEventHandlers=function(destElem,srcElem,prototype){var properties=Object.getOwnPropertyNames(prototype);for(var prop in properties)if(prop){var propName=properties[prop];"function"==typeof propName.slice&&"on"===propName.slice(0,2)&&"function"==typeof srcElem[propName]&&AdapterJS.addEvent(destElem,propName.slice(2),srcElem[propName])}var subPrototype=Object.getPrototypeOf(prototype);subPrototype&&AdapterJS.forwardEventHandlers(destElem,srcElem,subPrototype)},RTCIceCandidate=function(candidate){return candidate.sdpMid||(candidate.sdpMid=""),AdapterJS.WebRTCPlugin.WaitForPluginReady(),AdapterJS.WebRTCPlugin.plugin.ConstructIceCandidate(candidate.sdpMid,candidate.sdpMLineIndex,candidate.candidate)},AdapterJS.addEvent(document,"readystatechange",AdapterJS.WebRTCPlugin.injectPlugin),AdapterJS.WebRTCPlugin.injectPlugin()}},AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb=AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb||function(){AdapterJS.addEvent(document,"readystatechange",AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv),AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv()},AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv=function(){if(!AdapterJS.options.hidePluginInstallPrompt){var downloadLink=AdapterJS.WebRTCPlugin.pluginInfo.downloadLink;if(downloadLink){var popupString;popupString=AdapterJS.WebRTCPlugin.pluginInfo.portalLink?'This website requires you to install the  <a href="'+AdapterJS.WebRTCPlugin.pluginInfo.portalLink+'" target="_blank">'+AdapterJS.WebRTCPlugin.pluginInfo.companyName+" WebRTC Plugin</a> to work on this browser.":AdapterJS.TEXT.PLUGIN.REQUIRE_INSTALLATION,AdapterJS.renderNotificationBar(popupString,AdapterJS.TEXT.PLUGIN.BUTTON,function(){window.open(downloadLink,"_top");var pluginInstallInterval=setInterval(function(){"IE"!==AdapterJS.webrtcDetectedBrowser&&navigator.plugins.refresh(!1),AdapterJS.WebRTCPlugin.isPluginInstalled(AdapterJS.WebRTCPlugin.pluginInfo.prefix,AdapterJS.WebRTCPlugin.pluginInfo.plugName,AdapterJS.WebRTCPlugin.pluginInfo.type,function(){clearInterval(pluginInstallInterval),AdapterJS.WebRTCPlugin.defineWebRTCInterface()},function(){})},500)})}else AdapterJS.renderNotificationBar(AdapterJS.TEXT.PLUGIN.NOT_SUPPORTED)}},AdapterJS.WebRTCPlugin.isPluginInstalled(AdapterJS.WebRTCPlugin.pluginInfo.prefix,AdapterJS.WebRTCPlugin.pluginInfo.plugName,AdapterJS.WebRTCPlugin.pluginInfo.type,AdapterJS.WebRTCPlugin.defineWebRTCInterface,AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb)),"undefined"!=typeof exports&&(module.exports=AdapterJS);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
-
-/***/ }),
-/* 134 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
- * (C) Copyright 2014 Kurento (http://kurento.org/)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
-/**
- * This module contains a set of reusable components that have been found useful
- * during the development of the WebRTC applications with Kurento.
- * 
- * @module kurentoUtils
- * 
- * @copyright 2014 Kurento (http://kurento.org/)
- * @license ALv2
- */
-
-var WebRtcPeer = __webpack_require__(135);
-
-exports.WebRtcPeer = WebRtcPeer;
-
-
-/***/ }),
-/* 135 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
- * (C) Copyright 2014-2015 Kurento (http://kurento.org/)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-var freeice = __webpack_require__(136)
-var inherits = __webpack_require__(140)
-var UAParser = __webpack_require__(141)
-var uuid = __webpack_require__(143)
-var hark = __webpack_require__(145)
-
-var EventEmitter = __webpack_require__(147).EventEmitter
-var recursive = __webpack_require__(148).recursive.bind(undefined, true)
-var sdpTranslator = __webpack_require__(149)
-var logger = window.Logger || console
-
-// var gUM = navigator.mediaDevices.getUserMedia || function (constraints) {
-//   return new Promise(navigator.getUserMedia(constraints, function (stream) {
-//     videoStream = stream
-//     start()
-//   }).eror(callback));
-// }
-
-try {
-  __webpack_require__(156)
-} catch (error) {
-  if (typeof getScreenConstraints === 'undefined') {
-    logger.warn('screen sharing is not available')
-
-    getScreenConstraints = function getScreenConstraints(sendSource, callback) {
-      callback(new Error("This library is not enabled for screen sharing"))
-    }
-  }
-}
-
-var MEDIA_CONSTRAINTS = {
-  audio: true,
-  video: {
-    width: 640,
-    framerate: 15
-  }
-}
-
-// Somehow, the UAParser constructor gets an empty window object.
-// We need to pass the user agent string in order to get information
-var ua = (window && window.navigator) ? window.navigator.userAgent : ''
-var parser = new UAParser(ua)
-var browser = parser.getBrowser()
-
-var usePlanB = false
-if (browser.name === 'Chrome' || browser.name === 'Chromium') {
-  logger.debug(browser.name + ": using SDP PlanB")
-  usePlanB = true
-}
-
-function noop(error) {
-  if (error) logger.error(error)
-}
-
-function trackStop(track) {
-  track.stop && track.stop()
-}
-
-function streamStop(stream) {
-  stream.getTracks().forEach(trackStop)
-}
-
-/**
- * Returns a string representation of a SessionDescription object.
- */
-var dumpSDP = function (description) {
-  if (typeof description === 'undefined' || description === null) {
-    return ''
-  }
-
-  return 'type: ' + description.type + '\r\n' + description.sdp
-}
-
-function bufferizeCandidates(pc, onerror) {
-  var candidatesQueue = []
-
-  pc.addEventListener('signalingstatechange', function () {
-    if (this.signalingState === 'stable') {
-      while (candidatesQueue.length) {
-        var entry = candidatesQueue.shift()
-
-        this.addIceCandidate(entry.candidate, entry.callback, entry.callback)
-      }
-    }
-  })
-
-  return function (candidate, callback) {
-    callback = callback || onerror
-
-    switch (pc.signalingState) {
-    case 'closed':
-      callback(new Error('PeerConnection object is closed'))
-      break
-    case 'stable':
-      if (pc.remoteDescription) {
-        pc.addIceCandidate(candidate, callback, callback)
-        break
-      }
-    default:
-      candidatesQueue.push({
-        candidate: candidate,
-        callback: callback
-      })
-    }
-  }
-}
-
-/* Simulcast utilities */
-
-function removeFIDFromOffer(sdp) {
-  var n = sdp.indexOf("a=ssrc-group:FID");
-
-  if (n > 0) {
-    return sdp.slice(0, n);
-  } else {
-    return sdp;
-  }
-}
-
-function getSimulcastInfo(videoStream) {
-  var videoTracks = videoStream.getVideoTracks();
-  if (!videoTracks.length) {
-    logger.warn('No video tracks available in the video stream')
-    return ''
-  }
-  var lines = [
-    'a=x-google-flag:conference',
-    'a=ssrc-group:SIM 1 2 3',
-    'a=ssrc:1 cname:localVideo',
-    'a=ssrc:1 msid:' + videoStream.id + ' ' + videoTracks[0].id,
-    'a=ssrc:1 mslabel:' + videoStream.id,
-    'a=ssrc:1 label:' + videoTracks[0].id,
-    'a=ssrc:2 cname:localVideo',
-    'a=ssrc:2 msid:' + videoStream.id + ' ' + videoTracks[0].id,
-    'a=ssrc:2 mslabel:' + videoStream.id,
-    'a=ssrc:2 label:' + videoTracks[0].id,
-    'a=ssrc:3 cname:localVideo',
-    'a=ssrc:3 msid:' + videoStream.id + ' ' + videoTracks[0].id,
-    'a=ssrc:3 mslabel:' + videoStream.id,
-    'a=ssrc:3 label:' + videoTracks[0].id
-  ];
-
-  lines.push('');
-
-  return lines.join('\n');
-}
-
-/**
- * Wrapper object of an RTCPeerConnection. This object is aimed to simplify the
- * development of WebRTC-based applications.
- *
- * @constructor module:kurentoUtils.WebRtcPeer
- *
- * @param {String} mode Mode in which the PeerConnection will be configured.
- *  Valid values are: 'recv', 'send', and 'sendRecv'
- * @param localVideo Video tag for the local stream
- * @param remoteVideo Video tag for the remote stream
- * @param {MediaStream} videoStream Stream to be used as primary source
- *  (typically video and audio, or only video if combined with audioStream) for
- *  localVideo and to be added as stream to the RTCPeerConnection
- * @param {MediaStream} audioStream Stream to be used as second source
- *  (typically for audio) for localVideo and to be added as stream to the
- *  RTCPeerConnection
- */
-function WebRtcPeer(mode, options, callback) {
-  if (!(this instanceof WebRtcPeer)) {
-    return new WebRtcPeer(mode, options, callback)
-  }
-
-  WebRtcPeer.super_.call(this)
-
-  if (options instanceof Function) {
-    callback = options
-    options = undefined
-  }
-
-  options = options || {}
-  callback = (callback || noop).bind(this)
-
-  var self = this
-  var localVideo = options.localVideo
-  var remoteVideo = options.remoteVideo
-  var videoStream = options.videoStream
-  var audioStream = options.audioStream
-  var mediaConstraints = options.mediaConstraints
-
-  var connectionConstraints = options.connectionConstraints
-  var pc = options.peerConnection
-  var sendSource = options.sendSource || 'webcam'
-
-  var dataChannelConfig = options.dataChannelConfig
-  var useDataChannels = options.dataChannels || false
-  var dataChannel
-
-  var guid = uuid.v4()
-  var configuration = recursive({
-      iceServers: freeice()
-    },
-    options.configuration)
-
-  var onicecandidate = options.onicecandidate
-  if (onicecandidate) this.on('icecandidate', onicecandidate)
-
-  var oncandidategatheringdone = options.oncandidategatheringdone
-  if (oncandidategatheringdone) {
-    this.on('candidategatheringdone', oncandidategatheringdone)
-  }
-
-  var simulcast = options.simulcast
-  var multistream = options.multistream
-  var interop = new sdpTranslator.Interop()
-  var candidatesQueueOut = []
-  var candidategatheringdone = false
-
-  Object.defineProperties(this, {
-    'peerConnection': {
-      get: function () {
-        return pc
-      }
-    },
-
-    'id': {
-      value: options.id || guid,
-      writable: false
-    },
-
-    'remoteVideo': {
-      get: function () {
-        return remoteVideo
-      }
-    },
-
-    'localVideo': {
-      get: function () {
-        return localVideo
-      }
-    },
-
-    'dataChannel': {
-      get: function () {
-        return dataChannel
-      }
-    },
-
-    /**
-     * @member {(external:ImageData|undefined)} currentFrame
-     */
-    'currentFrame': {
-      get: function () {
-        // [ToDo] Find solution when we have a remote stream but we didn't set
-        // a remoteVideo tag
-        if (!remoteVideo) return;
-
-        if (remoteVideo.readyState < remoteVideo.HAVE_CURRENT_DATA)
-          throw new Error('No video stream data available')
-
-        var canvas = document.createElement('canvas')
-        canvas.width = remoteVideo.videoWidth
-        canvas.height = remoteVideo.videoHeight
-
-        canvas.getContext('2d').drawImage(remoteVideo, 0, 0)
-
-        return canvas
-      }
-    }
-  })
-
-  // Init PeerConnection
-  if (!pc) {
-    pc = new RTCPeerConnection(configuration);
-    if (useDataChannels && !dataChannel) {
-      var dcId = 'WebRtcPeer-' + self.id
-      var dcOptions = undefined
-      if (dataChannelConfig) {
-        dcId = dataChannelConfig.id || dcId
-        dcOptions = dataChannelConfig.options
-      }
-      dataChannel = pc.createDataChannel(dcId, dcOptions);
-      if (dataChannelConfig) {
-        dataChannel.onopen = dataChannelConfig.onopen;
-        dataChannel.onclose = dataChannelConfig.onclose;
-        dataChannel.onmessage = dataChannelConfig.onmessage;
-        dataChannel.onbufferedamountlow = dataChannelConfig.onbufferedamountlow;
-        dataChannel.onerror = dataChannelConfig.onerror || noop;
-      }
-    }
-  }
-
-  pc.addEventListener('icecandidate', function (event) {
-    var candidate = event.candidate
-
-    if (EventEmitter.listenerCount(self, 'icecandidate') ||
-      EventEmitter.listenerCount(
-        self, 'candidategatheringdone')) {
-      if (candidate) {
-        var cand
-
-        if (multistream && usePlanB) {
-          cand = interop.candidateToUnifiedPlan(candidate)
-        } else {
-          cand = candidate
-        }
-
-        self.emit('icecandidate', cand)
-        candidategatheringdone = false
-      } else if (!candidategatheringdone) {
-        self.emit('candidategatheringdone')
-        candidategatheringdone = true
-      }
-    } else if (!candidategatheringdone) {
-      // Not listening to 'icecandidate' or 'candidategatheringdone' events, queue
-      // the candidate until one of them is listened
-      candidatesQueueOut.push(candidate)
-
-      if (!candidate) candidategatheringdone = true
-    }
-  })
-
-  pc.ontrack = options.onaddstream
-  pc.onnegotiationneeded = options.onnegotiationneeded
-  this.on('newListener', function (event, listener) {
-    if (event === 'icecandidate' || event === 'candidategatheringdone') {
-      while (candidatesQueueOut.length) {
-        var candidate = candidatesQueueOut.shift()
-
-        if (!candidate === (event === 'candidategatheringdone')) {
-          listener(candidate)
-        }
-      }
-    }
-  })
-
-  var addIceCandidate = bufferizeCandidates(pc)
-
-  /**
-   * Callback function invoked when an ICE candidate is received. Developers are
-   * expected to invoke this function in order to complete the SDP negotiation.
-   *
-   * @function module:kurentoUtils.WebRtcPeer.prototype.addIceCandidate
-   *
-   * @param iceCandidate - Literal object with the ICE candidate description
-   * @param callback - Called when the ICE candidate has been added.
-   */
-  this.addIceCandidate = function (iceCandidate, callback) {
-    var candidate
-
-    if (multistream && usePlanB) {
-      candidate = interop.candidateToPlanB(iceCandidate)
-    } else {
-      candidate = new RTCIceCandidate(iceCandidate)
-    }
-
-    logger.debug('Remote ICE candidate received', iceCandidate)
-    callback = (callback || noop).bind(this)
-    addIceCandidate(candidate, callback)
-  }
-
-  this.generateOffer = function (callback) {
-    callback = callback.bind(this)
-
-    var offerAudio = true
-    var offerVideo = true
-    // Constraints must have both blocks
-    if (mediaConstraints) {
-      offerAudio = (typeof mediaConstraints.audio === 'boolean') ?
-        mediaConstraints.audio : true
-      offerVideo = (typeof mediaConstraints.video === 'boolean') ?
-        mediaConstraints.video : true
-    }
-
-    var browserDependantConstraints = {
-      offerToReceiveAudio: (mode !== 'sendonly' && offerAudio),
-      offerToReceiveVideo: (mode !== 'sendonly' && offerVideo)
-    }
-
-    //FIXME: clarify possible constraints passed to createOffer()
-    /*var constraints = recursive(browserDependantConstraints,
-      connectionConstraints)*/
-
-    var constraints = browserDependantConstraints;
-
-    logger.debug('constraints: ' + JSON.stringify(constraints))
-
-    pc.createOffer(constraints).then(function (offer) {
-      logger.debug('Created SDP offer')
-      offer = mangleSdpToAddSimulcast(offer)
-      return pc.setLocalDescription(offer)
-    }).then(function () {
-      var localDescription = pc.localDescription
-      logger.debug('Local description set', localDescription.sdp)
-      if (multistream && usePlanB) {
-        localDescription = interop.toUnifiedPlan(localDescription)
-        logger.debug('offer::origPlanB->UnifiedPlan', dumpSDP(
-          localDescription))
-      }
-      callback(null, localDescription.sdp, self.processAnswer.bind(
-        self))
-    }).catch(callback)
-  }
-
-  this.getLocalSessionDescriptor = function () {
-    return pc.localDescription
-  }
-
-  this.getRemoteSessionDescriptor = function () {
-    return pc.remoteDescription
-  }
-
-  function setRemoteVideo() {
-    if (remoteVideo) {
-      var stream = pc.getRemoteStreams()[0]
-      var url = stream ? URL.createObjectURL(stream) : ''
-
-      remoteVideo.pause()
-      remoteVideo.src = url
-      remoteVideo.load()
-
-      logger.debug('Remote URL:', url)
-    }
-  }
-
-  this.showLocalVideo = function () {
-    localVideo.src = URL.createObjectURL(videoStream)
-    localVideo.muted = true
-  }
-
-  this.send = function (data) {
-    if (dataChannel && dataChannel.readyState === 'open') {
-      dataChannel.send(data)
-    } else {
-      logger.warn(
-        'Trying to send data over a non-existing or closed data channel')
-    }
-  }
-
-  /**
-   * Callback function invoked when a SDP answer is received. Developers are
-   * expected to invoke this function in order to complete the SDP negotiation.
-   *
-   * @function module:kurentoUtils.WebRtcPeer.prototype.processAnswer
-   *
-   * @param sdpAnswer - Description of sdpAnswer
-   * @param callback -
-   *            Invoked after the SDP answer is processed, or there is an error.
-   */
-  this.processAnswer = function (sdpAnswer, callback) {
-    callback = (callback || noop).bind(this)
-
-    var answer = new RTCSessionDescription({
-      type: 'answer',
-      sdp: sdpAnswer
-    })
-
-    if (multistream && usePlanB) {
-      var planBAnswer = interop.toPlanB(answer)
-      logger.debug('asnwer::planB', dumpSDP(planBAnswer))
-      answer = planBAnswer
-    }
-
-    logger.debug('SDP answer received, setting remote description')
-
-    if (pc.signalingState === 'closed') {
-      return callback('PeerConnection is closed')
-    }
-
-    pc.setRemoteDescription(answer, function () {
-        setRemoteVideo()
-
-        callback()
-      },
-      callback)
-  }
-
-  /**
-   * Callback function invoked when a SDP offer is received. Developers are
-   * expected to invoke this function in order to complete the SDP negotiation.
-   *
-   * @function module:kurentoUtils.WebRtcPeer.prototype.processOffer
-   *
-   * @param sdpOffer - Description of sdpOffer
-   * @param callback - Called when the remote description has been set
-   *  successfully.
-   */
-  this.processOffer = function (sdpOffer, callback) {
-    callback = callback.bind(this)
-
-    var offer = new RTCSessionDescription({
-      type: 'offer',
-      sdp: sdpOffer
-    })
-
-    if (multistream && usePlanB) {
-      var planBOffer = interop.toPlanB(offer)
-      logger.debug('offer::planB', dumpSDP(planBOffer))
-      offer = planBOffer
-    }
-
-    logger.debug('SDP offer received, setting remote description')
-
-    if (pc.signalingState === 'closed') {
-      return callback('PeerConnection is closed')
-    }
-
-    pc.setRemoteDescription(offer).then(function () {
-      return setRemoteVideo()
-    }).then(function () {
-      return pc.createAnswer()
-    }).then(function (answer) {
-      answer = mangleSdpToAddSimulcast(answer)
-      logger.debug('Created SDP answer')
-      return pc.setLocalDescription(answer)
-    }).then(function () {
-      var localDescription = pc.localDescription
-      if (multistream && usePlanB) {
-        localDescription = interop.toUnifiedPlan(localDescription)
-        logger.debug('answer::origPlanB->UnifiedPlan', dumpSDP(
-          localDescription))
-      }
-      logger.debug('Local description set', localDescription.sdp)
-      callback(null, localDescription.sdp)
-    }).catch(callback)
-  }
-
-  function mangleSdpToAddSimulcast(answer) {
-    if (simulcast) {
-      if (browser.name === 'Chrome' || browser.name === 'Chromium') {
-        logger.debug('Adding multicast info')
-        answer = new RTCSessionDescription({
-          'type': answer.type,
-          'sdp': removeFIDFromOffer(answer.sdp) + getSimulcastInfo(
-            videoStream)
-        })
-      } else {
-        logger.warn('Simulcast is only available in Chrome browser.')
-      }
-    }
-
-    return answer
-  }
-
-  /**
-   * This function creates the RTCPeerConnection object taking into account the
-   * properties received in the constructor. It starts the SDP negotiation
-   * process: generates the SDP offer and invokes the onsdpoffer callback. This
-   * callback is expected to send the SDP offer, in order to obtain an SDP
-   * answer from another peer.
-   */
-  function start() {
-    if (pc.signalingState === 'closed') {
-      callback(
-        'The peer connection object is in "closed" state. This is most likely due to an invocation of the dispose method before accepting in the dialogue'
-      )
-    }
-
-    if (videoStream && localVideo) {
-      self.showLocalVideo()
-    }
-
-    if (videoStream) {
-      pc.addStream(videoStream)
-    }
-
-    if (audioStream) {
-      pc.addStream(audioStream)
-    }
-
-    // [Hack] https://code.google.com/p/chromium/issues/detail?id=443558
-    var browser = parser.getBrowser()
-    if (mode === 'sendonly' &&
-      (browser.name === 'Chrome' || browser.name === 'Chromium') &&
-      browser.major === 39) {
-      mode = 'sendrecv'
-    }
-
-    callback()
-  }
-
-  if (mode !== 'recvonly' && !videoStream && !audioStream) {
-    function getMedia(constraints) {
-      if (constraints === undefined) {
-        constraints = MEDIA_CONSTRAINTS
-      }
-
-      navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-        videoStream = stream
-        start()
-      }).catch(callback);
-    }
-    if (sendSource === 'webcam') {
-      getMedia(mediaConstraints)
-    } else {
-      getScreenConstraints(sendSource, function (error, constraints_) {
-        if (error)
-          return callback(error)
-
-        constraints = [mediaConstraints]
-        constraints.unshift(constraints_)
-        getMedia(recursive.apply(undefined, constraints))
-      }, guid)
-    }
-  } else {
-    setTimeout(start, 0)
-  }
-
-  this.on('_dispose', function () {
-    if (localVideo) {
-      localVideo.pause()
-      localVideo.src = ''
-      localVideo.load()
-      //Unmute local video in case the video tag is later used for remote video
-      localVideo.muted = false
-    }
-    if (remoteVideo) {
-      remoteVideo.pause()
-      remoteVideo.src = ''
-      remoteVideo.load()
-    }
-    self.removeAllListeners()
-
-    if (window.cancelChooseDesktopMedia !== undefined) {
-      window.cancelChooseDesktopMedia(guid)
-    }
-  })
-}
-inherits(WebRtcPeer, EventEmitter)
-
-function createEnableDescriptor(type) {
-  var method = 'get' + type + 'Tracks'
-
-  return {
-    enumerable: true,
-    get: function () {
-      // [ToDo] Should return undefined if not all tracks have the same value?
-
-      if (!this.peerConnection) return
-
-      var streams = this.peerConnection.getLocalStreams()
-      if (!streams.length) return
-
-      for (var i = 0, stream; stream = streams[i]; i++) {
-        var tracks = stream[method]()
-        for (var j = 0, track; track = tracks[j]; j++)
-          if (!track.enabled) return false
-      }
-
-      return true
-    },
-    set: function (value) {
-      function trackSetEnable(track) {
-        track.enabled = value
-      }
-
-      this.peerConnection.getLocalStreams().forEach(function (stream) {
-        stream[method]().forEach(trackSetEnable)
-      })
-    }
-  }
-}
-
-Object.defineProperties(WebRtcPeer.prototype, {
-  'enabled': {
-    enumerable: true,
-    get: function () {
-      return this.audioEnabled && this.videoEnabled
-    },
-    set: function (value) {
-      this.audioEnabled = this.videoEnabled = value
-    }
-  },
-  'audioEnabled': createEnableDescriptor('Audio'),
-  'videoEnabled': createEnableDescriptor('Video')
-})
-
-WebRtcPeer.prototype.getLocalStream = function (index) {
-  if (this.peerConnection) {
-    return this.peerConnection.getLocalStreams()[index || 0]
-  }
-}
-
-WebRtcPeer.prototype.getRemoteStream = function (index) {
-  if (this.peerConnection) {
-    return this.peerConnection.getRemoteStreams()[index || 0]
-  }
-}
-
-/**
- * @description This method frees the resources used by WebRtcPeer.
- *
- * @function module:kurentoUtils.WebRtcPeer.prototype.dispose
- */
-WebRtcPeer.prototype.dispose = function () {
-  logger.debug('Disposing WebRtcPeer')
-
-  var pc = this.peerConnection
-  var dc = this.dataChannel
-  try {
-    if (dc) {
-      if (dc.signalingState === 'closed') return
-
-      dc.close()
-    }
-
-    if (pc) {
-      if (pc.signalingState === 'closed') return
-
-      pc.getLocalStreams().forEach(streamStop)
-
-      // FIXME This is not yet implemented in firefox
-      // if(videoStream) pc.removeStream(videoStream);
-      // if(audioStream) pc.removeStream(audioStream);
-
-      pc.close()
-    }
-  } catch (err) {
-    logger.warn('Exception disposing webrtc peer ' + err)
-  }
-
-  this.emit('_dispose')
-}
-
-//
-// Specialized child classes
-//
-
-function WebRtcPeerRecvonly(options, callback) {
-  if (!(this instanceof WebRtcPeerRecvonly)) {
-    return new WebRtcPeerRecvonly(options, callback)
-  }
-
-  WebRtcPeerRecvonly.super_.call(this, 'recvonly', options, callback)
-}
-inherits(WebRtcPeerRecvonly, WebRtcPeer)
-
-function WebRtcPeerSendonly(options, callback) {
-  if (!(this instanceof WebRtcPeerSendonly)) {
-    return new WebRtcPeerSendonly(options, callback)
-  }
-
-  WebRtcPeerSendonly.super_.call(this, 'sendonly', options, callback)
-}
-inherits(WebRtcPeerSendonly, WebRtcPeer)
-
-function WebRtcPeerSendrecv(options, callback) {
-  if (!(this instanceof WebRtcPeerSendrecv)) {
-    return new WebRtcPeerSendrecv(options, callback)
-  }
-
-  WebRtcPeerSendrecv.super_.call(this, 'sendrecv', options, callback)
-}
-inherits(WebRtcPeerSendrecv, WebRtcPeer)
-
-function harkUtils(stream, options) {
-  return hark(stream, options);
-}
-
-exports.bufferizeCandidates = bufferizeCandidates
-
-exports.WebRtcPeerRecvonly = WebRtcPeerRecvonly
-exports.WebRtcPeerSendonly = WebRtcPeerSendonly
-exports.WebRtcPeerSendrecv = WebRtcPeerSendrecv
-exports.hark = harkUtils
-
-
-/***/ }),
-/* 136 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* jshint node: true */
-
-
-var normalice = __webpack_require__(137);
-
-/**
-  # freeice
-
-  The `freeice` module is a simple way of getting random STUN or TURN server
-  for your WebRTC application.  The list of servers (just STUN at this stage)
-  were sourced from this [gist](https://gist.github.com/zziuni/3741933).
-
-  ## Example Use
-
-  The following demonstrates how you can use `freeice` with
-  [rtc-quickconnect](https://github.com/rtc-io/rtc-quickconnect):
-
-  <<< examples/quickconnect.js
-
-  As the `freeice` module generates ice servers in a list compliant with the
-  WebRTC spec you will be able to use it with raw `RTCPeerConnection`
-  constructors and other WebRTC libraries.
-
-  ## Hey, don't use my STUN/TURN server!
-
-  If for some reason your free STUN or TURN server ends up in the
-  list of servers ([stun](https://github.com/DamonOehlman/freeice/blob/master/stun.json) or
-  [turn](https://github.com/DamonOehlman/freeice/blob/master/turn.json))
-  that is used in this module, you can feel
-  free to open an issue on this repository and those servers will be removed
-  within 24 hours (or sooner).  This is the quickest and probably the most
-  polite way to have something removed (and provides us some visibility
-  if someone opens a pull request requesting that a server is added).
-
-  ## Please add my server!
-
-  If you have a server that you wish to add to the list, that's awesome! I'm
-  sure I speak on behalf of a whole pile of WebRTC developers who say thanks.
-  To get it into the list, feel free to either open a pull request or if you
-  find that process a bit daunting then just create an issue requesting
-  the addition of the server (make sure you provide all the details, and if
-  you have a Terms of Service then including that in the PR/issue would be
-  awesome).
-
-  ## I know of a free server, can I add it?
-
-  Sure, if you do your homework and make sure it is ok to use (I'm currently
-  in the process of reviewing the terms of those STUN servers included from
-  the original list).  If it's ok to go, then please see the previous entry
-  for how to add it.
-
-  ## Current List of Servers
-
-  * current as at the time of last `README.md` file generation
-
-  ### STUN
-
-  <<< stun.json
-
-  ### TURN
-
-  <<< turn.json
-
-**/
-
-var freeice = module.exports = function(opts) {
-  // if a list of servers has been provided, then use it instead of defaults
-  var servers = {
-    stun: (opts || {}).stun || __webpack_require__(138),
-    turn: (opts || {}).turn || __webpack_require__(139)
-  };
-
-  var stunCount = (opts || {}).stunCount || 2;
-  var turnCount = (opts || {}).turnCount || 0;
-  var selected;
-
-  function getServers(type, count) {
-    var out = [];
-    var input = [].concat(servers[type]);
-    var idx;
-
-    while (input.length && out.length < count) {
-      idx = (Math.random() * input.length) | 0;
-      out = out.concat(input.splice(idx, 1));
-    }
-
-    return out.map(function(url) {
-        //If it's a not a string, don't try to "normalice" it otherwise using type:url will screw it up
-        if ((typeof url !== 'string') && (! (url instanceof String))) {
-            return url;
-        } else {
-            return normalice(type + ':' + url);
-        }
-    });
-  }
-
-  // add stun servers
-  selected = [].concat(getServers('stun', stunCount));
-
-  if (turnCount) {
-    selected = selected.concat(getServers('turn', turnCount));
-  }
-
-  return selected;
-};
-
-
-/***/ }),
-/* 137 */
-/***/ (function(module, exports) {
-
-/**
-  # normalice
-
-  Normalize an ice server configuration object (or plain old string) into a format
-  that is usable in all browsers supporting WebRTC.  Primarily this module is designed
-  to help with the transition of the `url` attribute of the configuration object to
-  the `urls` attribute.
-
-  ## Example Usage
-
-  <<< examples/simple.js
-
-**/
-
-var protocols = [
-  'stun:',
-  'turn:'
-];
-
-module.exports = function(input) {
-  var url = (input || {}).url || input;
-  var protocol;
-  var parts;
-  var output = {};
-
-  // if we don't have a string url, then allow the input to passthrough
-  if (typeof url != 'string' && (! (url instanceof String))) {
-    return input;
-  }
-
-  // trim the url string, and convert to an array
-  url = url.trim();
-
-  // if the protocol is not known, then passthrough
-  protocol = protocols[protocols.indexOf(url.slice(0, 5))];
-  if (! protocol) {
-    return input;
-  }
-
-  // now let's attack the remaining url parts
-  url = url.slice(5);
-  parts = url.split('@');
-
-  output.username = input.username;
-  output.credential = input.credential;
-  // if we have an authentication part, then set the credentials
-  if (parts.length > 1) {
-    url = parts[1];
-    parts = parts[0].split(':');
-
-    // add the output credential and username
-    output.username = parts[0];
-    output.credential = (input || {}).credential || parts[1] || '';
-  }
-
-  output.url = protocol + url;
-  output.urls = [ output.url ];
-
-  return output;
-};
-
-
-/***/ }),
-/* 138 */
-/***/ (function(module, exports) {
-
-module.exports = ["stun.l.google.com:19302","stun1.l.google.com:19302","stun2.l.google.com:19302","stun3.l.google.com:19302","stun4.l.google.com:19302","stun.ekiga.net","stun.ideasip.com","stun.schlund.de","stun.stunprotocol.org:3478","stun.voiparound.com","stun.voipbuster.com","stun.voipstunt.com","stun.voxgratia.org","stun.services.mozilla.com"]
-
-/***/ }),
-/* 139 */
-/***/ (function(module, exports) {
-
-module.exports = []
-
-/***/ }),
-/* 140 */
-/***/ (function(module, exports) {
-
-if (typeof Object.create === 'function') {
-  // implementation from standard node.js 'util' module
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    ctor.prototype = Object.create(superCtor.prototype, {
-      constructor: {
-        value: ctor,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-  };
-} else {
-  // old school shim for old browsers
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    var TempCtor = function () {}
-    TempCtor.prototype = superCtor.prototype
-    ctor.prototype = new TempCtor()
-    ctor.prototype.constructor = ctor
-  }
-}
-
-
-/***/ }),
-/* 141 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_RESULT__;/**
- * UAParser.js v0.7.14
- * Lightweight JavaScript-based User-Agent string parser
- * https://github.com/faisalman/ua-parser-js
- *
- * Copyright © 2012-2016 Faisal Salman <fyzlman@gmail.com>
- * Dual licensed under GPLv2 & MIT
- */
-
-(function (window, undefined) {
-
-    'use strict';
-
-    //////////////
-    // Constants
-    /////////////
-
-
-    var LIBVERSION  = '0.7.14',
-        EMPTY       = '',
-        UNKNOWN     = '?',
-        FUNC_TYPE   = 'function',
-        UNDEF_TYPE  = 'undefined',
-        OBJ_TYPE    = 'object',
-        STR_TYPE    = 'string',
-        MAJOR       = 'major', // deprecated
-        MODEL       = 'model',
-        NAME        = 'name',
-        TYPE        = 'type',
-        VENDOR      = 'vendor',
-        VERSION     = 'version',
-        ARCHITECTURE= 'architecture',
-        CONSOLE     = 'console',
-        MOBILE      = 'mobile',
-        TABLET      = 'tablet',
-        SMARTTV     = 'smarttv',
-        WEARABLE    = 'wearable',
-        EMBEDDED    = 'embedded';
-
-
-    ///////////
-    // Helper
-    //////////
-
-
-    var util = {
-        extend : function (regexes, extensions) {
-            var margedRegexes = {};
-            for (var i in regexes) {
-                if (extensions[i] && extensions[i].length % 2 === 0) {
-                    margedRegexes[i] = extensions[i].concat(regexes[i]);
-                } else {
-                    margedRegexes[i] = regexes[i];
-                }
-            }
-            return margedRegexes;
-        },
-        has : function (str1, str2) {
-          if (typeof str1 === "string") {
-            return str2.toLowerCase().indexOf(str1.toLowerCase()) !== -1;
-          } else {
-            return false;
-          }
-        },
-        lowerize : function (str) {
-            return str.toLowerCase();
-        },
-        major : function (version) {
-            return typeof(version) === STR_TYPE ? version.replace(/[^\d\.]/g,'').split(".")[0] : undefined;
-        },
-        trim : function (str) {
-          return str.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
-        }
-    };
-
-
-    ///////////////
-    // Map helper
-    //////////////
-
-
-    var mapper = {
-
-        rgx : function (ua, arrays) {
-
-            //var result = {},
-            var i = 0, j, k, p, q, matches, match;//, args = arguments;
-
-            /*// construct object barebones
-            for (p = 0; p < args[1].length; p++) {
-                q = args[1][p];
-                result[typeof q === OBJ_TYPE ? q[0] : q] = undefined;
-            }*/
-
-            // loop through all regexes maps
-            while (i < arrays.length && !matches) {
-
-                var regex = arrays[i],       // even sequence (0,2,4,..)
-                    props = arrays[i + 1];   // odd sequence (1,3,5,..)
-                j = k = 0;
-
-                // try matching uastring with regexes
-                while (j < regex.length && !matches) {
-
-                    matches = regex[j++].exec(ua);
-
-                    if (!!matches) {
-                        for (p = 0; p < props.length; p++) {
-                            match = matches[++k];
-                            q = props[p];
-                            // check if given property is actually array
-                            if (typeof q === OBJ_TYPE && q.length > 0) {
-                                if (q.length == 2) {
-                                    if (typeof q[1] == FUNC_TYPE) {
-                                        // assign modified match
-                                        this[q[0]] = q[1].call(this, match);
-                                    } else {
-                                        // assign given value, ignore regex match
-                                        this[q[0]] = q[1];
-                                    }
-                                } else if (q.length == 3) {
-                                    // check whether function or regex
-                                    if (typeof q[1] === FUNC_TYPE && !(q[1].exec && q[1].test)) {
-                                        // call function (usually string mapper)
-                                        this[q[0]] = match ? q[1].call(this, match, q[2]) : undefined;
-                                    } else {
-                                        // sanitize match using given regex
-                                        this[q[0]] = match ? match.replace(q[1], q[2]) : undefined;
-                                    }
-                                } else if (q.length == 4) {
-                                        this[q[0]] = match ? q[3].call(this, match.replace(q[1], q[2])) : undefined;
-                                }
-                            } else {
-                                this[q] = match ? match : undefined;
-                            }
-                        }
-                    }
-                }
-                i += 2;
-            }
-            //console.log(this);
-            //return this;
-        },
-
-        str : function (str, map) {
-
-            for (var i in map) {
-                // check if array
-                if (typeof map[i] === OBJ_TYPE && map[i].length > 0) {
-                    for (var j = 0; j < map[i].length; j++) {
-                        if (util.has(map[i][j], str)) {
-                            return (i === UNKNOWN) ? undefined : i;
-                        }
-                    }
-                } else if (util.has(map[i], str)) {
-                    return (i === UNKNOWN) ? undefined : i;
-                }
-            }
-            return str;
-        }
-    };
-
-
-    ///////////////
-    // String map
-    //////////////
-
-
-    var maps = {
-
-        browser : {
-            oldsafari : {
-                version : {
-                    '1.0'   : '/8',
-                    '1.2'   : '/1',
-                    '1.3'   : '/3',
-                    '2.0'   : '/412',
-                    '2.0.2' : '/416',
-                    '2.0.3' : '/417',
-                    '2.0.4' : '/419',
-                    '?'     : '/'
-                }
-            }
-        },
-
-        device : {
-            amazon : {
-                model : {
-                    'Fire Phone' : ['SD', 'KF']
-                }
-            },
-            sprint : {
-                model : {
-                    'Evo Shift 4G' : '7373KT'
-                },
-                vendor : {
-                    'HTC'       : 'APA',
-                    'Sprint'    : 'Sprint'
-                }
-            }
-        },
-
-        os : {
-            windows : {
-                version : {
-                    'ME'        : '4.90',
-                    'NT 3.11'   : 'NT3.51',
-                    'NT 4.0'    : 'NT4.0',
-                    '2000'      : 'NT 5.0',
-                    'XP'        : ['NT 5.1', 'NT 5.2'],
-                    'Vista'     : 'NT 6.0',
-                    '7'         : 'NT 6.1',
-                    '8'         : 'NT 6.2',
-                    '8.1'       : 'NT 6.3',
-                    '10'        : ['NT 6.4', 'NT 10.0'],
-                    'RT'        : 'ARM'
-                }
-            }
-        }
-    };
-
-
-    //////////////
-    // Regex map
-    /////////////
-
-
-    var regexes = {
-
-        browser : [[
-
-            // Presto based
-            /(opera\smini)\/([\w\.-]+)/i,                                       // Opera Mini
-            /(opera\s[mobiletab]+).+version\/([\w\.-]+)/i,                      // Opera Mobi/Tablet
-            /(opera).+version\/([\w\.]+)/i,                                     // Opera > 9.80
-            /(opera)[\/\s]+([\w\.]+)/i                                          // Opera < 9.80
-            ], [NAME, VERSION], [
-
-            /(opios)[\/\s]+([\w\.]+)/i                                          // Opera mini on iphone >= 8.0
-            ], [[NAME, 'Opera Mini'], VERSION], [
-
-            /\s(opr)\/([\w\.]+)/i                                               // Opera Webkit
-            ], [[NAME, 'Opera'], VERSION], [
-
-            // Mixed
-            /(kindle)\/([\w\.]+)/i,                                             // Kindle
-            /(lunascape|maxthon|netfront|jasmine|blazer)[\/\s]?([\w\.]+)*/i,
-                                                                                // Lunascape/Maxthon/Netfront/Jasmine/Blazer
-
-            // Trident based
-            /(avant\s|iemobile|slim|baidu)(?:browser)?[\/\s]?([\w\.]*)/i,
-                                                                                // Avant/IEMobile/SlimBrowser/Baidu
-            /(?:ms|\()(ie)\s([\w\.]+)/i,                                        // Internet Explorer
-
-            // Webkit/KHTML based
-            /(rekonq)\/([\w\.]+)*/i,                                            // Rekonq
-            /(chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron|vivaldi|iridium|phantomjs|bowser)\/([\w\.-]+)/i
-                                                                                // Chromium/Flock/RockMelt/Midori/Epiphany/Silk/Skyfire/Bolt/Iron/Iridium/PhantomJS/Bowser
-            ], [NAME, VERSION], [
-
-            /(trident).+rv[:\s]([\w\.]+).+like\sgecko/i                         // IE11
-            ], [[NAME, 'IE'], VERSION], [
-
-            /(edge)\/((\d+)?[\w\.]+)/i                                          // Microsoft Edge
-            ], [NAME, VERSION], [
-
-            /(yabrowser)\/([\w\.]+)/i                                           // Yandex
-            ], [[NAME, 'Yandex'], VERSION], [
-
-            /(puffin)\/([\w\.]+)/i                                              // Puffin
-            ], [[NAME, 'Puffin'], VERSION], [
-
-            /((?:[\s\/])uc?\s?browser|(?:juc.+)ucweb)[\/\s]?([\w\.]+)/i
-                                                                                // UCBrowser
-            ], [[NAME, 'UCBrowser'], VERSION], [
-
-            /(comodo_dragon)\/([\w\.]+)/i                                       // Comodo Dragon
-            ], [[NAME, /_/g, ' '], VERSION], [
-
-            /(micromessenger)\/([\w\.]+)/i                                      // WeChat
-            ], [[NAME, 'WeChat'], VERSION], [
-
-            /(QQ)\/([\d\.]+)/i                                                  // QQ, aka ShouQ
-            ], [NAME, VERSION], [
-
-            /m?(qqbrowser)[\/\s]?([\w\.]+)/i                                    // QQBrowser
-            ], [NAME, VERSION], [
-
-            /xiaomi\/miuibrowser\/([\w\.]+)/i                                   // MIUI Browser
-            ], [VERSION, [NAME, 'MIUI Browser']], [
-
-            /;fbav\/([\w\.]+);/i                                                // Facebook App for iOS & Android
-            ], [VERSION, [NAME, 'Facebook']], [
-
-            /(headlesschrome) ([\w\.]+)/i                                       // Chrome Headless
-            ], [VERSION, [NAME, 'Chrome Headless']], [
-
-            /\swv\).+(chrome)\/([\w\.]+)/i                                      // Chrome WebView
-            ], [[NAME, /(.+)/, '$1 WebView'], VERSION], [
-
-            /((?:oculus|samsung)browser)\/([\w\.]+)/i
-            ], [[NAME, /(.+(?:g|us))(.+)/, '$1 $2'], VERSION], [                // Oculus / Samsung Browser
-
-            /android.+version\/([\w\.]+)\s+(?:mobile\s?safari|safari)*/i        // Android Browser
-            ], [VERSION, [NAME, 'Android Browser']], [
-
-            /(chrome|omniweb|arora|[tizenoka]{5}\s?browser)\/v?([\w\.]+)/i
-                                                                                // Chrome/OmniWeb/Arora/Tizen/Nokia
-            ], [NAME, VERSION], [
-
-            /(dolfin)\/([\w\.]+)/i                                              // Dolphin
-            ], [[NAME, 'Dolphin'], VERSION], [
-
-            /((?:android.+)crmo|crios)\/([\w\.]+)/i                             // Chrome for Android/iOS
-            ], [[NAME, 'Chrome'], VERSION], [
-
-            /(coast)\/([\w\.]+)/i                                               // Opera Coast
-            ], [[NAME, 'Opera Coast'], VERSION], [
-
-            /fxios\/([\w\.-]+)/i                                                // Firefox for iOS
-            ], [VERSION, [NAME, 'Firefox']], [
-
-            /version\/([\w\.]+).+?mobile\/\w+\s(safari)/i                       // Mobile Safari
-            ], [VERSION, [NAME, 'Mobile Safari']], [
-
-            /version\/([\w\.]+).+?(mobile\s?safari|safari)/i                    // Safari & Safari Mobile
-            ], [VERSION, NAME], [
-
-            /webkit.+?(mobile\s?safari|safari)(\/[\w\.]+)/i                     // Safari < 3.0
-            ], [NAME, [VERSION, mapper.str, maps.browser.oldsafari.version]], [
-
-            /(konqueror)\/([\w\.]+)/i,                                          // Konqueror
-            /(webkit|khtml)\/([\w\.]+)/i
-            ], [NAME, VERSION], [
-
-            // Gecko based
-            /(navigator|netscape)\/([\w\.-]+)/i                                 // Netscape
-            ], [[NAME, 'Netscape'], VERSION], [
-            /(swiftfox)/i,                                                      // Swiftfox
-            /(icedragon|iceweasel|camino|chimera|fennec|maemo\sbrowser|minimo|conkeror)[\/\s]?([\w\.\+]+)/i,
-                                                                                // IceDragon/Iceweasel/Camino/Chimera/Fennec/Maemo/Minimo/Conkeror
-            /(firefox|seamonkey|k-meleon|icecat|iceape|firebird|phoenix)\/([\w\.-]+)/i,
-                                                                                // Firefox/SeaMonkey/K-Meleon/IceCat/IceApe/Firebird/Phoenix
-            /(mozilla)\/([\w\.]+).+rv\:.+gecko\/\d+/i,                          // Mozilla
-
-            // Other
-            /(polaris|lynx|dillo|icab|doris|amaya|w3m|netsurf|sleipnir)[\/\s]?([\w\.]+)/i,
-                                                                                // Polaris/Lynx/Dillo/iCab/Doris/Amaya/w3m/NetSurf/Sleipnir
-            /(links)\s\(([\w\.]+)/i,                                            // Links
-            /(gobrowser)\/?([\w\.]+)*/i,                                        // GoBrowser
-            /(ice\s?browser)\/v?([\w\._]+)/i,                                   // ICE Browser
-            /(mosaic)[\/\s]([\w\.]+)/i                                          // Mosaic
-            ], [NAME, VERSION]
-
-            /* /////////////////////
-            // Media players BEGIN
-            ////////////////////////
-
-            , [
-
-            /(apple(?:coremedia|))\/((\d+)[\w\._]+)/i,                          // Generic Apple CoreMedia
-            /(coremedia) v((\d+)[\w\._]+)/i
-            ], [NAME, VERSION], [
-
-            /(aqualung|lyssna|bsplayer)\/((\d+)?[\w\.-]+)/i                     // Aqualung/Lyssna/BSPlayer
-            ], [NAME, VERSION], [
-
-            /(ares|ossproxy)\s((\d+)[\w\.-]+)/i                                 // Ares/OSSProxy
-            ], [NAME, VERSION], [
-
-            /(audacious|audimusicstream|amarok|bass|core|dalvik|gnomemplayer|music on console|nsplayer|psp-internetradioplayer|videos)\/((\d+)[\w\.-]+)/i,
-                                                                                // Audacious/AudiMusicStream/Amarok/BASS/OpenCORE/Dalvik/GnomeMplayer/MoC
-                                                                                // NSPlayer/PSP-InternetRadioPlayer/Videos
-            /(clementine|music player daemon)\s((\d+)[\w\.-]+)/i,               // Clementine/MPD
-            /(lg player|nexplayer)\s((\d+)[\d\.]+)/i,
-            /player\/(nexplayer|lg player)\s((\d+)[\w\.-]+)/i                   // NexPlayer/LG Player
-            ], [NAME, VERSION], [
-            /(nexplayer)\s((\d+)[\w\.-]+)/i                                     // Nexplayer
-            ], [NAME, VERSION], [
-
-            /(flrp)\/((\d+)[\w\.-]+)/i                                          // Flip Player
-            ], [[NAME, 'Flip Player'], VERSION], [
-
-            /(fstream|nativehost|queryseekspider|ia-archiver|facebookexternalhit)/i
-                                                                                // FStream/NativeHost/QuerySeekSpider/IA Archiver/facebookexternalhit
-            ], [NAME], [
-
-            /(gstreamer) souphttpsrc (?:\([^\)]+\)){0,1} libsoup\/((\d+)[\w\.-]+)/i
-                                                                                // Gstreamer
-            ], [NAME, VERSION], [
-
-            /(htc streaming player)\s[\w_]+\s\/\s((\d+)[\d\.]+)/i,              // HTC Streaming Player
-            /(java|python-urllib|python-requests|wget|libcurl)\/((\d+)[\w\.-_]+)/i,
-                                                                                // Java/urllib/requests/wget/cURL
-            /(lavf)((\d+)[\d\.]+)/i                                             // Lavf (FFMPEG)
-            ], [NAME, VERSION], [
-
-            /(htc_one_s)\/((\d+)[\d\.]+)/i                                      // HTC One S
-            ], [[NAME, /_/g, ' '], VERSION], [
-
-            /(mplayer)(?:\s|\/)(?:(?:sherpya-){0,1}svn)(?:-|\s)(r\d+(?:-\d+[\w\.-]+){0,1})/i
-                                                                                // MPlayer SVN
-            ], [NAME, VERSION], [
-
-            /(mplayer)(?:\s|\/|[unkow-]+)((\d+)[\w\.-]+)/i                      // MPlayer
-            ], [NAME, VERSION], [
-
-            /(mplayer)/i,                                                       // MPlayer (no other info)
-            /(yourmuze)/i,                                                      // YourMuze
-            /(media player classic|nero showtime)/i                             // Media Player Classic/Nero ShowTime
-            ], [NAME], [
-
-            /(nero (?:home|scout))\/((\d+)[\w\.-]+)/i                           // Nero Home/Nero Scout
-            ], [NAME, VERSION], [
-
-            /(nokia\d+)\/((\d+)[\w\.-]+)/i                                      // Nokia
-            ], [NAME, VERSION], [
-
-            /\s(songbird)\/((\d+)[\w\.-]+)/i                                    // Songbird/Philips-Songbird
-            ], [NAME, VERSION], [
-
-            /(winamp)3 version ((\d+)[\w\.-]+)/i,                               // Winamp
-            /(winamp)\s((\d+)[\w\.-]+)/i,
-            /(winamp)mpeg\/((\d+)[\w\.-]+)/i
-            ], [NAME, VERSION], [
-
-            /(ocms-bot|tapinradio|tunein radio|unknown|winamp|inlight radio)/i  // OCMS-bot/tap in radio/tunein/unknown/winamp (no other info)
-                                                                                // inlight radio
-            ], [NAME], [
-
-            /(quicktime|rma|radioapp|radioclientapplication|soundtap|totem|stagefright|streamium)\/((\d+)[\w\.-]+)/i
-                                                                                // QuickTime/RealMedia/RadioApp/RadioClientApplication/
-                                                                                // SoundTap/Totem/Stagefright/Streamium
-            ], [NAME, VERSION], [
-
-            /(smp)((\d+)[\d\.]+)/i                                              // SMP
-            ], [NAME, VERSION], [
-
-            /(vlc) media player - version ((\d+)[\w\.]+)/i,                     // VLC Videolan
-            /(vlc)\/((\d+)[\w\.-]+)/i,
-            /(xbmc|gvfs|xine|xmms|irapp)\/((\d+)[\w\.-]+)/i,                    // XBMC/gvfs/Xine/XMMS/irapp
-            /(foobar2000)\/((\d+)[\d\.]+)/i,                                    // Foobar2000
-            /(itunes)\/((\d+)[\d\.]+)/i                                         // iTunes
-            ], [NAME, VERSION], [
-
-            /(wmplayer)\/((\d+)[\w\.-]+)/i,                                     // Windows Media Player
-            /(windows-media-player)\/((\d+)[\w\.-]+)/i
-            ], [[NAME, /-/g, ' '], VERSION], [
-
-            /windows\/((\d+)[\w\.-]+) upnp\/[\d\.]+ dlnadoc\/[\d\.]+ (home media server)/i
-                                                                                // Windows Media Server
-            ], [VERSION, [NAME, 'Windows']], [
-
-            /(com\.riseupradioalarm)\/((\d+)[\d\.]*)/i                          // RiseUP Radio Alarm
-            ], [NAME, VERSION], [
-
-            /(rad.io)\s((\d+)[\d\.]+)/i,                                        // Rad.io
-            /(radio.(?:de|at|fr))\s((\d+)[\d\.]+)/i
-            ], [[NAME, 'rad.io'], VERSION]
-
-            //////////////////////
-            // Media players END
-            ////////////////////*/
-
-        ],
-
-        cpu : [[
-
-            /(?:(amd|x(?:(?:86|64)[_-])?|wow|win)64)[;\)]/i                     // AMD64
-            ], [[ARCHITECTURE, 'amd64']], [
-
-            /(ia32(?=;))/i                                                      // IA32 (quicktime)
-            ], [[ARCHITECTURE, util.lowerize]], [
-
-            /((?:i[346]|x)86)[;\)]/i                                            // IA32
-            ], [[ARCHITECTURE, 'ia32']], [
-
-            // PocketPC mistakenly identified as PowerPC
-            /windows\s(ce|mobile);\sppc;/i
-            ], [[ARCHITECTURE, 'arm']], [
-
-            /((?:ppc|powerpc)(?:64)?)(?:\smac|;|\))/i                           // PowerPC
-            ], [[ARCHITECTURE, /ower/, '', util.lowerize]], [
-
-            /(sun4\w)[;\)]/i                                                    // SPARC
-            ], [[ARCHITECTURE, 'sparc']], [
-
-            /((?:avr32|ia64(?=;))|68k(?=\))|arm(?:64|(?=v\d+;))|(?=atmel\s)avr|(?:irix|mips|sparc)(?:64)?(?=;)|pa-risc)/i
-                                                                                // IA64, 68K, ARM/64, AVR/32, IRIX/64, MIPS/64, SPARC/64, PA-RISC
-            ], [[ARCHITECTURE, util.lowerize]]
-        ],
-
-        device : [[
-
-            /\((ipad|playbook);[\w\s\);-]+(rim|apple)/i                         // iPad/PlayBook
-            ], [MODEL, VENDOR, [TYPE, TABLET]], [
-
-            /applecoremedia\/[\w\.]+ \((ipad)/                                  // iPad
-            ], [MODEL, [VENDOR, 'Apple'], [TYPE, TABLET]], [
-
-            /(apple\s{0,1}tv)/i                                                 // Apple TV
-            ], [[MODEL, 'Apple TV'], [VENDOR, 'Apple']], [
-
-            /(archos)\s(gamepad2?)/i,                                           // Archos
-            /(hp).+(touchpad)/i,                                                // HP TouchPad
-            /(hp).+(tablet)/i,                                                  // HP Tablet
-            /(kindle)\/([\w\.]+)/i,                                             // Kindle
-            /\s(nook)[\w\s]+build\/(\w+)/i,                                     // Nook
-            /(dell)\s(strea[kpr\s\d]*[\dko])/i                                  // Dell Streak
-            ], [VENDOR, MODEL, [TYPE, TABLET]], [
-
-            /(kf[A-z]+)\sbuild\/[\w\.]+.*silk\//i                               // Kindle Fire HD
-            ], [MODEL, [VENDOR, 'Amazon'], [TYPE, TABLET]], [
-            /(sd|kf)[0349hijorstuw]+\sbuild\/[\w\.]+.*silk\//i                  // Fire Phone
-            ], [[MODEL, mapper.str, maps.device.amazon.model], [VENDOR, 'Amazon'], [TYPE, MOBILE]], [
-
-            /\((ip[honed|\s\w*]+);.+(apple)/i                                   // iPod/iPhone
-            ], [MODEL, VENDOR, [TYPE, MOBILE]], [
-            /\((ip[honed|\s\w*]+);/i                                            // iPod/iPhone
-            ], [MODEL, [VENDOR, 'Apple'], [TYPE, MOBILE]], [
-
-            /(blackberry)[\s-]?(\w+)/i,                                         // BlackBerry
-            /(blackberry|benq|palm(?=\-)|sonyericsson|acer|asus|dell|meizu|motorola|polytron)[\s_-]?([\w-]+)*/i,
-                                                                                // BenQ/Palm/Sony-Ericsson/Acer/Asus/Dell/Meizu/Motorola/Polytron
-            /(hp)\s([\w\s]+\w)/i,                                               // HP iPAQ
-            /(asus)-?(\w+)/i                                                    // Asus
-            ], [VENDOR, MODEL, [TYPE, MOBILE]], [
-            /\(bb10;\s(\w+)/i                                                   // BlackBerry 10
-            ], [MODEL, [VENDOR, 'BlackBerry'], [TYPE, MOBILE]], [
-                                                                                // Asus Tablets
-            /android.+(transfo[prime\s]{4,10}\s\w+|eeepc|slider\s\w+|nexus 7|padfone)/i
-            ], [MODEL, [VENDOR, 'Asus'], [TYPE, TABLET]], [
-
-            /(sony)\s(tablet\s[ps])\sbuild\//i,                                  // Sony
-            /(sony)?(?:sgp.+)\sbuild\//i
-            ], [[VENDOR, 'Sony'], [MODEL, 'Xperia Tablet'], [TYPE, TABLET]], [
-            /android.+\s([c-g]\d{4}|so[-l]\w+)\sbuild\//i
-            ], [MODEL, [VENDOR, 'Sony'], [TYPE, MOBILE]], [
-
-            /\s(ouya)\s/i,                                                      // Ouya
-            /(nintendo)\s([wids3u]+)/i                                          // Nintendo
-            ], [VENDOR, MODEL, [TYPE, CONSOLE]], [
-
-            /android.+;\s(shield)\sbuild/i                                      // Nvidia
-            ], [MODEL, [VENDOR, 'Nvidia'], [TYPE, CONSOLE]], [
-
-            /(playstation\s[34portablevi]+)/i                                   // Playstation
-            ], [MODEL, [VENDOR, 'Sony'], [TYPE, CONSOLE]], [
-
-            /(sprint\s(\w+))/i                                                  // Sprint Phones
-            ], [[VENDOR, mapper.str, maps.device.sprint.vendor], [MODEL, mapper.str, maps.device.sprint.model], [TYPE, MOBILE]], [
-
-            /(lenovo)\s?(S(?:5000|6000)+(?:[-][\w+]))/i                         // Lenovo tablets
-            ], [VENDOR, MODEL, [TYPE, TABLET]], [
-
-            /(htc)[;_\s-]+([\w\s]+(?=\))|\w+)*/i,                               // HTC
-            /(zte)-(\w+)*/i,                                                    // ZTE
-            /(alcatel|geeksphone|lenovo|nexian|panasonic|(?=;\s)sony)[_\s-]?([\w-]+)*/i
-                                                                                // Alcatel/GeeksPhone/Lenovo/Nexian/Panasonic/Sony
-            ], [VENDOR, [MODEL, /_/g, ' '], [TYPE, MOBILE]], [
-
-            /(nexus\s9)/i                                                       // HTC Nexus 9
-            ], [MODEL, [VENDOR, 'HTC'], [TYPE, TABLET]], [
-
-            /d\/huawei([\w\s-]+)[;\)]/i,
-            /(nexus\s6p)/i                                                      // Huawei
-            ], [MODEL, [VENDOR, 'Huawei'], [TYPE, MOBILE]], [
-
-            /(microsoft);\s(lumia[\s\w]+)/i                                     // Microsoft Lumia
-            ], [VENDOR, MODEL, [TYPE, MOBILE]], [
-
-            /[\s\(;](xbox(?:\sone)?)[\s\);]/i                                   // Microsoft Xbox
-            ], [MODEL, [VENDOR, 'Microsoft'], [TYPE, CONSOLE]], [
-            /(kin\.[onetw]{3})/i                                                // Microsoft Kin
-            ], [[MODEL, /\./g, ' '], [VENDOR, 'Microsoft'], [TYPE, MOBILE]], [
-
-                                                                                // Motorola
-            /\s(milestone|droid(?:[2-4x]|\s(?:bionic|x2|pro|razr))?(:?\s4g)?)[\w\s]+build\//i,
-            /mot[\s-]?(\w+)*/i,
-            /(XT\d{3,4}) build\//i,
-            /(nexus\s6)/i
-            ], [MODEL, [VENDOR, 'Motorola'], [TYPE, MOBILE]], [
-            /android.+\s(mz60\d|xoom[\s2]{0,2})\sbuild\//i
-            ], [MODEL, [VENDOR, 'Motorola'], [TYPE, TABLET]], [
-
-            /hbbtv\/\d+\.\d+\.\d+\s+\([\w\s]*;\s*(\w[^;]*);([^;]*)/i            // HbbTV devices
-            ], [[VENDOR, util.trim], [MODEL, util.trim], [TYPE, SMARTTV]], [
-
-            /hbbtv.+maple;(\d+)/i
-            ], [[MODEL, /^/, 'SmartTV'], [VENDOR, 'Samsung'], [TYPE, SMARTTV]], [
-
-            /\(dtv[\);].+(aquos)/i                                              // Sharp
-            ], [MODEL, [VENDOR, 'Sharp'], [TYPE, SMARTTV]], [
-
-            /android.+((sch-i[89]0\d|shw-m380s|gt-p\d{4}|gt-n\d+|sgh-t8[56]9|nexus 10))/i,
-            /((SM-T\w+))/i
-            ], [[VENDOR, 'Samsung'], MODEL, [TYPE, TABLET]], [                  // Samsung
-            /smart-tv.+(samsung)/i
-            ], [VENDOR, [TYPE, SMARTTV], MODEL], [
-            /((s[cgp]h-\w+|gt-\w+|galaxy\snexus|sm-\w[\w\d]+))/i,
-            /(sam[sung]*)[\s-]*(\w+-?[\w-]*)*/i,
-            /sec-((sgh\w+))/i
-            ], [[VENDOR, 'Samsung'], MODEL, [TYPE, MOBILE]], [
-
-            /sie-(\w+)*/i                                                       // Siemens
-            ], [MODEL, [VENDOR, 'Siemens'], [TYPE, MOBILE]], [
-
-            /(maemo|nokia).*(n900|lumia\s\d+)/i,                                // Nokia
-            /(nokia)[\s_-]?([\w-]+)*/i
-            ], [[VENDOR, 'Nokia'], MODEL, [TYPE, MOBILE]], [
-
-            /android\s3\.[\s\w;-]{10}(a\d{3})/i                                 // Acer
-            ], [MODEL, [VENDOR, 'Acer'], [TYPE, TABLET]], [
-
-            /android.+([vl]k\-?\d{3})\s+build/i                                 // LG Tablet
-            ], [MODEL, [VENDOR, 'LG'], [TYPE, TABLET]], [
-            /android\s3\.[\s\w;-]{10}(lg?)-([06cv9]{3,4})/i                     // LG Tablet
-            ], [[VENDOR, 'LG'], MODEL, [TYPE, TABLET]], [
-            /(lg) netcast\.tv/i                                                 // LG SmartTV
-            ], [VENDOR, MODEL, [TYPE, SMARTTV]], [
-            /(nexus\s[45])/i,                                                   // LG
-            /lg[e;\s\/-]+(\w+)*/i,
-            /android.+lg(\-?[\d\w]+)\s+build/i
-            ], [MODEL, [VENDOR, 'LG'], [TYPE, MOBILE]], [
-
-            /android.+(ideatab[a-z0-9\-\s]+)/i                                  // Lenovo
-            ], [MODEL, [VENDOR, 'Lenovo'], [TYPE, TABLET]], [
-
-            /linux;.+((jolla));/i                                               // Jolla
-            ], [VENDOR, MODEL, [TYPE, MOBILE]], [
-
-            /((pebble))app\/[\d\.]+\s/i                                         // Pebble
-            ], [VENDOR, MODEL, [TYPE, WEARABLE]], [
-
-            /android.+;\s(oppo)\s?([\w\s]+)\sbuild/i                            // OPPO
-            ], [VENDOR, MODEL, [TYPE, MOBILE]], [
-
-            /crkey/i                                                            // Google Chromecast
-            ], [[MODEL, 'Chromecast'], [VENDOR, 'Google']], [
-
-            /android.+;\s(glass)\s\d/i                                          // Google Glass
-            ], [MODEL, [VENDOR, 'Google'], [TYPE, WEARABLE]], [
-
-            /android.+;\s(pixel c)\s/i                                          // Google Pixel C
-            ], [MODEL, [VENDOR, 'Google'], [TYPE, TABLET]], [
-
-            /android.+;\s(pixel xl|pixel)\s/i                                   // Google Pixel
-            ], [MODEL, [VENDOR, 'Google'], [TYPE, MOBILE]], [
-
-            /android.+(\w+)\s+build\/hm\1/i,                                    // Xiaomi Hongmi 'numeric' models
-            /android.+(hm[\s\-_]*note?[\s_]*(?:\d\w)?)\s+build/i,               // Xiaomi Hongmi
-            /android.+(mi[\s\-_]*(?:one|one[\s_]plus|note lte)?[\s_]*(?:\d\w)?)\s+build/i    // Xiaomi Mi
-            ], [[MODEL, /_/g, ' '], [VENDOR, 'Xiaomi'], [TYPE, MOBILE]], [
-
-            /android.+;\s(m[1-5]\snote)\sbuild/i                                // Meizu Tablet
-            ], [MODEL, [VENDOR, 'Meizu'], [TYPE, TABLET]], [
-
-            /android.+a000(1)\s+build/i                                         // OnePlus
-            ], [MODEL, [VENDOR, 'OnePlus'], [TYPE, MOBILE]], [
-
-            /android.+[;\/]\s*(RCT[\d\w]+)\s+build/i                            // RCA Tablets
-            ], [MODEL, [VENDOR, 'RCA'], [TYPE, TABLET]], [
-
-            /android.+[;\/]\s*(Venue[\d\s]*)\s+build/i                          // Dell Venue Tablets
-            ], [MODEL, [VENDOR, 'Dell'], [TYPE, TABLET]], [
-
-            /android.+[;\/]\s*(Q[T|M][\d\w]+)\s+build/i                         // Verizon Tablet
-            ], [MODEL, [VENDOR, 'Verizon'], [TYPE, TABLET]], [
-
-            /android.+[;\/]\s+(Barnes[&\s]+Noble\s+|BN[RT])(V?.*)\s+build/i     // Barnes & Noble Tablet
-            ], [[VENDOR, 'Barnes & Noble'], MODEL, [TYPE, TABLET]], [
-
-            /android.+[;\/]\s+(TM\d{3}.*\b)\s+build/i                           // Barnes & Noble Tablet
-            ], [MODEL, [VENDOR, 'NuVision'], [TYPE, TABLET]], [
-
-            /android.+[;\/]\s*(zte)?.+(k\d{2})\s+build/i                        // ZTE K Series Tablet
-            ], [[VENDOR, 'ZTE'], MODEL, [TYPE, TABLET]], [
-
-            /android.+[;\/]\s*(gen\d{3})\s+build.*49h/i                         // Swiss GEN Mobile
-            ], [MODEL, [VENDOR, 'Swiss'], [TYPE, MOBILE]], [
-
-            /android.+[;\/]\s*(zur\d{3})\s+build/i                              // Swiss ZUR Tablet
-            ], [MODEL, [VENDOR, 'Swiss'], [TYPE, TABLET]], [
-
-            /android.+[;\/]\s*((Zeki)?TB.*\b)\s+build/i                         // Zeki Tablets
-            ], [MODEL, [VENDOR, 'Zeki'], [TYPE, TABLET]], [
-
-            /(android).+[;\/]\s+([YR]\d{2}x?.*)\s+build/i,
-            /android.+[;\/]\s+(Dragon[\-\s]+Touch\s+|DT)(.+)\s+build/i          // Dragon Touch Tablet
-            ], [[VENDOR, 'Dragon Touch'], MODEL, [TYPE, TABLET]], [
-
-            /android.+[;\/]\s*(NS-?.+)\s+build/i                                // Insignia Tablets
-            ], [MODEL, [VENDOR, 'Insignia'], [TYPE, TABLET]], [
-
-            /android.+[;\/]\s*((NX|Next)-?.+)\s+build/i                         // NextBook Tablets
-            ], [MODEL, [VENDOR, 'NextBook'], [TYPE, TABLET]], [
-
-            /android.+[;\/]\s*(Xtreme\_?)?(V(1[045]|2[015]|30|40|60|7[05]|90))\s+build/i
-            ], [[VENDOR, 'Voice'], MODEL, [TYPE, MOBILE]], [                    // Voice Xtreme Phones
-
-            /android.+[;\/]\s*(LVTEL\-?)?(V1[12])\s+build/i                     // LvTel Phones
-            ], [[VENDOR, 'LvTel'], MODEL, [TYPE, MOBILE]], [
-
-            /android.+[;\/]\s*(V(100MD|700NA|7011|917G).*\b)\s+build/i          // Envizen Tablets
-            ], [MODEL, [VENDOR, 'Envizen'], [TYPE, TABLET]], [
-
-            /android.+[;\/]\s*(Le[\s\-]+Pan)[\s\-]+(.*\b)\s+build/i             // Le Pan Tablets
-            ], [VENDOR, MODEL, [TYPE, TABLET]], [
-
-            /android.+[;\/]\s*(Trio[\s\-]*.*)\s+build/i                         // MachSpeed Tablets
-            ], [MODEL, [VENDOR, 'MachSpeed'], [TYPE, TABLET]], [
-
-            /android.+[;\/]\s*(Trinity)[\-\s]*(T\d{3})\s+build/i                // Trinity Tablets
-            ], [VENDOR, MODEL, [TYPE, TABLET]], [
-
-            /android.+[;\/]\s*TU_(1491)\s+build/i                               // Rotor Tablets
-            ], [MODEL, [VENDOR, 'Rotor'], [TYPE, TABLET]], [
-
-            /android.+(KS(.+))\s+build/i                                        // Amazon Kindle Tablets
-            ], [MODEL, [VENDOR, 'Amazon'], [TYPE, TABLET]], [
-
-            /android.+(Gigaset)[\s\-]+(Q.+)\s+build/i                           // Gigaset Tablets
-            ], [VENDOR, MODEL, [TYPE, TABLET]], [
-
-            /\s(tablet|tab)[;\/]/i,                                             // Unidentifiable Tablet
-            /\s(mobile)(?:[;\/]|\ssafari)/i                                     // Unidentifiable Mobile
-            ], [[TYPE, util.lowerize], VENDOR, MODEL], [
-
-            /(android.+)[;\/].+build/i                                          // Generic Android Device
-            ], [MODEL, [VENDOR, 'Generic']]
-
-
-        /*//////////////////////////
-            // TODO: move to string map
-            ////////////////////////////
-
-            /(C6603)/i                                                          // Sony Xperia Z C6603
-            ], [[MODEL, 'Xperia Z C6603'], [VENDOR, 'Sony'], [TYPE, MOBILE]], [
-            /(C6903)/i                                                          // Sony Xperia Z 1
-            ], [[MODEL, 'Xperia Z 1'], [VENDOR, 'Sony'], [TYPE, MOBILE]], [
-
-            /(SM-G900[F|H])/i                                                   // Samsung Galaxy S5
-            ], [[MODEL, 'Galaxy S5'], [VENDOR, 'Samsung'], [TYPE, MOBILE]], [
-            /(SM-G7102)/i                                                       // Samsung Galaxy Grand 2
-            ], [[MODEL, 'Galaxy Grand 2'], [VENDOR, 'Samsung'], [TYPE, MOBILE]], [
-            /(SM-G530H)/i                                                       // Samsung Galaxy Grand Prime
-            ], [[MODEL, 'Galaxy Grand Prime'], [VENDOR, 'Samsung'], [TYPE, MOBILE]], [
-            /(SM-G313HZ)/i                                                      // Samsung Galaxy V
-            ], [[MODEL, 'Galaxy V'], [VENDOR, 'Samsung'], [TYPE, MOBILE]], [
-            /(SM-T805)/i                                                        // Samsung Galaxy Tab S 10.5
-            ], [[MODEL, 'Galaxy Tab S 10.5'], [VENDOR, 'Samsung'], [TYPE, TABLET]], [
-            /(SM-G800F)/i                                                       // Samsung Galaxy S5 Mini
-            ], [[MODEL, 'Galaxy S5 Mini'], [VENDOR, 'Samsung'], [TYPE, MOBILE]], [
-            /(SM-T311)/i                                                        // Samsung Galaxy Tab 3 8.0
-            ], [[MODEL, 'Galaxy Tab 3 8.0'], [VENDOR, 'Samsung'], [TYPE, TABLET]], [
-
-            /(T3C)/i                                                            // Advan Vandroid T3C
-            ], [MODEL, [VENDOR, 'Advan'], [TYPE, TABLET]], [
-            /(ADVAN T1J\+)/i                                                    // Advan Vandroid T1J+
-            ], [[MODEL, 'Vandroid T1J+'], [VENDOR, 'Advan'], [TYPE, TABLET]], [
-            /(ADVAN S4A)/i                                                      // Advan Vandroid S4A
-            ], [[MODEL, 'Vandroid S4A'], [VENDOR, 'Advan'], [TYPE, MOBILE]], [
-
-            /(V972M)/i                                                          // ZTE V972M
-            ], [MODEL, [VENDOR, 'ZTE'], [TYPE, MOBILE]], [
-
-            /(i-mobile)\s(IQ\s[\d\.]+)/i                                        // i-mobile IQ
-            ], [VENDOR, MODEL, [TYPE, MOBILE]], [
-            /(IQ6.3)/i                                                          // i-mobile IQ IQ 6.3
-            ], [[MODEL, 'IQ 6.3'], [VENDOR, 'i-mobile'], [TYPE, MOBILE]], [
-            /(i-mobile)\s(i-style\s[\d\.]+)/i                                   // i-mobile i-STYLE
-            ], [VENDOR, MODEL, [TYPE, MOBILE]], [
-            /(i-STYLE2.1)/i                                                     // i-mobile i-STYLE 2.1
-            ], [[MODEL, 'i-STYLE 2.1'], [VENDOR, 'i-mobile'], [TYPE, MOBILE]], [
-
-            /(mobiistar touch LAI 512)/i                                        // mobiistar touch LAI 512
-            ], [[MODEL, 'Touch LAI 512'], [VENDOR, 'mobiistar'], [TYPE, MOBILE]], [
-
-            /////////////
-            // END TODO
-            ///////////*/
-
-        ],
-
-        engine : [[
-
-            /windows.+\sedge\/([\w\.]+)/i                                       // EdgeHTML
-            ], [VERSION, [NAME, 'EdgeHTML']], [
-
-            /(presto)\/([\w\.]+)/i,                                             // Presto
-            /(webkit|trident|netfront|netsurf|amaya|lynx|w3m)\/([\w\.]+)/i,     // WebKit/Trident/NetFront/NetSurf/Amaya/Lynx/w3m
-            /(khtml|tasman|links)[\/\s]\(?([\w\.]+)/i,                          // KHTML/Tasman/Links
-            /(icab)[\/\s]([23]\.[\d\.]+)/i                                      // iCab
-            ], [NAME, VERSION], [
-
-            /rv\:([\w\.]+).*(gecko)/i                                           // Gecko
-            ], [VERSION, NAME]
-        ],
-
-        os : [[
-
-            // Windows based
-            /microsoft\s(windows)\s(vista|xp)/i                                 // Windows (iTunes)
-            ], [NAME, VERSION], [
-            /(windows)\snt\s6\.2;\s(arm)/i,                                     // Windows RT
-            /(windows\sphone(?:\sos)*)[\s\/]?([\d\.\s]+\w)*/i,                  // Windows Phone
-            /(windows\smobile|windows)[\s\/]?([ntce\d\.\s]+\w)/i
-            ], [NAME, [VERSION, mapper.str, maps.os.windows.version]], [
-            /(win(?=3|9|n)|win\s9x\s)([nt\d\.]+)/i
-            ], [[NAME, 'Windows'], [VERSION, mapper.str, maps.os.windows.version]], [
-
-            // Mobile/Embedded OS
-            /\((bb)(10);/i                                                      // BlackBerry 10
-            ], [[NAME, 'BlackBerry'], VERSION], [
-            /(blackberry)\w*\/?([\w\.]+)*/i,                                    // Blackberry
-            /(tizen)[\/\s]([\w\.]+)/i,                                          // Tizen
-            /(android|webos|palm\sos|qnx|bada|rim\stablet\sos|meego|contiki)[\/\s-]?([\w\.]+)*/i,
-                                                                                // Android/WebOS/Palm/QNX/Bada/RIM/MeeGo/Contiki
-            /linux;.+(sailfish);/i                                              // Sailfish OS
-            ], [NAME, VERSION], [
-            /(symbian\s?os|symbos|s60(?=;))[\/\s-]?([\w\.]+)*/i                 // Symbian
-            ], [[NAME, 'Symbian'], VERSION], [
-            /\((series40);/i                                                    // Series 40
-            ], [NAME], [
-            /mozilla.+\(mobile;.+gecko.+firefox/i                               // Firefox OS
-            ], [[NAME, 'Firefox OS'], VERSION], [
-
-            // Console
-            /(nintendo|playstation)\s([wids34portablevu]+)/i,                   // Nintendo/Playstation
-
-            // GNU/Linux based
-            /(mint)[\/\s\(]?(\w+)*/i,                                           // Mint
-            /(mageia|vectorlinux)[;\s]/i,                                       // Mageia/VectorLinux
-            /(joli|[kxln]?ubuntu|debian|[open]*suse|gentoo|(?=\s)arch|slackware|fedora|mandriva|centos|pclinuxos|redhat|zenwalk|linpus)[\/\s-]?(?!chrom)([\w\.-]+)*/i,
-                                                                                // Joli/Ubuntu/Debian/SUSE/Gentoo/Arch/Slackware
-                                                                                // Fedora/Mandriva/CentOS/PCLinuxOS/RedHat/Zenwalk/Linpus
-            /(hurd|linux)\s?([\w\.]+)*/i,                                       // Hurd/Linux
-            /(gnu)\s?([\w\.]+)*/i                                               // GNU
-            ], [NAME, VERSION], [
-
-            /(cros)\s[\w]+\s([\w\.]+\w)/i                                       // Chromium OS
-            ], [[NAME, 'Chromium OS'], VERSION],[
-
-            // Solaris
-            /(sunos)\s?([\w\.]+\d)*/i                                           // Solaris
-            ], [[NAME, 'Solaris'], VERSION], [
-
-            // BSD based
-            /\s([frentopc-]{0,4}bsd|dragonfly)\s?([\w\.]+)*/i                   // FreeBSD/NetBSD/OpenBSD/PC-BSD/DragonFly
-            ], [NAME, VERSION],[
-
-            /(haiku)\s(\w+)/i                                                  // Haiku
-            ], [NAME, VERSION],[
-
-            /cfnetwork\/.+darwin/i,
-            /ip[honead]+(?:.*os\s([\w]+)*\slike\smac|;\sopera)/i                // iOS
-            ], [[VERSION, /_/g, '.'], [NAME, 'iOS']], [
-
-            /(mac\sos\sx)\s?([\w\s\.]+\w)*/i,
-            /(macintosh|mac(?=_powerpc)\s)/i                                    // Mac OS
-            ], [[NAME, 'Mac OS'], [VERSION, /_/g, '.']], [
-
-            // Other
-            /((?:open)?solaris)[\/\s-]?([\w\.]+)*/i,                            // Solaris
-            /(aix)\s((\d)(?=\.|\)|\s)[\w\.]*)*/i,                               // AIX
-            /(plan\s9|minix|beos|os\/2|amigaos|morphos|risc\sos|openvms)/i,
-                                                                                // Plan9/Minix/BeOS/OS2/AmigaOS/MorphOS/RISCOS/OpenVMS
-            /(unix)\s?([\w\.]+)*/i                                              // UNIX
-            ], [NAME, VERSION]
-        ]
-    };
-
-
-    /////////////////
-    // Constructor
-    ////////////////
-
-    var Browser = function (name, version) {
-        this[NAME] = name;
-        this[VERSION] = version;
-    };
-    var CPU = function (arch) {
-        this[ARCHITECTURE] = arch;
-    };
-    var Device = function (vendor, model, type) {
-        this[VENDOR] = vendor;
-        this[MODEL] = model;
-        this[TYPE] = type;
-    };
-    var Engine = Browser;
-    var OS = Browser;
-
-    var UAParser = function (uastring, extensions) {
-
-        if (typeof uastring === 'object') {
-            extensions = uastring;
-            uastring = undefined;
-        }
-
-        if (!(this instanceof UAParser)) {
-            return new UAParser(uastring, extensions).getResult();
-        }
-
-        var ua = uastring || ((window && window.navigator && window.navigator.userAgent) ? window.navigator.userAgent : EMPTY);
-        var rgxmap = extensions ? util.extend(regexes, extensions) : regexes;
-        var browser = new Browser();
-        var cpu = new CPU();
-        var device = new Device();
-        var engine = new Engine();
-        var os = new OS();
-
-        this.getBrowser = function () {
-            mapper.rgx.call(browser, ua, rgxmap.browser);
-            browser.major = util.major(browser.version); // deprecated
-            return browser;
-        };
-        this.getCPU = function () {
-            mapper.rgx.call(cpu, ua, rgxmap.cpu);
-            return cpu;
-        };
-        this.getDevice = function () {
-            mapper.rgx.call(device, ua, rgxmap.device);
-            return device;
-        };
-        this.getEngine = function () {
-            mapper.rgx.call(engine, ua, rgxmap.engine);
-            return engine;
-        };
-        this.getOS = function () {
-            mapper.rgx.call(os, ua, rgxmap.os);
-            return os;
-        };
-        this.getResult = function () {
-            return {
-                ua      : this.getUA(),
-                browser : this.getBrowser(),
-                engine  : this.getEngine(),
-                os      : this.getOS(),
-                device  : this.getDevice(),
-                cpu     : this.getCPU()
-            };
-        };
-        this.getUA = function () {
-            return ua;
-        };
-        this.setUA = function (uastring) {
-            ua = uastring;
-            browser = new Browser();
-            cpu = new CPU();
-            device = new Device();
-            engine = new Engine();
-            os = new OS();
-            return this;
-        };
-        return this;
-    };
-
-    UAParser.VERSION = LIBVERSION;
-    UAParser.BROWSER = {
-        NAME    : NAME,
-        MAJOR   : MAJOR, // deprecated
-        VERSION : VERSION
-    };
-    UAParser.CPU = {
-        ARCHITECTURE : ARCHITECTURE
-    };
-    UAParser.DEVICE = {
-        MODEL   : MODEL,
-        VENDOR  : VENDOR,
-        TYPE    : TYPE,
-        CONSOLE : CONSOLE,
-        MOBILE  : MOBILE,
-        SMARTTV : SMARTTV,
-        TABLET  : TABLET,
-        WEARABLE: WEARABLE,
-        EMBEDDED: EMBEDDED
-    };
-    UAParser.ENGINE = {
-        NAME    : NAME,
-        VERSION : VERSION
-    };
-    UAParser.OS = {
-        NAME    : NAME,
-        VERSION : VERSION
-    };
-    //UAParser.Utils = util;
-
-    ///////////
-    // Export
-    //////////
-
-
-    // check js environment
-    if (typeof(exports) !== UNDEF_TYPE) {
-        // nodejs env
-        if (typeof module !== UNDEF_TYPE && module.exports) {
-            exports = module.exports = UAParser;
-        }
-        exports.UAParser = UAParser;
-    } else {
-        // requirejs env (optional)
-        if ("function" === FUNC_TYPE && __webpack_require__(142)) {
-            !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-                return UAParser;
-            }.call(exports, __webpack_require__, exports, module),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-        } else if (window) {
-            // browser env
-            window.UAParser = UAParser;
-        }
-    }
-
-    // jQuery/Zepto specific (optional)
-    // Note:
-    //   In AMD env the global scope should be kept clean, but jQuery is an exception.
-    //   jQuery always exports to global scope, unless jQuery.noConflict(true) is used,
-    //   and we should catch that.
-    var $ = window && (window.jQuery || window.Zepto);
-    if (typeof $ !== UNDEF_TYPE) {
-        var parser = new UAParser();
-        $.ua = parser.getResult();
-        $.ua.get = function () {
-            return parser.getUA();
-        };
-        $.ua.set = function (uastring) {
-            parser.setUA(uastring);
-            var result = parser.getResult();
-            for (var prop in result) {
-                $.ua[prop] = result[prop];
-            }
-        };
-    }
-
-})(typeof window === 'object' ? window : this);
-
-
-/***/ }),
-/* 142 */
-/***/ (function(module, exports) {
-
-/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
-module.exports = __webpack_amd_options__;
-
-/* WEBPACK VAR INJECTION */}.call(exports, {}))
-
-/***/ }),
-/* 143 */
-/***/ (function(module, exports, __webpack_require__) {
-
-//     uuid.js
-//
-//     Copyright (c) 2010-2012 Robert Kieffer
-//     MIT License - http://opensource.org/licenses/mit-license.php
-
-// Unique ID creation requires a high quality random # generator.  We feature
-// detect to determine the best RNG source, normalizing to a function that
-// returns 128-bits of randomness, since that's what's usually required
-var _rng = __webpack_require__(144);
-
-// Maps for number <-> hex string conversion
-var _byteToHex = [];
-var _hexToByte = {};
-for (var i = 0; i < 256; i++) {
-  _byteToHex[i] = (i + 0x100).toString(16).substr(1);
-  _hexToByte[_byteToHex[i]] = i;
-}
-
-// **`parse()` - Parse a UUID into it's component bytes**
-function parse(s, buf, offset) {
-  var i = (buf && offset) || 0, ii = 0;
-
-  buf = buf || [];
-  s.toLowerCase().replace(/[0-9a-f]{2}/g, function(oct) {
-    if (ii < 16) { // Don't overflow!
-      buf[i + ii++] = _hexToByte[oct];
-    }
-  });
-
-  // Zero out remaining bytes if string was short
-  while (ii < 16) {
-    buf[i + ii++] = 0;
-  }
-
-  return buf;
-}
-
-// **`unparse()` - Convert UUID byte array (ala parse()) into a string**
-function unparse(buf, offset) {
-  var i = offset || 0, bth = _byteToHex;
-  return  bth[buf[i++]] + bth[buf[i++]] +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] +
-          bth[buf[i++]] + bth[buf[i++]] +
-          bth[buf[i++]] + bth[buf[i++]];
-}
-
-// **`v1()` - Generate time-based UUID**
-//
-// Inspired by https://github.com/LiosK/UUID.js
-// and http://docs.python.org/library/uuid.html
-
-// random #'s we need to init node and clockseq
-var _seedBytes = _rng();
-
-// Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
-var _nodeId = [
-  _seedBytes[0] | 0x01,
-  _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
-];
-
-// Per 4.2.2, randomize (14 bit) clockseq
-var _clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
-
-// Previous uuid creation time
-var _lastMSecs = 0, _lastNSecs = 0;
-
-// See https://github.com/broofa/node-uuid for API details
-function v1(options, buf, offset) {
-  var i = buf && offset || 0;
-  var b = buf || [];
-
-  options = options || {};
-
-  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
-
-  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
-  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
-  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
-  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
-
-  // Per 4.2.1.2, use count of uuid's generated during the current clock
-  // cycle to simulate higher resolution clock
-  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
-
-  // Time since last uuid creation (in msecs)
-  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
-
-  // Per 4.2.1.2, Bump clockseq on clock regression
-  if (dt < 0 && options.clockseq === undefined) {
-    clockseq = clockseq + 1 & 0x3fff;
-  }
-
-  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
-  // time interval
-  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
-    nsecs = 0;
-  }
-
-  // Per 4.2.1.2 Throw error if too many uuids are requested
-  if (nsecs >= 10000) {
-    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
-  }
-
-  _lastMSecs = msecs;
-  _lastNSecs = nsecs;
-  _clockseq = clockseq;
-
-  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
-  msecs += 12219292800000;
-
-  // `time_low`
-  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
-  b[i++] = tl >>> 24 & 0xff;
-  b[i++] = tl >>> 16 & 0xff;
-  b[i++] = tl >>> 8 & 0xff;
-  b[i++] = tl & 0xff;
-
-  // `time_mid`
-  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
-  b[i++] = tmh >>> 8 & 0xff;
-  b[i++] = tmh & 0xff;
-
-  // `time_high_and_version`
-  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
-  b[i++] = tmh >>> 16 & 0xff;
-
-  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
-  b[i++] = clockseq >>> 8 | 0x80;
-
-  // `clock_seq_low`
-  b[i++] = clockseq & 0xff;
-
-  // `node`
-  var node = options.node || _nodeId;
-  for (var n = 0; n < 6; n++) {
-    b[i + n] = node[n];
-  }
-
-  return buf ? buf : unparse(b);
-}
-
-// **`v4()` - Generate random UUID**
-
-// See https://github.com/broofa/node-uuid for API details
-function v4(options, buf, offset) {
-  // Deprecated - 'format' argument, as supported in v1.2
-  var i = buf && offset || 0;
-
-  if (typeof(options) == 'string') {
-    buf = options == 'binary' ? new Array(16) : null;
-    options = null;
-  }
-  options = options || {};
-
-  var rnds = options.random || (options.rng || _rng)();
-
-  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
-  rnds[6] = (rnds[6] & 0x0f) | 0x40;
-  rnds[8] = (rnds[8] & 0x3f) | 0x80;
-
-  // Copy bytes to buffer, if provided
-  if (buf) {
-    for (var ii = 0; ii < 16; ii++) {
-      buf[i + ii] = rnds[ii];
-    }
-  }
-
-  return buf || unparse(rnds);
-}
-
-// Export public API
-var uuid = v4;
-uuid.v1 = v1;
-uuid.v4 = v4;
-uuid.parse = parse;
-uuid.unparse = unparse;
-
-module.exports = uuid;
-
-
-/***/ }),
-/* 144 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {
-var rng;
-
-var crypto = global.crypto || global.msCrypto; // for IE 11
-if (crypto && crypto.getRandomValues) {
-  // WHATWG crypto-based RNG - http://wiki.whatwg.org/wiki/Crypto
-  // Moderately fast, high quality
-  var _rnds8 = new Uint8Array(16);
-  rng = function whatwgRNG() {
-    crypto.getRandomValues(_rnds8);
-    return _rnds8;
-  };
-}
-
-if (!rng) {
-  // Math.random()-based (RNG)
-  //
-  // If all else fails, use Math.random().  It's fast, but is of unspecified
-  // quality.
-  var  _rnds = new Array(16);
-  rng = function() {
-    for (var i = 0, r; i < 16; i++) {
-      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
-      _rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
-    }
-
-    return _rnds;
-  };
-}
-
-module.exports = rng;
-
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
 /* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var WildEmitter = __webpack_require__(146);
-
-function getMaxVolume (analyser, fftBins) {
-  var maxVolume = -Infinity;
-  analyser.getFloatFrequencyData(fftBins);
-
-  for(var i=4, ii=fftBins.length; i < ii; i++) {
-    if (fftBins[i] > maxVolume && fftBins[i] < 0) {
-      maxVolume = fftBins[i];
-    }
-  };
-
-  return maxVolume;
-}
-
-
-var audioContextType = window.AudioContext || window.webkitAudioContext;
-// use a single audio context due to hardware limits
-var audioContext = null;
-module.exports = function(stream, options) {
-  var harker = new WildEmitter();
-
-
-  // make it not break in non-supported browsers
-  if (!audioContextType) return harker;
-
-  //Config
-  var options = options || {},
-      smoothing = (options.smoothing || 0.1),
-      interval = (options.interval || 50),
-      threshold = options.threshold,
-      play = options.play,
-      history = options.history || 10,
-      running = true;
-
-  //Setup Audio Context
-  if (!audioContext) {
-    audioContext = new audioContextType();
-  }
-  var sourceNode, fftBins, analyser;
-
-  analyser = audioContext.createAnalyser();
-  analyser.fftSize = 512;
-  analyser.smoothingTimeConstant = smoothing;
-  fftBins = new Float32Array(analyser.fftSize);
-
-  if (stream.jquery) stream = stream[0];
-  if (stream instanceof HTMLAudioElement || stream instanceof HTMLVideoElement) {
-    //Audio Tag
-    sourceNode = audioContext.createMediaElementSource(stream);
-    if (typeof play === 'undefined') play = true;
-    threshold = threshold || -50;
-  } else {
-    //WebRTC Stream
-    sourceNode = audioContext.createMediaStreamSource(stream);
-    threshold = threshold || -50;
-  }
-
-  sourceNode.connect(analyser);
-  if (play) analyser.connect(audioContext.destination);
-
-  harker.speaking = false;
-
-  harker.setThreshold = function(t) {
-    threshold = t;
-  };
-
-  harker.setInterval = function(i) {
-    interval = i;
-  };
-  
-  harker.stop = function() {
-    running = false;
-    harker.emit('volume_change', -100, threshold);
-    if (harker.speaking) {
-      harker.speaking = false;
-      harker.emit('stopped_speaking');
-    }
-  };
-  harker.speakingHistory = [];
-  for (var i = 0; i < history; i++) {
-      harker.speakingHistory.push(0);
-  }
-
-  // Poll the analyser node to determine if speaking
-  // and emit events if changed
-  var looper = function() {
-    setTimeout(function() {
-    
-      //check if stop has been called
-      if(!running) {
-        return;
-      }
-      
-      var currentVolume = getMaxVolume(analyser, fftBins);
-
-      harker.emit('volume_change', currentVolume, threshold);
-
-      var history = 0;
-      if (currentVolume > threshold && !harker.speaking) {
-        // trigger quickly, short history
-        for (var i = harker.speakingHistory.length - 3; i < harker.speakingHistory.length; i++) {
-          history += harker.speakingHistory[i];
-        }
-        if (history >= 2) {
-          harker.speaking = true;
-          harker.emit('speaking');
-        }
-      } else if (currentVolume < threshold && harker.speaking) {
-        for (var i = 0; i < harker.speakingHistory.length; i++) {
-          history += harker.speakingHistory[i];
-        }
-        if (history == 0) {
-          harker.speaking = false;
-          harker.emit('stopped_speaking');
-        }
-      }
-      harker.speakingHistory.shift();
-      harker.speakingHistory.push(0 + (currentVolume > threshold));
-
-      looper();
-    }, interval);
-  };
-  looper();
-
-
-  return harker;
-}
-
-
-/***/ }),
-/* 146 */
-/***/ (function(module, exports) {
-
-/*
-WildEmitter.js is a slim little event emitter by @henrikjoreteg largely based
-on @visionmedia's Emitter from UI Kit.
-
-Why? I wanted it standalone.
-
-I also wanted support for wildcard emitters like this:
-
-emitter.on('*', function (eventName, other, event, payloads) {
-
-});
-
-emitter.on('somenamespace*', function (eventName, payloads) {
-
-});
-
-Please note that callbacks triggered by wildcard registered events also get
-the event name as the first argument.
-*/
-
-module.exports = WildEmitter;
-
-function WildEmitter() { }
-
-WildEmitter.mixin = function (constructor) {
-    var prototype = constructor.prototype || constructor;
-
-    prototype.isWildEmitter= true;
-
-    // Listen on the given `event` with `fn`. Store a group name if present.
-    prototype.on = function (event, groupName, fn) {
-        this.callbacks = this.callbacks || {};
-        var hasGroup = (arguments.length === 3),
-            group = hasGroup ? arguments[1] : undefined,
-            func = hasGroup ? arguments[2] : arguments[1];
-        func._groupName = group;
-        (this.callbacks[event] = this.callbacks[event] || []).push(func);
-        return this;
-    };
-
-    // Adds an `event` listener that will be invoked a single
-    // time then automatically removed.
-    prototype.once = function (event, groupName, fn) {
-        var self = this,
-            hasGroup = (arguments.length === 3),
-            group = hasGroup ? arguments[1] : undefined,
-            func = hasGroup ? arguments[2] : arguments[1];
-        function on() {
-            self.off(event, on);
-            func.apply(this, arguments);
-        }
-        this.on(event, group, on);
-        return this;
-    };
-
-    // Unbinds an entire group
-    prototype.releaseGroup = function (groupName) {
-        this.callbacks = this.callbacks || {};
-        var item, i, len, handlers;
-        for (item in this.callbacks) {
-            handlers = this.callbacks[item];
-            for (i = 0, len = handlers.length; i < len; i++) {
-                if (handlers[i]._groupName === groupName) {
-                    //console.log('removing');
-                    // remove it and shorten the array we're looping through
-                    handlers.splice(i, 1);
-                    i--;
-                    len--;
-                }
-            }
-        }
-        return this;
-    };
-
-    // Remove the given callback for `event` or all
-    // registered callbacks.
-    prototype.off = function (event, fn) {
-        this.callbacks = this.callbacks || {};
-        var callbacks = this.callbacks[event],
-            i;
-
-        if (!callbacks) return this;
-
-        // remove all handlers
-        if (arguments.length === 1) {
-            delete this.callbacks[event];
-            return this;
-        }
-
-        // remove specific handler
-        i = callbacks.indexOf(fn);
-        callbacks.splice(i, 1);
-        if (callbacks.length === 0) {
-            delete this.callbacks[event];
-        }
-        return this;
-    };
-
-    /// Emit `event` with the given args.
-    // also calls any `*` handlers
-    prototype.emit = function (event) {
-        this.callbacks = this.callbacks || {};
-        var args = [].slice.call(arguments, 1),
-            callbacks = this.callbacks[event],
-            specialCallbacks = this.getWildcardCallbacks(event),
-            i,
-            len,
-            item,
-            listeners;
-
-        if (callbacks) {
-            listeners = callbacks.slice();
-            for (i = 0, len = listeners.length; i < len; ++i) {
-                if (!listeners[i]) {
-                    break;
-                }
-                listeners[i].apply(this, args);
-            }
-        }
-
-        if (specialCallbacks) {
-            len = specialCallbacks.length;
-            listeners = specialCallbacks.slice();
-            for (i = 0, len = listeners.length; i < len; ++i) {
-                if (!listeners[i]) {
-                    break;
-                }
-                listeners[i].apply(this, [event].concat(args));
-            }
-        }
-
-        return this;
-    };
-
-    // Helper for for finding special wildcard event handlers that match the event
-    prototype.getWildcardCallbacks = function (eventName) {
-        this.callbacks = this.callbacks || {};
-        var item,
-            split,
-            result = [];
-
-        for (item in this.callbacks) {
-            split = item.split('*');
-            if (item === '*' || (split.length === 2 && eventName.slice(0, split[0].length) === split[0])) {
-                result = result.concat(this.callbacks[item]);
-            }
-        }
-        return result;
-    };
-
-};
-
-WildEmitter.mixin(WildEmitter);
-
-
-/***/ }),
-/* 147 */
-/***/ (function(module, exports) {
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function(n) {
-  if (!isNumber(n) || n < 0 || isNaN(n))
-    throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-EventEmitter.prototype.emit = function(type) {
-  var er, handler, len, args, i, listeners;
-
-  if (!this._events)
-    this._events = {};
-
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error ||
-        (isObject(this._events.error) && !this._events.error.length)) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      } else {
-        // At least give some kind of context to the user
-        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
-        err.context = er;
-        throw err;
-      }
-    }
-  }
-
-  handler = this._events[type];
-
-  if (isUndefined(handler))
-    return false;
-
-  if (isFunction(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        args = Array.prototype.slice.call(arguments, 1);
-        handler.apply(this, args);
-    }
-  } else if (isObject(handler)) {
-    args = Array.prototype.slice.call(arguments, 1);
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++)
-      listeners[i].apply(this, args);
-  }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function(type, listener) {
-  var m;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events)
-    this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener)
-    this.emit('newListener', type,
-              isFunction(listener.listener) ?
-              listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;
-  else if (isObject(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);
-  else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject(this._events[type]) && !this._events[type].warned) {
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' +
-                    'leak detected. %d listeners added. ' +
-                    'Use emitter.setMaxListeners() to increase limit.',
-                    this._events[type].length);
-      if (typeof console.trace === 'function') {
-        // not supported in IE 10
-        console.trace();
-      }
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function(type, listener) {
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function(type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type])
-    return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener ||
-      (isFunction(list.listener) && list.listener === listener)) {
-    delete this._events[type];
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-
-  } else if (isObject(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener ||
-          (list[i].listener && list[i].listener === listener)) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0)
-      return this;
-
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
-    } else {
-      list.splice(position, 1);
-    }
-
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function(type) {
-  var key, listeners;
-
-  if (!this._events)
-    return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0)
-      this._events = {};
-    else if (this._events[type])
-      delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
-    }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
-  }
-
-  listeners = this._events[type];
-
-  if (isFunction(listeners)) {
-    this.removeListener(type, listeners);
-  } else if (listeners) {
-    // LIFO order
-    while (listeners.length)
-      this.removeListener(type, listeners[listeners.length - 1]);
-  }
-  delete this._events[type];
-
-  return this;
-};
-
-EventEmitter.prototype.listeners = function(type) {
-  var ret;
-  if (!this._events || !this._events[type])
-    ret = [];
-  else if (isFunction(this._events[type]))
-    ret = [this._events[type]];
-  else
-    ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.prototype.listenerCount = function(type) {
-  if (this._events) {
-    var evlistener = this._events[type];
-
-    if (isFunction(evlistener))
-      return 1;
-    else if (evlistener)
-      return evlistener.length;
-  }
-  return 0;
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  return emitter.listenerCount(type);
-};
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
-
-/***/ }),
-/* 148 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(module) {/*!
- * @name JavaScript/NodeJS Merge v1.2.0
- * @author yeikos
- * @repository https://github.com/yeikos/js.merge
-
- * Copyright 2014 yeikos - MIT license
- * https://raw.github.com/yeikos/js.merge/master/LICENSE
- */
-
-;(function(isNode) {
-
-	/**
-	 * Merge one or more objects 
-	 * @param bool? clone
-	 * @param mixed,... arguments
-	 * @return object
-	 */
-
-	var Public = function(clone) {
-
-		return merge(clone === true, false, arguments);
-
-	}, publicName = 'merge';
-
-	/**
-	 * Merge two or more objects recursively 
-	 * @param bool? clone
-	 * @param mixed,... arguments
-	 * @return object
-	 */
-
-	Public.recursive = function(clone) {
-
-		return merge(clone === true, true, arguments);
-
-	};
-
-	/**
-	 * Clone the input removing any reference
-	 * @param mixed input
-	 * @return mixed
-	 */
-
-	Public.clone = function(input) {
-
-		var output = input,
-			type = typeOf(input),
-			index, size;
-
-		if (type === 'array') {
-
-			output = [];
-			size = input.length;
-
-			for (index=0;index<size;++index)
-
-				output[index] = Public.clone(input[index]);
-
-		} else if (type === 'object') {
-
-			output = {};
-
-			for (index in input)
-
-				output[index] = Public.clone(input[index]);
-
-		}
-
-		return output;
-
-	};
-
-	/**
-	 * Merge two objects recursively
-	 * @param mixed input
-	 * @param mixed extend
-	 * @return mixed
-	 */
-
-	function merge_recursive(base, extend) {
-
-		if (typeOf(base) !== 'object')
-
-			return extend;
-
-		for (var key in extend) {
-
-			if (typeOf(base[key]) === 'object' && typeOf(extend[key]) === 'object') {
-
-				base[key] = merge_recursive(base[key], extend[key]);
-
-			} else {
-
-				base[key] = extend[key];
-
-			}
-
-		}
-
-		return base;
-
-	}
-
-	/**
-	 * Merge two or more objects
-	 * @param bool clone
-	 * @param bool recursive
-	 * @param array argv
-	 * @return object
-	 */
-
-	function merge(clone, recursive, argv) {
-
-		var result = argv[0],
-			size = argv.length;
-
-		if (clone || typeOf(result) !== 'object')
-
-			result = {};
-
-		for (var index=0;index<size;++index) {
-
-			var item = argv[index],
-
-				type = typeOf(item);
-
-			if (type !== 'object') continue;
-
-			for (var key in item) {
-
-				var sitem = clone ? Public.clone(item[key]) : item[key];
-
-				if (recursive) {
-
-					result[key] = merge_recursive(result[key], sitem);
-
-				} else {
-
-					result[key] = sitem;
-
-				}
-
-			}
-
-		}
-
-		return result;
-
-	}
-
-	/**
-	 * Get type of variable
-	 * @param mixed input
-	 * @return string
-	 *
-	 * @see http://jsperf.com/typeofvar
-	 */
-
-	function typeOf(input) {
-
-		return ({}).toString.call(input).slice(8, -1).toLowerCase();
-
-	}
-
-	if (isNode) {
-
-		module.exports = Public;
-
-	} else {
-
-		window[publicName] = Public;
-
-	}
-
-})(typeof module === 'object' && module && typeof module.exports === 'object' && module.exports);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
-
-/***/ }),
-/* 149 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* Copyright @ 2015 Atlassian Pty Ltd
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-exports.Interop = __webpack_require__(150);
-
-
-/***/ }),
-/* 150 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* Copyright @ 2015 Atlassian Pty Ltd
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/* global RTCSessionDescription */
-/* global RTCIceCandidate */
-/* jshint -W097 */
-
-
-var transform = __webpack_require__(151);
-var arrayEquals = __webpack_require__(155);
-
-function Interop() {
-
-    /**
-     * This map holds the most recent Unified Plan offer/answer SDP that was
-     * converted to Plan B, with the SDP type ('offer' or 'answer') as keys and
-     * the SDP string as values.
-     *
-     * @type {{}}
-     */
-    this.cache = {
-        mlB2UMap : {},
-        mlU2BMap : {}
-    };
-}
-
-module.exports = Interop;
-
-/**
- * Changes the candidate args to match with the related Unified Plan
- */
-Interop.prototype.candidateToUnifiedPlan = function(candidate) {
-    var cand = new RTCIceCandidate(candidate);
-
-    cand.sdpMLineIndex = this.cache.mlB2UMap[cand.sdpMLineIndex];
-    /* TODO: change sdpMid to (audio|video)-SSRC */
-
-    return cand;
-};
-
-/**
- * Changes the candidate args to match with the related Plan B
- */
-Interop.prototype.candidateToPlanB = function(candidate) {
-    var cand = new RTCIceCandidate(candidate);
-
-    if (cand.sdpMid.indexOf('audio') === 0) {
-      cand.sdpMid = 'audio';
-    } else if (cand.sdpMid.indexOf('video') === 0) {
-      cand.sdpMid = 'video';
-    } else {
-      throw new Error('candidate with ' + cand.sdpMid + ' not allowed');
-    }
-
-    cand.sdpMLineIndex = this.cache.mlU2BMap[cand.sdpMLineIndex];
-
-    return cand;
-};
-
-/**
- * Returns the index of the first m-line with the given media type and with a
- * direction which allows sending, in the last Unified Plan description with
- * type "answer" converted to Plan B. Returns {null} if there is no saved
- * answer, or if none of its m-lines with the given type allow sending.
- * @param type the media type ("audio" or "video").
- * @returns {*}
- */
-Interop.prototype.getFirstSendingIndexFromAnswer = function(type) {
-    if (!this.cache.answer) {
-        return null;
-    }
-
-    var session = transform.parse(this.cache.answer);
-    if (session && session.media && Array.isArray(session.media)){
-        for (var i = 0; i < session.media.length; i++) {
-            if (session.media[i].type == type &&
-                (!session.media[i].direction /* default to sendrecv */ ||
-                    session.media[i].direction === 'sendrecv' ||
-                    session.media[i].direction === 'sendonly')){
-                return i;
-            }
-        }
-    }
-
-    return null;
-};
-
-/**
- * This method transforms a Unified Plan SDP to an equivalent Plan B SDP. A
- * PeerConnection wrapper transforms the SDP to Plan B before passing it to the
- * application.
- *
- * @param desc
- * @returns {*}
- */
-Interop.prototype.toPlanB = function(desc) {
-    var self = this;
-    //#region Preliminary input validation.
-
-    if (typeof desc !== 'object' || desc === null ||
-        typeof desc.sdp !== 'string') {
-        console.warn('An empty description was passed as an argument.');
-        return desc;
-    }
-
-    // Objectify the SDP for easier manipulation.
-    var session = transform.parse(desc.sdp);
-
-    // If the SDP contains no media, there's nothing to transform.
-    if (typeof session.media === 'undefined' ||
-        !Array.isArray(session.media) || session.media.length === 0) {
-        console.warn('The description has no media.');
-        return desc;
-    }
-
-    // Try some heuristics to "make sure" this is a Unified Plan SDP. Plan B
-    // SDP has a video, an audio and a data "channel" at most.
-    if (session.media.length <= 3 && session.media.every(function(m) {
-            return ['video', 'audio', 'data'].indexOf(m.mid) !== -1;
-        })) {
-        console.warn('This description does not look like Unified Plan.');
-        return desc;
-    }
-
-    //#endregion
-
-    // HACK https://bugzilla.mozilla.org/show_bug.cgi?id=1113443
-    var sdp = desc.sdp;
-    var rewrite = false;
-    for (var i = 0; i < session.media.length; i++) {
-        var uLine = session.media[i];
-        uLine.rtp.forEach(function(rtp) {
-            if (rtp.codec === 'NULL')
-            {
-                rewrite = true;
-                var offer = transform.parse(self.cache.offer);
-                rtp.codec = offer.media[i].rtp[0].codec;
-            }
-        });
-    }
-    if (rewrite) {
-        sdp = transform.write(session);
-    }
-
-    // Unified Plan SDP is our "precious". Cache it for later use in the Plan B
-    // -> Unified Plan transformation.
-    this.cache[desc.type] = sdp;
-
-    //#region Convert from Unified Plan to Plan B.
-
-    // We rebuild the session.media array.
-    var media = session.media;
-    session.media = [];
-
-    // Associative array that maps channel types to channel objects for fast
-    // access to channel objects by their type, e.g. type2bl['audio']->channel
-    // obj.
-    var type2bl = {};
-
-    // Used to build the group:BUNDLE value after the channels construction
-    // loop.
-    var types = [];
-
-    media.forEach(function(uLine) {
-        // rtcp-mux is required in the Plan B SDP.
-        if ((typeof uLine.rtcpMux !== 'string' ||
-            uLine.rtcpMux !== 'rtcp-mux') &&
-            uLine.direction !== 'inactive') {
-            throw new Error('Cannot convert to Plan B because m-lines ' +
-                'without the rtcp-mux attribute were found.');
-        }
-
-        // If we don't have a channel for this uLine.type OR the selected is
-        // inactive, then select this uLine as the channel basis.
-        if (typeof type2bl[uLine.type] === 'undefined' ||
-            type2bl[uLine.type].direction === 'inactive') {
-            type2bl[uLine.type] = uLine;
-        }
-
-        if (uLine.protocol != type2bl[uLine.type].protocol) {
-          throw new Error('Cannot convert to Plan B because m-lines ' +
-              'have different protocols and this library does not have ' +
-              'support for that');
-        }
-
-        if (uLine.payloads != type2bl[uLine.type].payloads) {
-          throw new Error('Cannot convert to Plan B because m-lines ' +
-              'have different payloads and this library does not have ' +
-              'support for that');
-        }
-
-    });
-
-    // Implode the Unified Plan m-lines/tracks into Plan B channels.
-    media.forEach(function(uLine) {
-        if (uLine.type === 'application') {
-            session.media.push(uLine);
-            types.push(uLine.mid);
-            return;
-        }
-
-        // Add sources to the channel and handle a=msid.
-        if (typeof uLine.sources === 'object') {
-            Object.keys(uLine.sources).forEach(function(ssrc) {
-                if (typeof type2bl[uLine.type].sources !== 'object')
-                    type2bl[uLine.type].sources = {};
-
-                // Assign the sources to the channel.
-                type2bl[uLine.type].sources[ssrc] =
-                    uLine.sources[ssrc];
-
-                if (typeof uLine.msid !== 'undefined') {
-                    // In Plan B the msid is an SSRC attribute. Also, we don't
-                    // care about the obsolete label and mslabel attributes.
-                    //
-                    // Note that it is not guaranteed that the uLine will
-                    // have an msid. recvonly channels in particular don't have
-                    // one.
-                    type2bl[uLine.type].sources[ssrc].msid =
-                        uLine.msid;
-                }
-                // NOTE ssrcs in ssrc groups will share msids, as
-                // draft-uberti-rtcweb-plan-00 mandates.
-            });
-        }
-
-        // Add ssrc groups to the channel.
-        if (typeof uLine.ssrcGroups !== 'undefined' &&
-                Array.isArray(uLine.ssrcGroups)) {
-
-            // Create the ssrcGroups array, if it's not defined.
-            if (typeof type2bl[uLine.type].ssrcGroups === 'undefined' ||
-                    !Array.isArray(type2bl[uLine.type].ssrcGroups)) {
-                type2bl[uLine.type].ssrcGroups = [];
-            }
-
-            type2bl[uLine.type].ssrcGroups =
-                type2bl[uLine.type].ssrcGroups.concat(
-                    uLine.ssrcGroups);
-        }
-
-        if (type2bl[uLine.type] === uLine) {
-            // Plan B mids are in ['audio', 'video', 'data']
-            uLine.mid = uLine.type;
-
-            // Plan B doesn't support/need the bundle-only attribute.
-            delete uLine.bundleOnly;
-
-            // In Plan B the msid is an SSRC attribute.
-            delete uLine.msid;
-
-	    if (uLine.type == media[0].type) {
-	      types.unshift(uLine.type);
-	      // Add the channel to the new media array.
-	      session.media.unshift(uLine);
-	    } else {
-	      types.push(uLine.type);
-	      // Add the channel to the new media array.
-	      session.media.push(uLine);
-	    }
-        }
-    });
-
-    if (typeof session.groups !== 'undefined') {
-      // We regenerate the BUNDLE group with the new mids.
-      session.groups.some(function(group) {
-	  if (group.type === 'BUNDLE') {
-	      group.mids = types.join(' ');
-	      return true;
-	  }
-      });
-    }
-
-    // msid semantic
-    session.msidSemantic = {
-        semantic: 'WMS',
-        token: '*'
-    };
-
-    var resStr = transform.write(session);
-
-    return new RTCSessionDescription({
-        type: desc.type,
-        sdp: resStr
-    });
-
-    //#endregion
-};
-
-/* follow rules defined in RFC4145 */
-function addSetupAttr(uLine) {
-    if (typeof uLine.setup === 'undefined') {
-        return;
-    }
-
-    if (uLine.setup === "active") {
-            uLine.setup = "passive";
-    } else if (uLine.setup === "passive") {
-        uLine.setup = "active";
-    }
-}
-
-/**
- * This method transforms a Plan B SDP to an equivalent Unified Plan SDP. A
- * PeerConnection wrapper transforms the SDP to Unified Plan before passing it
- * to FF.
- *
- * @param desc
- * @returns {*}
- */
-Interop.prototype.toUnifiedPlan = function(desc) {
-    var self = this;
-    //#region Preliminary input validation.
-
-    if (typeof desc !== 'object' || desc === null ||
-        typeof desc.sdp !== 'string') {
-        console.warn('An empty description was passed as an argument.');
-        return desc;
-    }
-
-    var session = transform.parse(desc.sdp);
-
-    // If the SDP contains no media, there's nothing to transform.
-    if (typeof session.media === 'undefined' ||
-        !Array.isArray(session.media) || session.media.length === 0) {
-        console.warn('The description has no media.');
-        return desc;
-    }
-
-    // Try some heuristics to "make sure" this is a Plan B SDP. Plan B SDP has
-    // a video, an audio and a data "channel" at most.
-    if (session.media.length > 3 || !session.media.every(function(m) {
-            return ['video', 'audio', 'data'].indexOf(m.mid) !== -1;
-        })) {
-        console.warn('This description does not look like Plan B.');
-        return desc;
-    }
-
-    // Make sure this Plan B SDP can be converted to a Unified Plan SDP.
-    var mids = [];
-    session.media.forEach(function(m) {
-        mids.push(m.mid);
-    });
-
-    var hasBundle = false;
-    if (typeof session.groups !== 'undefined' &&
-        Array.isArray(session.groups)) {
-        hasBundle = session.groups.every(function(g) {
-            return g.type !== 'BUNDLE' ||
-                arrayEquals.apply(g.mids.sort(), [mids.sort()]);
-        });
-    }
-
-    if (!hasBundle) {
-        var mustBeBundle = false;
-
-        session.media.forEach(function(m) {
-            if (m.direction !== 'inactive') {
-                mustBeBundle = true;
-            }
-        });
-
-        if (mustBeBundle) {
-            throw new Error("Cannot convert to Unified Plan because m-lines that" +
-              " are not bundled were found.");
-        }
-    }
-
-    //#endregion
-
-
-    //#region Convert from Plan B to Unified Plan.
-
-    // Unfortunately, a Plan B offer/answer doesn't have enough information to
-    // rebuild an equivalent Unified Plan offer/answer.
-    //
-    // For example, if this is a local answer (in Unified Plan style) that we
-    // convert to Plan B prior to handing it over to the application (the
-    // PeerConnection wrapper called us, for instance, after a successful
-    // createAnswer), we want to remember the m-line at which we've seen the
-    // (local) SSRC. That's because when the application wants to do call the
-    // SLD method, forcing us to do the inverse transformation (from Plan B to
-    // Unified Plan), we need to know to which m-line to assign the (local)
-    // SSRC. We also need to know all the other m-lines that the original
-    // answer had and include them in the transformed answer as well.
-    //
-    // Another example is if this is a remote offer that we convert to Plan B
-    // prior to giving it to the application, we want to remember the mid at
-    // which we've seen the (remote) SSRC.
-    //
-    // In the iteration that follows, we use the cached Unified Plan (if it
-    // exists) to assign mids to ssrcs.
-
-    var type;
-    if (desc.type === 'answer') {
-        type = 'offer';
-    } else if (desc.type === 'offer') {
-        type = 'answer';
-    } else {
-        throw new Error("Type '" + desc.type + "' not supported.");
-    }
-
-    var cached;
-    if (typeof this.cache[type] !== 'undefined') {
-        cached = transform.parse(this.cache[type]);
-    }
-
-    var recvonlySsrcs = {
-        audio: {},
-        video: {}
-    };
-
-    // A helper map that sends mids to m-line objects. We use it later to
-    // rebuild the Unified Plan style session.media array.
-    var mid2ul = {};
-    var bIdx = 0;
-    var uIdx = 0;
-
-    var sources2ul = {};
-
-    var candidates;
-    var iceUfrag;
-    var icePwd;
-    var fingerprint;
-    var payloads = {};
-    var rtcpFb = {};
-    var rtp = {};
-
-    session.media.forEach(function(bLine) {
-        if ((typeof bLine.rtcpMux !== 'string' ||
-            bLine.rtcpMux !== 'rtcp-mux') &&
-            bLine.direction !== 'inactive') {
-            throw new Error("Cannot convert to Unified Plan because m-lines " +
-                "without the rtcp-mux attribute were found.");
-        }
-
-        if (bLine.type === 'application') {
-            mid2ul[bLine.mid] = bLine;
-            return;
-        }
-
-        // With rtcp-mux and bundle all the channels should have the same ICE
-        // stuff.
-        var sources = bLine.sources;
-        var ssrcGroups = bLine.ssrcGroups;
-        var port = bLine.port;
-
-        /* Chrome adds different candidates even using bundle, so we concat the candidates list */
-        if (typeof bLine.candidates != 'undefined') {
-            if (typeof candidates != 'undefined') {
-                candidates = candidates.concat(bLine.candidates);
-            } else {
-                candidates = bLine.candidates;
-            }
-        }
-
-        if ((typeof iceUfrag != 'undefined') && (typeof bLine.iceUfrag != 'undefined') && (iceUfrag != bLine.iceUfrag)) {
-            throw new Error("Only BUNDLE supported, iceUfrag must be the same for all m-lines.\n" +
-                            "\tLast iceUfrag: " + iceUfrag + "\n" +
-                            "\tNew iceUfrag: " + bLine.iceUfrag
-            );
-        }
-
-        if (typeof bLine.iceUfrag != 'undefined') {
-                iceUfrag = bLine.iceUfrag;
-        }
-
-        if ((typeof icePwd != 'undefined') && (typeof bLine.icePwd != 'undefined') && (icePwd != bLine.icePwd)) {
-            throw new Error("Only BUNDLE supported, icePwd must be the same for all m-lines.\n" +
-                            "\tLast icePwd: " + icePwd + "\n" +
-                            "\tNew icePwd: " + bLine.icePwd
-            );
-        }
-
-        if (typeof bLine.icePwd != 'undefined') {
-                icePwd = bLine.icePwd;
-        }
-
-        if ((typeof fingerprint != 'undefined') && (typeof bLine.fingerprint != 'undefined') &&
-            (fingerprint.type != bLine.fingerprint.type || fingerprint.hash != bLine.fingerprint.hash)) {
-            throw new Error("Only BUNDLE supported, fingerprint must be the same for all m-lines.\n" +
-                            "\tLast fingerprint: " + JSON.stringify(fingerprint) + "\n" +
-                            "\tNew fingerprint: " + JSON.stringify(bLine.fingerprint)
-            );
-        }
-
-        if (typeof bLine.fingerprint != 'undefined') {
-                fingerprint = bLine.fingerprint;
-        }
-
-        payloads[bLine.type] = bLine.payloads;
-        rtcpFb[bLine.type] = bLine.rtcpFb;
-        rtp[bLine.type] = bLine.rtp;
-
-        // inverted ssrc group map
-        var ssrc2group = {};
-        if (typeof ssrcGroups !== 'undefined' && Array.isArray(ssrcGroups)) {
-            ssrcGroups.forEach(function (ssrcGroup) {
-                // XXX This might brake if an SSRC is in more than one group
-                // for some reason.
-                if (typeof ssrcGroup.ssrcs !== 'undefined' &&
-                    Array.isArray(ssrcGroup.ssrcs)) {
-                    ssrcGroup.ssrcs.forEach(function (ssrc) {
-                        if (typeof ssrc2group[ssrc] === 'undefined') {
-                            ssrc2group[ssrc] = [];
-                        }
-
-                        ssrc2group[ssrc].push(ssrcGroup);
-                    });
-                }
-            });
-        }
-
-        // ssrc to m-line index.
-        var ssrc2ml = {};
-
-        if (typeof sources === 'object') {
-
-            // We'll use the "bLine" object as a prototype for each new "mLine"
-            // that we create, but first we need to clean it up a bit.
-            delete bLine.sources;
-            delete bLine.ssrcGroups;
-            delete bLine.candidates;
-            delete bLine.iceUfrag;
-            delete bLine.icePwd;
-            delete bLine.fingerprint;
-            delete bLine.port;
-            delete bLine.mid;
-
-            // Explode the Plan B channel sources with one m-line per source.
-            Object.keys(sources).forEach(function(ssrc) {
-
-                // The (unified) m-line for this SSRC. We either create it from
-                // scratch or, if it's a grouped SSRC, we re-use a related
-                // mline. In other words, if the source is grouped with another
-                // source, put the two together in the same m-line.
-                var uLine;
-
-                // We assume here that we are the answerer in the O/A, so any
-                // offers which we translate come from the remote side, while
-                // answers are local. So the check below is to make that we
-                // handle receive-only SSRCs in a special way only if they come
-                // from the remote side.
-                if (desc.type==='offer') {
-                    // We want to detect SSRCs which are used by a remote peer
-                    // in an m-line with direction=recvonly (i.e. they are
-                    // being used for RTCP only).
-                    // This information would have gotten lost if the remote
-                    // peer used Unified Plan and their local description was
-                    // translated to Plan B. So we use the lack of an MSID
-                    // attribute to deduce a "receive only" SSRC.
-                    if (!sources[ssrc].msid) {
-                        recvonlySsrcs[bLine.type][ssrc] = sources[ssrc];
-                        // Receive-only SSRCs must not create new m-lines. We
-                        // will assign them to an existing m-line later.
-                        return;
-                    }
-                }
-
-                if (typeof ssrc2group[ssrc] !== 'undefined' &&
-                    Array.isArray(ssrc2group[ssrc])) {
-                    ssrc2group[ssrc].some(function (ssrcGroup) {
-                        // ssrcGroup.ssrcs *is* an Array, no need to check
-                        // again here.
-                        return ssrcGroup.ssrcs.some(function (related) {
-                            if (typeof ssrc2ml[related] === 'object') {
-                                uLine = ssrc2ml[related];
-                                return true;
-                            }
-                        });
-                    });
-                }
-
-                if (typeof uLine === 'object') {
-                    // the m-line already exists. Just add the source.
-                    uLine.sources[ssrc] = sources[ssrc];
-                    delete sources[ssrc].msid;
-                } else {
-                    // Use the "bLine" as a prototype for the "uLine".
-                    uLine = Object.create(bLine);
-                    ssrc2ml[ssrc] = uLine;
-
-                    if (typeof sources[ssrc].msid !== 'undefined') {
-                        // Assign the msid of the source to the m-line. Note
-                        // that it is not guaranteed that the source will have
-                        // msid. In particular "recvonly" sources don't have an
-                        // msid. Note that "recvonly" is a term only defined
-                        // for m-lines.
-                        uLine.msid = sources[ssrc].msid;
-                        delete sources[ssrc].msid;
-                    }
-
-                    // We assign one SSRC per media line.
-                    uLine.sources = {};
-                    uLine.sources[ssrc] = sources[ssrc];
-                    uLine.ssrcGroups = ssrc2group[ssrc];
-
-                    // Use the cached Unified Plan SDP (if it exists) to assign
-                    // SSRCs to mids.
-                    if (typeof cached !== 'undefined' &&
-                        typeof cached.media !== 'undefined' &&
-                        Array.isArray(cached.media)) {
-
-                        cached.media.forEach(function (m) {
-                            if (typeof m.sources === 'object') {
-                                Object.keys(m.sources).forEach(function (s) {
-                                    if (s === ssrc) {
-                                        uLine.mid = m.mid;
-                                    }
-                                });
-                            }
-                        });
-                    }
-
-                    if (typeof uLine.mid === 'undefined') {
-
-                        // If this is an SSRC that we see for the first time
-                        // assign it a new mid. This is typically the case when
-                        // this method is called to transform a remote
-                        // description for the first time or when there is a
-                        // new SSRC in the remote description because a new
-                        // peer has joined the conference. Local SSRCs should
-                        // have already been added to the map in the toPlanB
-                        // method.
-                        //
-                        // Because FF generates answers in Unified Plan style,
-                        // we MUST already have a cached answer with all the
-                        // local SSRCs mapped to some m-line/mid.
-
-                        uLine.mid = [bLine.type, '-', ssrc].join('');
-                    }
-
-                    // Include the candidates in the 1st media line.
-                    uLine.candidates = candidates;
-                    uLine.iceUfrag = iceUfrag;
-                    uLine.icePwd = icePwd;
-                    uLine.fingerprint = fingerprint;
-                    uLine.port = port;
-
-                    mid2ul[uLine.mid] = uLine;
-                    sources2ul[uIdx] = uLine.sources;
-
-                    self.cache.mlU2BMap[uIdx] = bIdx;
-                    if (typeof self.cache.mlB2UMap[bIdx] === 'undefined') {
-                      self.cache.mlB2UMap[bIdx] = uIdx;
-                    }
-                    uIdx++;
-                }
-            });
-        } else {
-          var uLine = bLine;
-
-          uLine.candidates = candidates;
-          uLine.iceUfrag = iceUfrag;
-          uLine.icePwd = icePwd;
-          uLine.fingerprint = fingerprint;
-          uLine.port = port;
-
-          mid2ul[uLine.mid] = uLine;
-
-          self.cache.mlU2BMap[uIdx] = bIdx;
-          if (typeof self.cache.mlB2UMap[bIdx] === 'undefined') {
-            self.cache.mlB2UMap[bIdx] = uIdx;
-          }
-        }
-
-        bIdx++;
-    });
-
-    // Rebuild the media array in the right order and add the missing mLines
-    // (missing from the Plan B SDP).
-    session.media = [];
-    mids = []; // reuse
-
-    if (desc.type === 'answer') {
-
-        // The media lines in the answer must match the media lines in the
-        // offer. The order is important too. Here we assume that Firefox is
-        // the answerer, so we merely have to use the reconstructed (unified)
-        // answer to update the cached (unified) answer accordingly.
-        //
-        // In the general case, one would have to use the cached (unified)
-        // offer to find the m-lines that are missing from the reconstructed
-        // answer, potentially grabbing them from the cached (unified) answer.
-        // One has to be careful with this approach because inactive m-lines do
-        // not always have an mid, making it tricky (impossible?) to find where
-        // exactly and which m-lines are missing from the reconstructed answer.
-
-        for (var i = 0; i < cached.media.length; i++) {
-            var uLine = cached.media[i];
-
-            delete uLine.msid;
-            delete uLine.sources;
-            delete uLine.ssrcGroups;
-
-            if (typeof sources2ul[i] === 'undefined') {
-              if (!uLine.direction
-                  || uLine.direction === 'sendrecv')
-                  uLine.direction = 'recvonly';
-              else if (uLine.direction === 'sendonly')
-                  uLine.direction = 'inactive';
-            } else {
-              if (!uLine.direction
-                  || uLine.direction === 'sendrecv')
-                  uLine.direction = 'sendrecv';
-              else if (uLine.direction === 'recvonly')
-                  uLine.direction = 'sendonly';
-            }
-
-            uLine.sources = sources2ul[i];
-            uLine.candidates = candidates;
-            uLine.iceUfrag = iceUfrag;
-            uLine.icePwd = icePwd;
-            uLine.fingerprint = fingerprint;
-
-            uLine.rtp = rtp[uLine.type];
-            uLine.payloads = payloads[uLine.type];
-            uLine.rtcpFb = rtcpFb[uLine.type];
-
-            session.media.push(uLine);
-
-            if (typeof uLine.mid === 'string') {
-                // inactive lines don't/may not have an mid.
-                mids.push(uLine.mid);
-            }
-        }
-    } else {
-
-        // SDP offer/answer (and the JSEP spec) forbids removing an m-section
-        // under any circumstances. If we are no longer interested in sending a
-        // track, we just remove the msid and ssrc attributes and set it to
-        // either a=recvonly (as the reofferer, we must use recvonly if the
-        // other side was previously sending on the m-section, but we can also
-        // leave the possibility open if it wasn't previously in use), or
-        // a=inactive.
-
-        if (typeof cached !== 'undefined' &&
-            typeof cached.media !== 'undefined' &&
-            Array.isArray(cached.media)) {
-            cached.media.forEach(function(uLine) {
-                mids.push(uLine.mid);
-                if (typeof mid2ul[uLine.mid] !== 'undefined') {
-                    session.media.push(mid2ul[uLine.mid]);
-                } else {
-                    delete uLine.msid;
-                    delete uLine.sources;
-                    delete uLine.ssrcGroups;
-
-                    if (!uLine.direction
-                        || uLine.direction === 'sendrecv') {
-                        uLine.direction = 'sendonly';
-                    }
-                    if (!uLine.direction
-                        || uLine.direction === 'recvonly') {
-                        uLine.direction = 'inactive';
-                    }
-
-                    addSetupAttr (uLine);
-                    session.media.push(uLine);
-                }
-            });
-        }
-
-        // Add all the remaining (new) m-lines of the transformed SDP.
-        Object.keys(mid2ul).forEach(function(mid) {
-            if (mids.indexOf(mid) === -1) {
-                mids.push(mid);
-                if (mid2ul[mid].direction === 'recvonly') {
-                    // This is a remote recvonly channel. Add its SSRC to the
-                    // appropriate sendrecv or sendonly channel.
-                    // TODO(gp) what if we don't have sendrecv/sendonly
-                    // channel?
-
-                    var done = false;
-
-                    session.media.some(function (uLine) {
-                        if ((uLine.direction === 'sendrecv' ||
-                            uLine.direction === 'sendonly') &&
-                            uLine.type === mid2ul[mid].type) {
-                            // mid2ul[mid] shouldn't have any ssrc-groups
-                            Object.keys(mid2ul[mid].sources).forEach(
-                                function (ssrc) {
-                                uLine.sources[ssrc] =
-                                    mid2ul[mid].sources[ssrc];
-                            });
-
-                            done = true;
-                            return true;
-                        }
-                    });
-
-                    if (!done) {
-                        session.media.push(mid2ul[mid]);
-                    }
-                } else {
-                    session.media.push(mid2ul[mid]);
-                }
-            }
-        });
-    }
-
-    // After we have constructed the Plan Unified m-lines we can figure out
-    // where (in which m-line) to place the 'recvonly SSRCs'.
-    // Note: we assume here that we are the answerer in the O/A, so any offers
-    // which we translate come from the remote side, while answers are local
-    // (and so our last local description is cached as an 'answer').
-    ["audio", "video"].forEach(function (type) {
-        if (!session || !session.media || !Array.isArray(session.media))
-            return;
-
-        var idx = null;
-        if (Object.keys(recvonlySsrcs[type]).length > 0) {
-            idx = self.getFirstSendingIndexFromAnswer(type);
-            if (idx === null){
-                // If this is the first offer we receive, we don't have a
-                // cached answer. Assume that we will be sending media using
-                // the first m-line for each media type.
-
-                for (var i = 0; i < session.media.length; i++) {
-                    if (session.media[i].type === type) {
-                        idx = i;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (idx && session.media.length > idx) {
-            var mLine = session.media[idx];
-            Object.keys(recvonlySsrcs[type]).forEach(function(ssrc) {
-                if (mLine.sources && mLine.sources[ssrc]) {
-                    console.warn("Replacing an existing SSRC.");
-                }
-                if (!mLine.sources) {
-                    mLine.sources = {};
-                }
-
-                mLine.sources[ssrc] = recvonlySsrcs[type][ssrc];
-            });
-        }
-    });
-
-    if (typeof session.groups !== 'undefined') {
-      // We regenerate the BUNDLE group (since we regenerated the mids)
-      session.groups.some(function(group) {
-	  if (group.type === 'BUNDLE') {
-	      group.mids = mids.join(' ');
-	      return true;
-	  }
-      });
-    }
-
-    // msid semantic
-    session.msidSemantic = {
-        semantic: 'WMS',
-        token: '*'
-    };
-
-    var resStr = transform.write(session);
-
-    // Cache the transformed SDP (Unified Plan) for later re-use in this
-    // function.
-    this.cache[desc.type] = resStr;
-
-    return new RTCSessionDescription({
-        type: desc.type,
-        sdp: resStr
-    });
-
-    //#endregion
-};
-
-
-/***/ }),
-/* 151 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* Copyright @ 2015 Atlassian Pty Ltd
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-var transform = __webpack_require__(152);
-
-exports.write = function(session, opts) {
-
-  if (typeof session !== 'undefined' &&
-      typeof session.media !== 'undefined' &&
-      Array.isArray(session.media)) {
-
-    session.media.forEach(function (mLine) {
-      // expand sources to ssrcs
-      if (typeof mLine.sources !== 'undefined' &&
-        Object.keys(mLine.sources).length !== 0) {
-          mLine.ssrcs = [];
-          Object.keys(mLine.sources).forEach(function (ssrc) {
-            var source = mLine.sources[ssrc];
-            Object.keys(source).forEach(function (attribute) {
-              mLine.ssrcs.push({
-                id: ssrc,
-                attribute: attribute,
-                value: source[attribute]
-              });
-            });
-          });
-          delete mLine.sources;
-        }
-
-      // join ssrcs in ssrc groups
-      if (typeof mLine.ssrcGroups !== 'undefined' &&
-        Array.isArray(mLine.ssrcGroups)) {
-          mLine.ssrcGroups.forEach(function (ssrcGroup) {
-            if (typeof ssrcGroup.ssrcs !== 'undefined' &&
-                Array.isArray(ssrcGroup.ssrcs)) {
-              ssrcGroup.ssrcs = ssrcGroup.ssrcs.join(' ');
-            }
-          });
-        }
-    });
-  }
-
-  // join group mids
-  if (typeof session !== 'undefined' &&
-      typeof session.groups !== 'undefined' && Array.isArray(session.groups)) {
-
-    session.groups.forEach(function (g) {
-      if (typeof g.mids !== 'undefined' && Array.isArray(g.mids)) {
-        g.mids = g.mids.join(' ');
-      }
-    });
-  }
-
-  return transform.write(session, opts);
-};
-
-exports.parse = function(sdp) {
-  var session = transform.parse(sdp);
-
-  if (typeof session !== 'undefined' && typeof session.media !== 'undefined' &&
-      Array.isArray(session.media)) {
-
-    session.media.forEach(function (mLine) {
-      // group sources attributes by ssrc
-      if (typeof mLine.ssrcs !== 'undefined' && Array.isArray(mLine.ssrcs)) {
-        mLine.sources = {};
-        mLine.ssrcs.forEach(function (ssrc) {
-          if (!mLine.sources[ssrc.id])
-          mLine.sources[ssrc.id] = {};
-        mLine.sources[ssrc.id][ssrc.attribute] = ssrc.value;
-        });
-
-        delete mLine.ssrcs;
-      }
-
-      // split ssrcs in ssrc groups
-      if (typeof mLine.ssrcGroups !== 'undefined' &&
-        Array.isArray(mLine.ssrcGroups)) {
-          mLine.ssrcGroups.forEach(function (ssrcGroup) {
-            if (typeof ssrcGroup.ssrcs === 'string') {
-              ssrcGroup.ssrcs = ssrcGroup.ssrcs.split(' ');
-            }
-          });
-        }
-    });
-  }
-  // split group mids
-  if (typeof session !== 'undefined' &&
-      typeof session.groups !== 'undefined' && Array.isArray(session.groups)) {
-
-    session.groups.forEach(function (g) {
-      if (typeof g.mids === 'string') {
-        g.mids = g.mids.split(' ');
-      }
-    });
-  }
-
-  return session;
-};
-
-
-
-/***/ }),
-/* 152 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var parser = __webpack_require__(153);
-var writer = __webpack_require__(154);
-
-exports.write = writer;
-exports.parse = parser.parse;
-exports.parseFmtpConfig = parser.parseFmtpConfig;
-exports.parsePayloads = parser.parsePayloads;
-exports.parseRemoteCandidates = parser.parseRemoteCandidates;
-
-
-/***/ }),
-/* 153 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var toIntIfInt = function (v) {
-  return String(Number(v)) === v ? Number(v) : v;
-};
-
-var attachProperties = function (match, location, names, rawName) {
-  if (rawName && !names) {
-    location[rawName] = toIntIfInt(match[1]);
-  }
-  else {
-    for (var i = 0; i < names.length; i += 1) {
-      if (match[i+1] != null) {
-        location[names[i]] = toIntIfInt(match[i+1]);
-      }
-    }
-  }
-};
-
-var parseReg = function (obj, location, content) {
-  var needsBlank = obj.name && obj.names;
-  if (obj.push && !location[obj.push]) {
-    location[obj.push] = [];
-  }
-  else if (needsBlank && !location[obj.name]) {
-    location[obj.name] = {};
-  }
-  var keyLocation = obj.push ?
-    {} :  // blank object that will be pushed
-    needsBlank ? location[obj.name] : location; // otherwise, named location or root
-
-  attachProperties(content.match(obj.reg), keyLocation, obj.names, obj.name);
-
-  if (obj.push) {
-    location[obj.push].push(keyLocation);
-  }
-};
-
-var grammar = __webpack_require__(6);
-var validLine = RegExp.prototype.test.bind(/^([a-z])=(.*)/);
-
-exports.parse = function (sdp) {
-  var session = {}
-    , media = []
-    , location = session; // points at where properties go under (one of the above)
-
-  // parse lines we understand
-  sdp.split(/(\r\n|\r|\n)/).filter(validLine).forEach(function (l) {
-    var type = l[0];
-    var content = l.slice(2);
-    if (type === 'm') {
-      media.push({rtp: [], fmtp: []});
-      location = media[media.length-1]; // point at latest media line
-    }
-
-    for (var j = 0; j < (grammar[type] || []).length; j += 1) {
-      var obj = grammar[type][j];
-      if (obj.reg.test(content)) {
-        return parseReg(obj, location, content);
-      }
-    }
-  });
-
-  session.media = media; // link it up
-  return session;
-};
-
-var fmtpReducer = function (acc, expr) {
-  var s = expr.split('=');
-  if (s.length === 2) {
-    acc[s[0]] = toIntIfInt(s[1]);
-  }
-  return acc;
-};
-
-exports.parseFmtpConfig = function (str) {
-  return str.split(/\;\s?/).reduce(fmtpReducer, {});
-};
-
-exports.parsePayloads = function (str) {
-  return str.split(' ').map(Number);
-};
-
-exports.parseRemoteCandidates = function (str) {
-  var candidates = [];
-  var parts = str.split(' ').map(toIntIfInt);
-  for (var i = 0; i < parts.length; i += 3) {
-    candidates.push({
-      component: parts[i],
-      ip: parts[i + 1],
-      port: parts[i + 2]
-    });
-  }
-  return candidates;
-};
-
-
-/***/ }),
-/* 154 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var grammar = __webpack_require__(6);
-
-// customized util.format - discards excess arguments and can void middle ones
-var formatRegExp = /%[sdv%]/g;
-var format = function (formatStr) {
-  var i = 1;
-  var args = arguments;
-  var len = args.length;
-  return formatStr.replace(formatRegExp, function (x) {
-    if (i >= len) {
-      return x; // missing argument
-    }
-    var arg = args[i];
-    i += 1;
-    switch (x) {
-      case '%%':
-        return '%';
-      case '%s':
-        return String(arg);
-      case '%d':
-        return Number(arg);
-      case '%v':
-        return '';
-    }
-  });
-  // NB: we discard excess arguments - they are typically undefined from makeLine
-};
-
-var makeLine = function (type, obj, location) {
-  var str = obj.format instanceof Function ?
-    (obj.format(obj.push ? location : location[obj.name])) :
-    obj.format;
-
-  var args = [type + '=' + str];
-  if (obj.names) {
-    for (var i = 0; i < obj.names.length; i += 1) {
-      var n = obj.names[i];
-      if (obj.name) {
-        args.push(location[obj.name][n]);
-      }
-      else { // for mLine and push attributes
-        args.push(location[obj.names[i]]);
-      }
-    }
-  }
-  else {
-    args.push(location[obj.name]);
-  }
-  return format.apply(null, args);
-};
-
-// RFC specified order
-// TODO: extend this with all the rest
-var defaultOuterOrder = [
-  'v', 'o', 's', 'i',
-  'u', 'e', 'p', 'c',
-  'b', 't', 'r', 'z', 'a'
-];
-var defaultInnerOrder = ['i', 'c', 'b', 'a'];
-
-
-module.exports = function (session, opts) {
-  opts = opts || {};
-  // ensure certain properties exist
-  if (session.version == null) {
-    session.version = 0; // "v=0" must be there (only defined version atm)
-  }
-  if (session.name == null) {
-    session.name = " "; // "s= " must be there if no meaningful name set
-  }
-  session.media.forEach(function (mLine) {
-    if (mLine.payloads == null) {
-      mLine.payloads = "";
-    }
-  });
-
-  var outerOrder = opts.outerOrder || defaultOuterOrder;
-  var innerOrder = opts.innerOrder || defaultInnerOrder;
-  var sdp = [];
-
-  // loop through outerOrder for matching properties on session
-  outerOrder.forEach(function (type) {
-    grammar[type].forEach(function (obj) {
-      if (obj.name in session && session[obj.name] != null) {
-        sdp.push(makeLine(type, obj, session));
-      }
-      else if (obj.push in session && session[obj.push] != null) {
-        session[obj.push].forEach(function (el) {
-          sdp.push(makeLine(type, obj, el));
-        });
-      }
-    });
-  });
-
-  // then for each media line, follow the innerOrder
-  session.media.forEach(function (mLine) {
-    sdp.push(makeLine('m', grammar.m[0], mLine));
-
-    innerOrder.forEach(function (type) {
-      grammar[type].forEach(function (obj) {
-        if (obj.name in mLine && mLine[obj.name] != null) {
-          sdp.push(makeLine(type, obj, mLine));
-        }
-        else if (obj.push in mLine && mLine[obj.push] != null) {
-          mLine[obj.push].forEach(function (el) {
-            sdp.push(makeLine(type, obj, el));
-          });
-        }
-      });
-    });
-  });
-
-  return sdp.join('\r\n') + '\r\n';
-};
-
-
-/***/ }),
-/* 155 */
-/***/ (function(module, exports) {
-
-/* Copyright @ 2015 Atlassian Pty Ltd
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-module.exports = function arrayEquals(array) {
-    // if the other array is a falsy value, return
-    if (!array)
-        return false;
-
-    // compare lengths - can save a lot of time
-    if (this.length != array.length)
-        return false;
-
-    for (var i = 0, l = this.length; i < l; i++) {
-        // Check if we have nested arrays
-        if (this[i] instanceof Array && array[i] instanceof Array) {
-            // recurse into the nested arrays
-            if (!arrayEquals.apply(this[i], [array[i]]))
-                return false;
-        } else if (this[i] != array[i]) {
-            // Warning - two different object instances will never be equal:
-            // {x:20} != {x:20}
-            return false;
-        }
-    }
-    return true;
-};
-
-
-
-/***/ }),
-/* 156 */
-/***/ (function(module, exports) {
-
-// Does nothing at all.
-
-
-/***/ }),
-/* 157 */
-/***/ (function(module, exports, __webpack_require__) {
-
 var map = {
-	"./af": 7,
-	"./af.js": 7,
-	"./ar": 8,
-	"./ar-dz": 9,
-	"./ar-dz.js": 9,
-	"./ar-kw": 10,
-	"./ar-kw.js": 10,
-	"./ar-ly": 11,
-	"./ar-ly.js": 11,
-	"./ar-ma": 12,
-	"./ar-ma.js": 12,
-	"./ar-sa": 13,
-	"./ar-sa.js": 13,
-	"./ar-tn": 14,
-	"./ar-tn.js": 14,
-	"./ar.js": 8,
-	"./az": 15,
-	"./az.js": 15,
-	"./be": 16,
-	"./be.js": 16,
-	"./bg": 17,
-	"./bg.js": 17,
-	"./bn": 18,
-	"./bn.js": 18,
-	"./bo": 19,
-	"./bo.js": 19,
-	"./br": 20,
-	"./br.js": 20,
-	"./bs": 21,
-	"./bs.js": 21,
-	"./ca": 22,
-	"./ca.js": 22,
-	"./cs": 23,
-	"./cs.js": 23,
-	"./cv": 24,
-	"./cv.js": 24,
-	"./cy": 25,
-	"./cy.js": 25,
-	"./da": 26,
-	"./da.js": 26,
-	"./de": 27,
-	"./de-at": 28,
-	"./de-at.js": 28,
-	"./de-ch": 29,
-	"./de-ch.js": 29,
-	"./de.js": 27,
-	"./dv": 30,
-	"./dv.js": 30,
-	"./el": 31,
-	"./el.js": 31,
-	"./en-au": 32,
-	"./en-au.js": 32,
-	"./en-ca": 33,
-	"./en-ca.js": 33,
-	"./en-gb": 34,
-	"./en-gb.js": 34,
-	"./en-ie": 35,
-	"./en-ie.js": 35,
-	"./en-nz": 36,
-	"./en-nz.js": 36,
-	"./eo": 37,
-	"./eo.js": 37,
-	"./es": 38,
-	"./es-do": 39,
-	"./es-do.js": 39,
-	"./es.js": 38,
-	"./et": 40,
-	"./et.js": 40,
-	"./eu": 41,
-	"./eu.js": 41,
-	"./fa": 42,
-	"./fa.js": 42,
-	"./fi": 43,
-	"./fi.js": 43,
-	"./fo": 44,
-	"./fo.js": 44,
-	"./fr": 45,
-	"./fr-ca": 46,
-	"./fr-ca.js": 46,
-	"./fr-ch": 47,
-	"./fr-ch.js": 47,
-	"./fr.js": 45,
-	"./fy": 48,
-	"./fy.js": 48,
-	"./gd": 49,
-	"./gd.js": 49,
-	"./gl": 50,
-	"./gl.js": 50,
-	"./gom-latn": 51,
-	"./gom-latn.js": 51,
-	"./he": 52,
-	"./he.js": 52,
-	"./hi": 53,
-	"./hi.js": 53,
-	"./hr": 54,
-	"./hr.js": 54,
-	"./hu": 55,
-	"./hu.js": 55,
-	"./hy-am": 56,
-	"./hy-am.js": 56,
-	"./id": 57,
-	"./id.js": 57,
-	"./is": 58,
-	"./is.js": 58,
-	"./it": 59,
-	"./it.js": 59,
-	"./ja": 60,
-	"./ja.js": 60,
-	"./jv": 61,
-	"./jv.js": 61,
-	"./ka": 62,
-	"./ka.js": 62,
-	"./kk": 63,
-	"./kk.js": 63,
-	"./km": 64,
-	"./km.js": 64,
-	"./kn": 65,
-	"./kn.js": 65,
-	"./ko": 66,
-	"./ko.js": 66,
-	"./ky": 67,
-	"./ky.js": 67,
-	"./lb": 68,
-	"./lb.js": 68,
-	"./lo": 69,
-	"./lo.js": 69,
-	"./lt": 70,
-	"./lt.js": 70,
-	"./lv": 71,
-	"./lv.js": 71,
-	"./me": 72,
-	"./me.js": 72,
-	"./mi": 73,
-	"./mi.js": 73,
-	"./mk": 74,
-	"./mk.js": 74,
-	"./ml": 75,
-	"./ml.js": 75,
-	"./mr": 76,
-	"./mr.js": 76,
-	"./ms": 77,
-	"./ms-my": 78,
-	"./ms-my.js": 78,
-	"./ms.js": 77,
-	"./my": 79,
-	"./my.js": 79,
-	"./nb": 80,
-	"./nb.js": 80,
-	"./ne": 81,
-	"./ne.js": 81,
-	"./nl": 82,
-	"./nl-be": 83,
-	"./nl-be.js": 83,
-	"./nl.js": 82,
-	"./nn": 84,
-	"./nn.js": 84,
-	"./pa-in": 85,
-	"./pa-in.js": 85,
-	"./pl": 86,
-	"./pl.js": 86,
-	"./pt": 87,
-	"./pt-br": 88,
-	"./pt-br.js": 88,
-	"./pt.js": 87,
-	"./ro": 89,
-	"./ro.js": 89,
-	"./ru": 90,
-	"./ru.js": 90,
-	"./sd": 91,
-	"./sd.js": 91,
-	"./se": 92,
-	"./se.js": 92,
-	"./si": 93,
-	"./si.js": 93,
-	"./sk": 94,
-	"./sk.js": 94,
-	"./sl": 95,
-	"./sl.js": 95,
-	"./sq": 96,
-	"./sq.js": 96,
-	"./sr": 97,
-	"./sr-cyrl": 98,
-	"./sr-cyrl.js": 98,
-	"./sr.js": 97,
-	"./ss": 99,
-	"./ss.js": 99,
-	"./sv": 100,
-	"./sv.js": 100,
-	"./sw": 101,
-	"./sw.js": 101,
-	"./ta": 102,
-	"./ta.js": 102,
-	"./te": 103,
-	"./te.js": 103,
-	"./tet": 104,
-	"./tet.js": 104,
-	"./th": 105,
-	"./th.js": 105,
-	"./tl-ph": 106,
-	"./tl-ph.js": 106,
-	"./tlh": 107,
-	"./tlh.js": 107,
-	"./tr": 108,
-	"./tr.js": 108,
-	"./tzl": 109,
-	"./tzl.js": 109,
-	"./tzm": 110,
-	"./tzm-latn": 111,
-	"./tzm-latn.js": 111,
-	"./tzm.js": 110,
-	"./uk": 112,
-	"./uk.js": 112,
-	"./ur": 113,
-	"./ur.js": 113,
-	"./uz": 114,
-	"./uz-latn": 115,
-	"./uz-latn.js": 115,
-	"./uz.js": 114,
-	"./vi": 116,
-	"./vi.js": 116,
-	"./x-pseudo": 117,
-	"./x-pseudo.js": 117,
-	"./yo": 118,
-	"./yo.js": 118,
-	"./zh-cn": 119,
-	"./zh-cn.js": 119,
-	"./zh-hk": 120,
-	"./zh-hk.js": 120,
-	"./zh-tw": 121,
-	"./zh-tw.js": 121
+	"./af": 8,
+	"./af.js": 8,
+	"./ar": 9,
+	"./ar-dz": 10,
+	"./ar-dz.js": 10,
+	"./ar-kw": 11,
+	"./ar-kw.js": 11,
+	"./ar-ly": 12,
+	"./ar-ly.js": 12,
+	"./ar-ma": 13,
+	"./ar-ma.js": 13,
+	"./ar-sa": 14,
+	"./ar-sa.js": 14,
+	"./ar-tn": 15,
+	"./ar-tn.js": 15,
+	"./ar.js": 9,
+	"./az": 16,
+	"./az.js": 16,
+	"./be": 17,
+	"./be.js": 17,
+	"./bg": 18,
+	"./bg.js": 18,
+	"./bn": 19,
+	"./bn.js": 19,
+	"./bo": 20,
+	"./bo.js": 20,
+	"./br": 21,
+	"./br.js": 21,
+	"./bs": 22,
+	"./bs.js": 22,
+	"./ca": 23,
+	"./ca.js": 23,
+	"./cs": 24,
+	"./cs.js": 24,
+	"./cv": 25,
+	"./cv.js": 25,
+	"./cy": 26,
+	"./cy.js": 26,
+	"./da": 27,
+	"./da.js": 27,
+	"./de": 28,
+	"./de-at": 29,
+	"./de-at.js": 29,
+	"./de-ch": 30,
+	"./de-ch.js": 30,
+	"./de.js": 28,
+	"./dv": 31,
+	"./dv.js": 31,
+	"./el": 32,
+	"./el.js": 32,
+	"./en-au": 33,
+	"./en-au.js": 33,
+	"./en-ca": 34,
+	"./en-ca.js": 34,
+	"./en-gb": 35,
+	"./en-gb.js": 35,
+	"./en-ie": 36,
+	"./en-ie.js": 36,
+	"./en-nz": 37,
+	"./en-nz.js": 37,
+	"./eo": 38,
+	"./eo.js": 38,
+	"./es": 39,
+	"./es-do": 40,
+	"./es-do.js": 40,
+	"./es.js": 39,
+	"./et": 41,
+	"./et.js": 41,
+	"./eu": 42,
+	"./eu.js": 42,
+	"./fa": 43,
+	"./fa.js": 43,
+	"./fi": 44,
+	"./fi.js": 44,
+	"./fo": 45,
+	"./fo.js": 45,
+	"./fr": 46,
+	"./fr-ca": 47,
+	"./fr-ca.js": 47,
+	"./fr-ch": 48,
+	"./fr-ch.js": 48,
+	"./fr.js": 46,
+	"./fy": 49,
+	"./fy.js": 49,
+	"./gd": 50,
+	"./gd.js": 50,
+	"./gl": 51,
+	"./gl.js": 51,
+	"./gom-latn": 52,
+	"./gom-latn.js": 52,
+	"./he": 53,
+	"./he.js": 53,
+	"./hi": 54,
+	"./hi.js": 54,
+	"./hr": 55,
+	"./hr.js": 55,
+	"./hu": 56,
+	"./hu.js": 56,
+	"./hy-am": 57,
+	"./hy-am.js": 57,
+	"./id": 58,
+	"./id.js": 58,
+	"./is": 59,
+	"./is.js": 59,
+	"./it": 60,
+	"./it.js": 60,
+	"./ja": 61,
+	"./ja.js": 61,
+	"./jv": 62,
+	"./jv.js": 62,
+	"./ka": 63,
+	"./ka.js": 63,
+	"./kk": 64,
+	"./kk.js": 64,
+	"./km": 65,
+	"./km.js": 65,
+	"./kn": 66,
+	"./kn.js": 66,
+	"./ko": 67,
+	"./ko.js": 67,
+	"./ky": 68,
+	"./ky.js": 68,
+	"./lb": 69,
+	"./lb.js": 69,
+	"./lo": 70,
+	"./lo.js": 70,
+	"./lt": 71,
+	"./lt.js": 71,
+	"./lv": 72,
+	"./lv.js": 72,
+	"./me": 73,
+	"./me.js": 73,
+	"./mi": 74,
+	"./mi.js": 74,
+	"./mk": 75,
+	"./mk.js": 75,
+	"./ml": 76,
+	"./ml.js": 76,
+	"./mr": 77,
+	"./mr.js": 77,
+	"./ms": 78,
+	"./ms-my": 79,
+	"./ms-my.js": 79,
+	"./ms.js": 78,
+	"./my": 80,
+	"./my.js": 80,
+	"./nb": 81,
+	"./nb.js": 81,
+	"./ne": 82,
+	"./ne.js": 82,
+	"./nl": 83,
+	"./nl-be": 84,
+	"./nl-be.js": 84,
+	"./nl.js": 83,
+	"./nn": 85,
+	"./nn.js": 85,
+	"./pa-in": 86,
+	"./pa-in.js": 86,
+	"./pl": 87,
+	"./pl.js": 87,
+	"./pt": 88,
+	"./pt-br": 89,
+	"./pt-br.js": 89,
+	"./pt.js": 88,
+	"./ro": 90,
+	"./ro.js": 90,
+	"./ru": 91,
+	"./ru.js": 91,
+	"./sd": 92,
+	"./sd.js": 92,
+	"./se": 93,
+	"./se.js": 93,
+	"./si": 94,
+	"./si.js": 94,
+	"./sk": 95,
+	"./sk.js": 95,
+	"./sl": 96,
+	"./sl.js": 96,
+	"./sq": 97,
+	"./sq.js": 97,
+	"./sr": 98,
+	"./sr-cyrl": 99,
+	"./sr-cyrl.js": 99,
+	"./sr.js": 98,
+	"./ss": 100,
+	"./ss.js": 100,
+	"./sv": 101,
+	"./sv.js": 101,
+	"./sw": 102,
+	"./sw.js": 102,
+	"./ta": 103,
+	"./ta.js": 103,
+	"./te": 104,
+	"./te.js": 104,
+	"./tet": 105,
+	"./tet.js": 105,
+	"./th": 106,
+	"./th.js": 106,
+	"./tl-ph": 107,
+	"./tl-ph.js": 107,
+	"./tlh": 108,
+	"./tlh.js": 108,
+	"./tr": 109,
+	"./tr.js": 109,
+	"./tzl": 110,
+	"./tzl.js": 110,
+	"./tzm": 111,
+	"./tzm-latn": 112,
+	"./tzm-latn.js": 112,
+	"./tzm.js": 111,
+	"./uk": 113,
+	"./uk.js": 113,
+	"./ur": 114,
+	"./ur.js": 114,
+	"./uz": 115,
+	"./uz-latn": 116,
+	"./uz-latn.js": 116,
+	"./uz.js": 115,
+	"./vi": 117,
+	"./vi.js": 117,
+	"./x-pseudo": 118,
+	"./x-pseudo.js": 118,
+	"./yo": 119,
+	"./yo.js": 119,
+	"./zh-cn": 120,
+	"./zh-cn.js": 120,
+	"./zh-hk": 121,
+	"./zh-hk.js": 121,
+	"./zh-tw": 122,
+	"./zh-tw.js": 122
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -63495,10 +63280,10 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 157;
+webpackContext.id = 145;
 
 /***/ }),
-/* 158 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*! Moment Duration Format v1.3.0
@@ -63986,7 +63771,7 @@ webpackContext.id = 157;
 
 
 /***/ }),
-/* 159 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;(function (window, document, undefined) {
@@ -64508,22 +64293,22 @@ var __WEBPACK_AMD_DEFINE_RESULT__;(function (window, document, undefined) {
 
 
 /***/ }),
-/* 160 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(161);
+module.exports = __webpack_require__(149);
 
 /***/ }),
-/* 161 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(2);
-var bind = __webpack_require__(122);
-var Axios = __webpack_require__(163);
-var defaults = __webpack_require__(5);
+var bind = __webpack_require__(123);
+var Axios = __webpack_require__(151);
+var defaults = __webpack_require__(6);
 
 /**
  * Create an instance of Axios
@@ -64556,15 +64341,15 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(126);
-axios.CancelToken = __webpack_require__(178);
-axios.isCancel = __webpack_require__(125);
+axios.Cancel = __webpack_require__(127);
+axios.CancelToken = __webpack_require__(166);
+axios.isCancel = __webpack_require__(126);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(179);
+axios.spread = __webpack_require__(167);
 
 module.exports = axios;
 
@@ -64573,7 +64358,7 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 162 */
+/* 150 */
 /***/ (function(module, exports) {
 
 /*!
@@ -64600,18 +64385,18 @@ function isSlowBuffer (obj) {
 
 
 /***/ }),
-/* 163 */
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var defaults = __webpack_require__(5);
+var defaults = __webpack_require__(6);
 var utils = __webpack_require__(2);
-var InterceptorManager = __webpack_require__(173);
-var dispatchRequest = __webpack_require__(174);
-var isAbsoluteURL = __webpack_require__(176);
-var combineURLs = __webpack_require__(177);
+var InterceptorManager = __webpack_require__(161);
+var dispatchRequest = __webpack_require__(162);
+var isAbsoluteURL = __webpack_require__(164);
+var combineURLs = __webpack_require__(165);
 
 /**
  * Create a new instance of Axios
@@ -64693,7 +64478,7 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 164 */
+/* 152 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -64883,7 +64668,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 165 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64902,13 +64687,13 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 166 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var createError = __webpack_require__(124);
+var createError = __webpack_require__(125);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -64935,7 +64720,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 167 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -64963,7 +64748,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
 
 
 /***/ }),
-/* 168 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65038,7 +64823,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 169 */
+/* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65082,7 +64867,7 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 170 */
+/* 158 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65157,7 +64942,7 @@ module.exports = (
 
 
 /***/ }),
-/* 171 */
+/* 159 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65200,7 +64985,7 @@ module.exports = btoa;
 
 
 /***/ }),
-/* 172 */
+/* 160 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65260,7 +65045,7 @@ module.exports = (
 
 
 /***/ }),
-/* 173 */
+/* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65319,16 +65104,16 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 174 */
+/* 162 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(2);
-var transformData = __webpack_require__(175);
-var isCancel = __webpack_require__(125);
-var defaults = __webpack_require__(5);
+var transformData = __webpack_require__(163);
+var isCancel = __webpack_require__(126);
+var defaults = __webpack_require__(6);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -65405,7 +65190,7 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 175 */
+/* 163 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65432,7 +65217,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 176 */
+/* 164 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65453,7 +65238,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 177 */
+/* 165 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65474,13 +65259,13 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 178 */
+/* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Cancel = __webpack_require__(126);
+var Cancel = __webpack_require__(127);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -65538,7 +65323,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 179 */
+/* 167 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -65572,7 +65357,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 180 */
+/* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -75769,10 +75554,10 @@ Vue$3.compile = compileToFunctions;
 
 module.exports = Vue$3;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
-/* 181 */
+/* 169 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -76874,7 +76659,7 @@ var xhrClient = function (request) {
 
 var nodeClient = function (request) {
 
-    var client = __webpack_require__(182);
+    var client = __webpack_require__(170);
 
     return new PromiseObj(function (resolve) {
 
@@ -77350,20 +77135,20 @@ if (typeof window !== 'undefined' && window.Vue) {
 
 
 /***/ }),
-/* 182 */
+/* 170 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 183 */
+/* 171 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function(t,e){ true?module.exports=e():"function"==typeof define&&define.amd?define([],e):"object"==typeof exports?exports.Buefy=e():t.Buefy=e()})(this,function(){return function(t){function e(i){if(n[i])return n[i].exports;var r=n[i]={i:i,l:!1,exports:{}};return t[i].call(r.exports,r,r.exports,e),r.l=!0,r.exports}var n={};return e.m=t,e.c=n,e.i=function(t){return t},e.d=function(t,n,i){e.o(t,n)||Object.defineProperty(t,n,{configurable:!1,enumerable:!0,get:i})},e.n=function(t){var n=t&&t.__esModule?function(){return t.default}:function(){return t};return e.d(n,"a",n),n},e.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},e.p="/",e(e.s=215)}([function(t,e){t.exports=function(t,e,n,i,r){var a,o=t=t||{},s=typeof t.default;"object"!==s&&"function"!==s||(a=t,o=t.default);var c="function"==typeof o?o.options:o;e&&(c.render=e.render,c.staticRenderFns=e.staticRenderFns),i&&(c._scopeId=i);var u;if(r?(u=function(t){t=t||this.$vnode&&this.$vnode.ssrContext||this.parent&&this.parent.$vnode&&this.parent.$vnode.ssrContext,t||"undefined"==typeof __VUE_SSR_CONTEXT__||(t=__VUE_SSR_CONTEXT__),n&&n.call(this,t),t&&t._registeredComponents&&t._registeredComponents.add(r)},c._ssrRegister=u):n&&(u=n),u){var l=c.functional,d=l?c.render:c.beforeCreate;l?c.render=function(t,e){return u.call(e),d(t,e)}:c.beforeCreate=d?[].concat(d,u):[u]}return{esModule:a,exports:o,options:c}}},function(t,e,n){var i=n(34)("wks"),r=n(24),a=n(6).Symbol,o="function"==typeof a;(t.exports=function(t){return i[t]||(i[t]=o&&a[t]||(o?a:r)("Symbol."+t))}).store=i},function(t,e,n){"use strict";var i=n(162),r=n.n(i);e.a=r.a},function(t,e,n){"use strict";n.d(e,"a",function(){return a});var i=this,r={defaultContainerElement:null,defaultIconPack:"mdi",defaultSnackbarDuration:3500,defaultToastDuration:2e3,defaultTooltipType:"is-primary",defaultTooltipAnimated:!1,defaultInputAutocomplete:"on",defaultDateFormatter:null,defaultDateParser:null};e.b=r;var a=function(t){i.config=t}},function(t,e,n){"use strict";e.__esModule=!0;var i=n(112),r=function(t){return t&&t.__esModule?t:{default:t}}(i);e.default=function(t,e,n){return e in t?(0,r.default)(t,e,{value:n,enumerable:!0,configurable:!0,writable:!0}):t[e]=n,t}},function(t,e){var n=t.exports={version:"2.4.0"};"number"==typeof __e&&(__e=n)},function(t,e){var n=t.exports="undefined"!=typeof window&&window.Math==Math?window:"undefined"!=typeof self&&self.Math==Math?self:Function("return this")();"number"==typeof __g&&(__g=n)},function(t,e,n){var i=n(13),r=n(51),a=n(37),o=Object.defineProperty;e.f=n(8)?Object.defineProperty:function(t,e,n){if(i(t),e=a(e,!0),i(n),r)try{return o(t,e,n)}catch(t){}if("get"in n||"set"in n)throw TypeError("Accessors not supported!");return"value"in n&&(t[e]=n.value),t}},function(t,e,n){t.exports=!n(17)(function(){return 7!=Object.defineProperty({},"a",{get:function(){return 7}}).a})},function(t,e){var n={}.hasOwnProperty;t.exports=function(t,e){return n.call(t,e)}},function(t,e,n){var i=n(52),r=n(28);t.exports=function(t){return i(r(t))}},function(t,e,n){t.exports={default:n(118),__esModule:!0}},function(t,e,n){t.exports={default:n(120),__esModule:!0}},function(t,e,n){var i=n(22);t.exports=function(t){if(!i(t))throw TypeError(t+" is not an object!");return t}},function(t,e,n){var i=n(7),r=n(20);t.exports=n(8)?function(t,e,n){return i.f(t,e,r(1,n))}:function(t,e,n){return t[e]=n,t}},function(t,e,n){"use strict";e.a={props:{size:String,expanded:Boolean,loading:Boolean,icon:String,iconPack:String,autocomplete:String,maxlength:[Number,String]},data:function(){return{isValid:!0}},computed:{parentField:function(){for(var t=this.$parent,e=0;e<3;e++)t&&!t.$data._isField&&(t=t.$parent);return t},statusType:function(){if(this.parentField)return this.parentField.newType}},methods:{focus:function(){var t=this;void 0!==this.$refs[this.$data._elementRef]&&(this.$data._isSelect||this.$data._isAutocomplete||this.$data._isDatepicker?this.$nextTick(function(){return t.$refs[t.$data._elementRef].focus()}):this.$nextTick(function(){return t.$refs[t.$data._elementRef].select()}))},checkHtml5Validity:function(){if(void 0!==this.$refs[this.$data._elementRef]){var t=this.$data._isAutocomplete||this.$data._isDatepicker?this.$refs.input.$refs.input:this.$refs[this.$data._elementRef],e=null,n=null,i=!0;return t.checkValidity()||(e="is-danger",n=t.validationMessage,i=!1),this.isValid=i,this.parentField&&(this.parentField.type||(this.parentField.newType=e),this.parentField.message||(this.parentField.newMessage=n)),this.isValid}}}}},function(t,e,n){var i=n(6),r=n(5),a=n(49),o=n(14),s=function(t,e,n){var c,u,l,d=t&s.F,f=t&s.G,p=t&s.S,h=t&s.P,v=t&s.B,m=t&s.W,y=f?r:r[e]||(r[e]={}),g=y.prototype,b=f?i:p?i[e]:(i[e]||{}).prototype;f&&(n=e);for(c in n)(u=!d&&b&&void 0!==b[c])&&c in y||(l=u?b[c]:n[c],y[c]=f&&"function"!=typeof b[c]?n[c]:v&&u?a(l,i):m&&b[c]==l?function(t){var e=function(e,n,i){if(this instanceof t){switch(arguments.length){case 0:return new t;case 1:return new t(e);case 2:return new t(e,n)}return new t(e,n,i)}return t.apply(this,arguments)};return e.prototype=t.prototype,e}(l):h&&"function"==typeof l?a(Function.call,l):l,h&&((y.virtual||(y.virtual={}))[c]=l,t&s.R&&g&&!g[c]&&o(g,c,l)))};s.F=1,s.G=2,s.S=4,s.P=8,s.B=16,s.W=32,s.U=64,s.R=128,t.exports=s},function(t,e){t.exports=function(t){try{return!!t()}catch(t){return!0}}},function(t,e){t.exports={}},function(t,e,n){var i=n(56),r=n(29);t.exports=Object.keys||function(t){return i(t,r)}},function(t,e){t.exports=function(t,e){return{enumerable:!(1&t),configurable:!(2&t),writable:!(4&t),value:e}}},function(t,e,n){"use strict";(function(t){function n(t){return void 0===t||null===t}function i(t){return void 0!==t&&null!==t}function r(t){return!0===t}function a(t){return!1===t}function o(t){return"string"==typeof t||"number"==typeof t||"boolean"==typeof t}function s(t){return null!==t&&"object"==typeof t}function c(t){return"[object Object]"===ei.call(t)}function u(t){return"[object RegExp]"===ei.call(t)}function l(t){var e=parseFloat(t);return e>=0&&Math.floor(e)===e&&isFinite(t)}function d(t){return null==t?"":"object"==typeof t?JSON.stringify(t,null,2):String(t)}function f(t){var e=parseFloat(t);return isNaN(e)?t:e}function p(t,e){for(var n=Object.create(null),i=t.split(","),r=0;r<i.length;r++)n[i[r]]=!0;return e?function(t){return n[t.toLowerCase()]}:function(t){return n[t]}}function h(t,e){if(t.length){var n=t.indexOf(e);if(n>-1)return t.splice(n,1)}}function v(t,e){return ii.call(t,e)}function m(t){var e=Object.create(null);return function(n){return e[n]||(e[n]=t(n))}}function y(t,e){function n(n){var i=arguments.length;return i?i>1?t.apply(e,arguments):t.call(e,n):t.call(e)}return n._length=t.length,n}function g(t,e){e=e||0;for(var n=t.length-e,i=new Array(n);n--;)i[n]=t[n+e];return i}function b(t,e){for(var n in e)t[n]=e[n];return t}function _(t){for(var e={},n=0;n<t.length;n++)t[n]&&b(e,t[n]);return e}function w(t,e,n){}function k(t,e){if(t===e)return!0;var n=s(t),i=s(e);if(!n||!i)return!n&&!i&&String(t)===String(e);try{var r=Array.isArray(t),a=Array.isArray(e);if(r&&a)return t.length===e.length&&t.every(function(t,n){return k(t,e[n])});if(r||a)return!1;var o=Object.keys(t),c=Object.keys(e);return o.length===c.length&&o.every(function(n){return k(t[n],e[n])})}catch(t){return!1}}function x(t,e){for(var n=0;n<t.length;n++)if(k(t[n],e))return n;return-1}function C(t){var e=!1;return function(){e||(e=!0,t.apply(this,arguments))}}function $(t){var e=(t+"").charCodeAt(0);return 36===e||95===e}function D(t,e,n,i){Object.defineProperty(t,e,{value:n,enumerable:!!i,writable:!0,configurable:!0})}function A(t){if(!mi.test(t)){var e=t.split(".");return function(t){for(var n=0;n<e.length;n++){if(!t)return;t=t[e[n]]}return t}}}function S(t,e,n){if(hi.errorHandler)hi.errorHandler.call(null,t,e,n);else{if(!bi||"undefined"==typeof console)throw t;console.error(t)}}function O(t){return"function"==typeof t&&/native code/.test(t.toString())}function P(t){Fi.target&&Ni.push(Fi.target),Fi.target=t}function M(){Fi.target=Ni.pop()}function T(t,e,n){t.__proto__=e}function V(t,e,n){for(var i=0,r=n.length;i<r;i++){var a=n[i];D(t,a,e[a])}}function E(t,e){if(s(t)){var n;return v(t,"__ob__")&&t.__ob__ instanceof Hi?n=t.__ob__:zi.shouldConvert&&!Ti()&&(Array.isArray(t)||c(t))&&Object.isExtensible(t)&&!t._isVue&&(n=new Hi(t)),e&&n&&n.vmCount++,n}}function j(t,e,n,i,r){var a=new Fi,o=Object.getOwnPropertyDescriptor(t,e);if(!o||!1!==o.configurable){var s=o&&o.get,c=o&&o.set,u=!r&&E(n);Object.defineProperty(t,e,{enumerable:!0,configurable:!0,get:function(){var e=s?s.call(t):n;return Fi.target&&(a.depend(),u&&u.dep.depend(),Array.isArray(e)&&N(e)),e},set:function(e){var i=s?s.call(t):n;e===i||e!==e&&i!==i||(c?c.call(t,e):n=e,u=!r&&E(e),a.notify())}})}}function I(t,e,n){if(Array.isArray(t)&&l(e))return t.length=Math.max(t.length,e),t.splice(e,1,n),n;if(v(t,e))return t[e]=n,n;var i=t.__ob__;return t._isVue||i&&i.vmCount?n:i?(j(i.value,e,n),i.dep.notify(),n):(t[e]=n,n)}function F(t,e){if(Array.isArray(t)&&l(e))return void t.splice(e,1);var n=t.__ob__;t._isVue||n&&n.vmCount||v(t,e)&&(delete t[e],n&&n.dep.notify())}function N(t){for(var e=void 0,n=0,i=t.length;n<i;n++)e=t[n],e&&e.__ob__&&e.__ob__.dep.depend(),Array.isArray(e)&&N(e)}function R(t,e){if(!e)return t;for(var n,i,r,a=Object.keys(e),o=0;o<a.length;o++)n=a[o],i=t[n],r=e[n],v(t,n)?c(i)&&c(r)&&R(i,r):I(t,n,r);return t}function B(t,e,n){return n?t||e?function(){var i="function"==typeof e?e.call(n):e,r="function"==typeof t?t.call(n):void 0;return i?R(i,r):r}:void 0:e?t?function(){return R("function"==typeof e?e.call(this):e,"function"==typeof t?t.call(this):t)}:e:t}function L(t,e){return e?t?t.concat(e):Array.isArray(e)?e:[e]:t}function z(t,e){var n=Object.create(t||null);return e?b(n,e):n}function H(t){var e=t.props;if(e){var n,i,r,a={};if(Array.isArray(e))for(n=e.length;n--;)"string"==typeof(i=e[n])&&(r=ai(i),a[r]={type:null});else if(c(e))for(var o in e)i=e[o],r=ai(o),a[r]=c(i)?i:{type:i};t.props=a}}function Y(t){var e=t.inject;if(Array.isArray(e))for(var n=t.inject={},i=0;i<e.length;i++)n[e[i]]=e[i]}function U(t){var e=t.directives;if(e)for(var n in e){var i=e[n];"function"==typeof i&&(e[n]={bind:i,update:i})}}function W(t,e,n){function i(i){var r=Yi[i]||Ui;c[i]=r(t[i],e[i],n,i)}"function"==typeof e&&(e=e.options),H(e),Y(e),U(e);var r=e.extends;if(r&&(t=W(t,r,n)),e.mixins)for(var a=0,o=e.mixins.length;a<o;a++)t=W(t,e.mixins[a],n);var s,c={};for(s in t)i(s);for(s in e)v(t,s)||i(s);return c}function q(t,e,n,i){if("string"==typeof n){var r=t[e];if(v(r,n))return r[n];var a=ai(n);if(v(r,a))return r[a];var o=oi(a);if(v(r,o))return r[o];return r[n]||r[a]||r[o]}}function K(t,e,n,i){var r=e[t],a=!v(n,t),o=n[t];if(X(Boolean,r.type)&&(a&&!v(r,"default")?o=!1:X(String,r.type)||""!==o&&o!==ci(t)||(o=!0)),void 0===o){o=J(i,r,t);var s=zi.shouldConvert;zi.shouldConvert=!0,E(o),zi.shouldConvert=s}return o}function J(t,e,n){if(v(e,"default")){var i=e.default;return t&&t.$options.propsData&&void 0===t.$options.propsData[n]&&void 0!==t._props[n]?t._props[n]:"function"==typeof i&&"Function"!==G(e.type)?i.call(t):i}}function G(t){var e=t&&t.toString().match(/^\s*function (\w+)/);return e?e[1]:""}function X(t,e){if(!Array.isArray(e))return G(e)===G(t);for(var n=0,i=e.length;n<i;n++)if(G(e[n])===G(t))return!0;return!1}function Q(t){return new Wi(void 0,void 0,void 0,String(t))}function Z(t){var e=new Wi(t.tag,t.data,t.children,t.text,t.elm,t.context,t.componentOptions,t.asyncFactory);return e.ns=t.ns,e.isStatic=t.isStatic,e.key=t.key,e.isComment=t.isComment,e.isCloned=!0,e}function tt(t){for(var e=t.length,n=new Array(e),i=0;i<e;i++)n[i]=Z(t[i]);return n}function et(t){function e(){var t=arguments,n=e.fns;if(!Array.isArray(n))return n.apply(null,arguments);for(var i=n.slice(),r=0;r<i.length;r++)i[r].apply(null,t)}return e.fns=t,e}function nt(t,e,i,r,a){var o,s,c,u;for(o in t)s=t[o],c=e[o],u=Gi(o),n(s)||(n(c)?(n(s.fns)&&(s=t[o]=et(s)),i(u.name,s,u.once,u.capture,u.passive)):s!==c&&(c.fns=s,t[o]=c));for(o in e)n(t[o])&&(u=Gi(o),r(u.name,e[o],u.capture))}function it(t,e,a){function o(){a.apply(this,arguments),h(s.fns,o)}var s,c=t[e];n(c)?s=et([o]):i(c.fns)&&r(c.merged)?(s=c,s.fns.push(o)):s=et([c,o]),s.merged=!0,t[e]=s}function rt(t,e,r){var a=e.options.props;if(!n(a)){var o={},s=t.attrs,c=t.props;if(i(s)||i(c))for(var u in a){var l=ci(u);at(o,c,u,l,!0)||at(o,s,u,l,!1)}return o}}function at(t,e,n,r,a){if(i(e)){if(v(e,n))return t[n]=e[n],a||delete e[n],!0;if(v(e,r))return t[n]=e[r],a||delete e[r],!0}return!1}function ot(t){for(var e=0;e<t.length;e++)if(Array.isArray(t[e]))return Array.prototype.concat.apply([],t);return t}function st(t){return o(t)?[Q(t)]:Array.isArray(t)?ut(t):void 0}function ct(t){return i(t)&&i(t.text)&&a(t.isComment)}function ut(t,e){var a,s,c,u=[];for(a=0;a<t.length;a++)s=t[a],n(s)||"boolean"==typeof s||(c=u[u.length-1],Array.isArray(s)?u.push.apply(u,ut(s,(e||"")+"_"+a)):o(s)?ct(c)?c.text+=String(s):""!==s&&u.push(Q(s)):ct(s)&&ct(c)?u[u.length-1]=Q(c.text+s.text):(r(t._isVList)&&i(s.tag)&&n(s.key)&&i(e)&&(s.key="__vlist"+e+"_"+a+"__"),u.push(s)));return u}function lt(t,e){return t.__esModule&&t.default&&(t=t.default),s(t)?e.extend(t):t}function dt(t,e,n,i,r){var a=Ji();return a.asyncFactory=t,a.asyncMeta={data:e,context:n,children:i,tag:r},a}function ft(t,e,a){if(r(t.error)&&i(t.errorComp))return t.errorComp;if(i(t.resolved))return t.resolved;if(r(t.loading)&&i(t.loadingComp))return t.loadingComp;if(!i(t.contexts)){var o=t.contexts=[a],c=!0,u=function(){for(var t=0,e=o.length;t<e;t++)o[t].$forceUpdate()},l=C(function(n){t.resolved=lt(n,e),c||u()}),d=C(function(e){i(t.errorComp)&&(t.error=!0,u())}),f=t(l,d);return s(f)&&("function"==typeof f.then?n(t.resolved)&&f.then(l,d):i(f.component)&&"function"==typeof f.component.then&&(f.component.then(l,d),i(f.error)&&(t.errorComp=lt(f.error,e)),i(f.loading)&&(t.loadingComp=lt(f.loading,e),0===f.delay?t.loading=!0:setTimeout(function(){n(t.resolved)&&n(t.error)&&(t.loading=!0,u())},f.delay||200)),i(f.timeout)&&setTimeout(function(){n(t.resolved)&&d(null)},f.timeout))),c=!1,t.loading?t.loadingComp:t.resolved}t.contexts.push(a)}function pt(t){if(Array.isArray(t))for(var e=0;e<t.length;e++){var n=t[e];if(i(n)&&i(n.componentOptions))return n}}function ht(t){t._events=Object.create(null),t._hasHookEvent=!1;var e=t.$options._parentListeners;e&&yt(t,e)}function vt(t,e,n){n?Ki.$once(t,e):Ki.$on(t,e)}function mt(t,e){Ki.$off(t,e)}function yt(t,e,n){Ki=t,nt(e,n||{},vt,mt,t)}function gt(t,e){var n={};if(!t)return n;for(var i=[],r=0,a=t.length;r<a;r++){var o=t[r];if(o.context!==e&&o.functionalContext!==e||!o.data||null==o.data.slot)i.push(o);else{var s=o.data.slot,c=n[s]||(n[s]=[]);"template"===o.tag?c.push.apply(c,o.children):c.push(o)}}return i.every(bt)||(n.default=i),n}function bt(t){return t.isComment||" "===t.text}function _t(t,e){e=e||{};for(var n=0;n<t.length;n++)Array.isArray(t[n])?_t(t[n],e):e[t[n].key]=t[n].fn;return e}function wt(t){var e=t.$options,n=e.parent;if(n&&!e.abstract){for(;n.$options.abstract&&n.$parent;)n=n.$parent;n.$children.push(t)}t.$parent=n,t.$root=n?n.$root:t,t.$children=[],t.$refs={},t._watcher=null,t._inactive=null,t._directInactive=!1,t._isMounted=!1,t._isDestroyed=!1,t._isBeingDestroyed=!1}function kt(t,e,n){t.$el=e,t.$options.render||(t.$options.render=Ji),At(t,"beforeMount");var i;return i=function(){t._update(t._render(),n)},t._watcher=new ar(t,i,w),n=!1,null==t.$vnode&&(t._isMounted=!0,At(t,"mounted")),t}function xt(t,e,n,i,r){var a=!!(r||t.$options._renderChildren||i.data.scopedSlots||t.$scopedSlots!==vi);if(t.$options._parentVnode=i,t.$vnode=i,t._vnode&&(t._vnode.parent=i),t.$options._renderChildren=r,t.$attrs=i.data&&i.data.attrs,t.$listeners=n,e&&t.$options.props){zi.shouldConvert=!1;for(var o=t._props,s=t.$options._propKeys||[],c=0;c<s.length;c++){var u=s[c];o[u]=K(u,t.$options.props,e,t)}zi.shouldConvert=!0,t.$options.propsData=e}if(n){var l=t.$options._parentListeners;t.$options._parentListeners=n,yt(t,n,l)}a&&(t.$slots=gt(r,i.context),t.$forceUpdate())}function Ct(t){for(;t&&(t=t.$parent);)if(t._inactive)return!0;return!1}function $t(t,e){if(e){if(t._directInactive=!1,Ct(t))return}else if(t._directInactive)return;if(t._inactive||null===t._inactive){t._inactive=!1;for(var n=0;n<t.$children.length;n++)$t(t.$children[n]);At(t,"activated")}}function Dt(t,e){if(!(e&&(t._directInactive=!0,Ct(t))||t._inactive)){t._inactive=!0;for(var n=0;n<t.$children.length;n++)Dt(t.$children[n]);At(t,"deactivated")}}function At(t,e){var n=t.$options[e];if(n)for(var i=0,r=n.length;i<r;i++)try{n[i].call(t)}catch(n){S(n,t,e+" hook")}t._hasHookEvent&&t.$emit("hook:"+e)}function St(){ir=Qi.length=Zi.length=0,tr={},er=nr=!1}function Ot(){nr=!0;var t,e;for(Qi.sort(function(t,e){return t.id-e.id}),ir=0;ir<Qi.length;ir++)t=Qi[ir],e=t.id,tr[e]=null,t.run();var n=Zi.slice(),i=Qi.slice();St(),Tt(n),Pt(i),Vi&&hi.devtools&&Vi.emit("flush")}function Pt(t){for(var e=t.length;e--;){var n=t[e],i=n.vm;i._watcher===n&&i._isMounted&&At(i,"updated")}}function Mt(t){t._inactive=!1,Zi.push(t)}function Tt(t){for(var e=0;e<t.length;e++)t[e]._inactive=!0,$t(t[e],!0)}function Vt(t){var e=t.id;if(null==tr[e]){if(tr[e]=!0,nr){for(var n=Qi.length-1;n>ir&&Qi[n].id>t.id;)n--;Qi.splice(n+1,0,t)}else Qi.push(t);er||(er=!0,ji(Ot))}}function Et(t){or.clear(),jt(t,or)}function jt(t,e){var n,i,r=Array.isArray(t);if((r||s(t))&&Object.isExtensible(t)){if(t.__ob__){var a=t.__ob__.dep.id;if(e.has(a))return;e.add(a)}if(r)for(n=t.length;n--;)jt(t[n],e);else for(i=Object.keys(t),n=i.length;n--;)jt(t[i[n]],e)}}function It(t,e,n){sr.get=function(){return this[e][n]},sr.set=function(t){this[e][n]=t},Object.defineProperty(t,n,sr)}function Ft(t){t._watchers=[];var e=t.$options;e.props&&Nt(t,e.props),e.methods&&Yt(t,e.methods),e.data?Rt(t):E(t._data={},!0),e.computed&&Lt(t,e.computed),e.watch&&e.watch!==Ai&&Ut(t,e.watch)}function Nt(t,e){var n=t.$options.propsData||{},i=t._props={},r=t.$options._propKeys=[],a=!t.$parent;zi.shouldConvert=a;for(var o in e)(function(a){r.push(a);var o=K(a,e,n,t);j(i,a,o),a in t||It(t,"_props",a)})(o);zi.shouldConvert=!0}function Rt(t){var e=t.$options.data;e=t._data="function"==typeof e?Bt(e,t):e||{},c(e)||(e={});for(var n=Object.keys(e),i=t.$options.props,r=(t.$options.methods,n.length);r--;){var a=n[r];i&&v(i,a)||$(a)||It(t,"_data",a)}E(e,!0)}function Bt(t,e){try{return t.call(e)}catch(t){return S(t,e,"data()"),{}}}function Lt(t,e){var n=t._computedWatchers=Object.create(null);for(var i in e){var r=e[i],a="function"==typeof r?r:r.get;n[i]=new ar(t,a||w,w,cr),i in t||zt(t,i,r)}}function zt(t,e,n){"function"==typeof n?(sr.get=Ht(e),sr.set=w):(sr.get=n.get?!1!==n.cache?Ht(e):n.get:w,sr.set=n.set?n.set:w),Object.defineProperty(t,e,sr)}function Ht(t){return function(){var e=this._computedWatchers&&this._computedWatchers[t];if(e)return e.dirty&&e.evaluate(),Fi.target&&e.depend(),e.value}}function Yt(t,e){t.$options.props;for(var n in e)t[n]=null==e[n]?w:y(e[n],t)}function Ut(t,e){for(var n in e){var i=e[n];if(Array.isArray(i))for(var r=0;r<i.length;r++)Wt(t,n,i[r]);else Wt(t,n,i)}}function Wt(t,e,n,i){return c(n)&&(i=n,n=n.handler),"string"==typeof n&&(n=t[n]),t.$watch(e,n,i)}function qt(t){var e=t.$options.provide;e&&(t._provided="function"==typeof e?e.call(t):e)}function Kt(t){var e=Jt(t.$options.inject,t);e&&(zi.shouldConvert=!1,Object.keys(e).forEach(function(n){j(t,n,e[n])}),zi.shouldConvert=!0)}function Jt(t,e){if(t){for(var n=Object.create(null),i=Ei?Reflect.ownKeys(t):Object.keys(t),r=0;r<i.length;r++)for(var a=i[r],o=t[a],s=e;s;){if(s._provided&&o in s._provided){n[a]=s._provided[o];break}s=s.$parent}return n}}function Gt(t,e,n,r,a){var o={},s=t.options.props;if(i(s))for(var c in s)o[c]=K(c,s,e||{});else i(n.attrs)&&Xt(o,n.attrs),i(n.props)&&Xt(o,n.props);var u=Object.create(r),l=function(t,e,n,i){return ie(u,t,e,n,i,!0)},d=t.options.render.call(null,l,{data:n,props:o,children:a,parent:r,listeners:n.on||{},injections:Jt(t.options.inject,r),slots:function(){return gt(a,r)}});return d instanceof Wi&&(d.functionalContext=r,d.functionalOptions=t.options,n.slot&&((d.data||(d.data={})).slot=n.slot)),d}function Xt(t,e){for(var n in e)t[ai(n)]=e[n]}function Qt(t,e,a,o,c){if(!n(t)){var u=a.$options._base;if(s(t)&&(t=u.extend(t)),"function"==typeof t){var l;if(n(t.cid)&&(l=t,void 0===(t=ft(l,u,a))))return dt(l,e,a,o,c);e=e||{},ge(t),i(e.model)&&ne(t.options,e);var d=rt(e,t,c);if(r(t.options.functional))return Gt(t,d,e,a,o);var f=e.on;if(e.on=e.nativeOn,r(t.options.abstract)){var p=e.slot;e={},p&&(e.slot=p)}te(e);var h=t.options.name||c;return new Wi("vue-component-"+t.cid+(h?"-"+h:""),e,void 0,void 0,void 0,a,{Ctor:t,propsData:d,listeners:f,tag:c,children:o},l)}}}function Zt(t,e,n,r){var a=t.componentOptions,o={_isComponent:!0,parent:e,propsData:a.propsData,_componentTag:a.tag,_parentVnode:t,_parentListeners:a.listeners,_renderChildren:a.children,_parentElm:n||null,_refElm:r||null},s=t.data.inlineTemplate;return i(s)&&(o.render=s.render,o.staticRenderFns=s.staticRenderFns),new a.Ctor(o)}function te(t){t.hook||(t.hook={});for(var e=0;e<lr.length;e++){var n=lr[e],i=t.hook[n],r=ur[n];t.hook[n]=i?ee(r,i):r}}function ee(t,e){return function(n,i,r,a){t(n,i,r,a),e(n,i,r,a)}}function ne(t,e){var n=t.model&&t.model.prop||"value",r=t.model&&t.model.event||"input";(e.props||(e.props={}))[n]=e.model.value;var a=e.on||(e.on={});i(a[r])?a[r]=[e.model.callback].concat(a[r]):a[r]=e.model.callback}function ie(t,e,n,i,a,s){return(Array.isArray(n)||o(n))&&(a=i,i=n,n=void 0),r(s)&&(a=fr),re(t,e,n,i,a)}function re(t,e,n,r,a){if(i(n)&&i(n.__ob__))return Ji();if(i(n)&&i(n.is)&&(e=n.is),!e)return Ji();Array.isArray(r)&&"function"==typeof r[0]&&(n=n||{},n.scopedSlots={default:r[0]},r.length=0),a===fr?r=st(r):a===dr&&(r=ot(r));var o,s;if("string"==typeof e){var c;s=hi.getTagNamespace(e),o=hi.isReservedTag(e)?new Wi(hi.parsePlatformTagName(e),n,r,void 0,void 0,t):i(c=q(t.$options,"components",e))?Qt(c,n,t,r,e):new Wi(e,n,r,void 0,void 0,t)}else o=Qt(e,n,t,r);return i(o)?(s&&ae(o,s),o):Ji()}function ae(t,e){if(t.ns=e,"foreignObject"!==t.tag&&i(t.children))for(var r=0,a=t.children.length;r<a;r++){var o=t.children[r];i(o.tag)&&n(o.ns)&&ae(o,e)}}function oe(t,e){var n,r,a,o,c;if(Array.isArray(t)||"string"==typeof t)for(n=new Array(t.length),r=0,a=t.length;r<a;r++)n[r]=e(t[r],r);else if("number"==typeof t)for(n=new Array(t),r=0;r<t;r++)n[r]=e(r+1,r);else if(s(t))for(o=Object.keys(t),n=new Array(o.length),r=0,a=o.length;r<a;r++)c=o[r],n[r]=e(t[c],c,r);return i(n)&&(n._isVList=!0),n}function se(t,e,n,i){var r=this.$scopedSlots[t];if(r)return n=n||{},i&&(n=b(b({},i),n)),r(n)||e;var a=this.$slots[t];return a||e}function ce(t){return q(this.$options,"filters",t,!0)||li}function ue(t,e,n){var i=hi.keyCodes[e]||n;return Array.isArray(i)?-1===i.indexOf(t):i!==t}function le(t,e,n,i,r){if(n)if(s(n)){Array.isArray(n)&&(n=_(n));var a;for(var o in n)(function(o){if("class"===o||"style"===o||ni(o))a=t;else{var s=t.attrs&&t.attrs.type;a=i||hi.mustUseProp(e,s,o)?t.domProps||(t.domProps={}):t.attrs||(t.attrs={})}if(!(o in a)&&(a[o]=n[o],r)){(t.on||(t.on={}))["update:"+o]=function(t){n[o]=t}}})(o)}else;return t}function de(t,e){var n=this._staticTrees[t];return n&&!e?Array.isArray(n)?tt(n):Z(n):(n=this._staticTrees[t]=this.$options.staticRenderFns[t].call(this._renderProxy),pe(n,"__static__"+t,!1),n)}function fe(t,e,n){return pe(t,"__once__"+e+(n?"_"+n:""),!0),t}function pe(t,e,n){if(Array.isArray(t))for(var i=0;i<t.length;i++)t[i]&&"string"!=typeof t[i]&&he(t[i],e+"_"+i,n);else he(t,e,n)}function he(t,e,n){t.isStatic=!0,t.key=e,t.isOnce=n}function ve(t,e){if(e)if(c(e)){var n=t.on=t.on?b({},t.on):{};for(var i in e){var r=n[i],a=e[i];n[i]=r?[].concat(a,r):a}}else;return t}function me(t){t._vnode=null,t._staticTrees=null;var e=t.$vnode=t.$options._parentVnode,n=e&&e.context;t.$slots=gt(t.$options._renderChildren,n),t.$scopedSlots=vi,t._c=function(e,n,i,r){return ie(t,e,n,i,r,!1)},t.$createElement=function(e,n,i,r){return ie(t,e,n,i,r,!0)};var i=e&&e.data;j(t,"$attrs",i&&i.attrs,null,!0),j(t,"$listeners",t.$options._parentListeners,null,!0)}function ye(t,e){var n=t.$options=Object.create(t.constructor.options);n.parent=e.parent,n.propsData=e.propsData,n._parentVnode=e._parentVnode,n._parentListeners=e._parentListeners,n._renderChildren=e._renderChildren,n._componentTag=e._componentTag,n._parentElm=e._parentElm,n._refElm=e._refElm,e.render&&(n.render=e.render,n.staticRenderFns=e.staticRenderFns)}function ge(t){var e=t.options;if(t.super){var n=ge(t.super);if(n!==t.superOptions){t.superOptions=n;var i=be(t);i&&b(t.extendOptions,i),e=t.options=W(n,t.extendOptions),e.name&&(e.components[e.name]=t)}}return e}function be(t){var e,n=t.options,i=t.extendOptions,r=t.sealedOptions;for(var a in n)n[a]!==r[a]&&(e||(e={}),e[a]=_e(n[a],i[a],r[a]));return e}function _e(t,e,n){if(Array.isArray(t)){var i=[];n=Array.isArray(n)?n:[n],e=Array.isArray(e)?e:[e];for(var r=0;r<t.length;r++)(e.indexOf(t[r])>=0||n.indexOf(t[r])<0)&&i.push(t[r]);return i}return t}function we(t){this._init(t)}function ke(t){t.use=function(t){var e=this._installedPlugins||(this._installedPlugins=[]);if(e.indexOf(t)>-1)return this;var n=g(arguments,1);return n.unshift(this),"function"==typeof t.install?t.install.apply(t,n):"function"==typeof t&&t.apply(null,n),e.push(t),this}}function xe(t){t.mixin=function(t){return this.options=W(this.options,t),this}}function Ce(t){t.cid=0;var e=1;t.extend=function(t){t=t||{};var n=this,i=n.cid,r=t._Ctor||(t._Ctor={});if(r[i])return r[i];var a=t.name||n.options.name,o=function(t){this._init(t)};return o.prototype=Object.create(n.prototype),o.prototype.constructor=o,o.cid=e++,o.options=W(n.options,t),o.super=n,o.options.props&&$e(o),o.options.computed&&De(o),o.extend=n.extend,o.mixin=n.mixin,o.use=n.use,fi.forEach(function(t){o[t]=n[t]}),a&&(o.options.components[a]=o),o.superOptions=n.options,o.extendOptions=t,o.sealedOptions=b({},o.options),r[i]=o,o}}function $e(t){var e=t.options.props;for(var n in e)It(t.prototype,"_props",n)}function De(t){var e=t.options.computed;for(var n in e)zt(t.prototype,n,e[n])}function Ae(t){fi.forEach(function(e){t[e]=function(t,n){return n?("component"===e&&c(n)&&(n.name=n.name||t,n=this.options._base.extend(n)),"directive"===e&&"function"==typeof n&&(n={bind:n,update:n}),this.options[e+"s"][t]=n,n):this.options[e+"s"][t]}})}function Se(t){return t&&(t.Ctor.options.name||t.tag)}function Oe(t,e){return Array.isArray(t)?t.indexOf(e)>-1:"string"==typeof t?t.split(",").indexOf(e)>-1:!!u(t)&&t.test(e)}function Pe(t,e,n){for(var i in t){var r=t[i];if(r){var a=Se(r.componentOptions);a&&!n(a)&&(r!==e&&Me(r),t[i]=null)}}}function Me(t){t&&t.componentInstance.$destroy()}function Te(t){for(var e=t.data,n=t,r=t;i(r.componentInstance);)r=r.componentInstance._vnode,r.data&&(e=Ve(r.data,e));for(;i(n=n.parent);)n.data&&(e=Ve(e,n.data));return Ee(e.staticClass,e.class)}function Ve(t,e){return{staticClass:je(t.staticClass,e.staticClass),class:i(t.class)?[t.class,e.class]:e.class}}function Ee(t,e){return i(t)||i(e)?je(t,Ie(e)):""}function je(t,e){return t?e?t+" "+e:t:e||""}function Ie(t){return Array.isArray(t)?Fe(t):s(t)?Ne(t):"string"==typeof t?t:""}function Fe(t){for(var e,n="",r=0,a=t.length;r<a;r++)i(e=Ie(t[r]))&&""!==e&&(n&&(n+=" "),n+=e);return n}function Ne(t){var e="";for(var n in t)t[n]&&(e&&(e+=" "),e+=n);return e}function Re(t){return Pr(t)?"svg":"math"===t?"math":void 0}function Be(t){if(!bi)return!0;if(Mr(t))return!1;if(t=t.toLowerCase(),null!=Tr[t])return Tr[t];var e=document.createElement(t);return t.indexOf("-")>-1?Tr[t]=e.constructor===window.HTMLUnknownElement||e.constructor===window.HTMLElement:Tr[t]=/HTMLUnknownElement/.test(e.toString())}function Le(t){if("string"==typeof t){var e=document.querySelector(t);return e||document.createElement("div")}return t}function ze(t,e){var n=document.createElement(t);return"select"!==t?n:(e.data&&e.data.attrs&&void 0!==e.data.attrs.multiple&&n.setAttribute("multiple","multiple"),n)}function He(t,e){return document.createElementNS(Sr[t],e)}function Ye(t){return document.createTextNode(t)}function Ue(t){return document.createComment(t)}function We(t,e,n){t.insertBefore(e,n)}function qe(t,e){t.removeChild(e)}function Ke(t,e){t.appendChild(e)}function Je(t){return t.parentNode}function Ge(t){return t.nextSibling}function Xe(t){return t.tagName}function Qe(t,e){t.textContent=e}function Ze(t,e,n){t.setAttribute(e,n)}function tn(t,e){var n=t.data.ref;if(n){var i=t.context,r=t.componentInstance||t.elm,a=i.$refs;e?Array.isArray(a[n])?h(a[n],r):a[n]===r&&(a[n]=void 0):t.data.refInFor?Array.isArray(a[n])?a[n].indexOf(r)<0&&a[n].push(r):a[n]=[r]:a[n]=r}}function en(t,e){return t.key===e.key&&(t.tag===e.tag&&t.isComment===e.isComment&&i(t.data)===i(e.data)&&nn(t,e)||r(t.isAsyncPlaceholder)&&t.asyncFactory===e.asyncFactory&&n(e.asyncFactory.error))}function nn(t,e){if("input"!==t.tag)return!0;var n;return(i(n=t.data)&&i(n=n.attrs)&&n.type)===(i(n=e.data)&&i(n=n.attrs)&&n.type)}function rn(t,e,n){var r,a,o={};for(r=e;r<=n;++r)a=t[r].key,i(a)&&(o[a]=r);return o}function an(t,e){(t.data.directives||e.data.directives)&&on(t,e)}function on(t,e){var n,i,r,a=t===jr,o=e===jr,s=sn(t.data.directives,t.context),c=sn(e.data.directives,e.context),u=[],l=[];for(n in c)i=s[n],r=c[n],i?(r.oldValue=i.value,un(r,"update",e,t),r.def&&r.def.componentUpdated&&l.push(r)):(un(r,"bind",e,t),r.def&&r.def.inserted&&u.push(r));if(u.length){var d=function(){for(var n=0;n<u.length;n++)un(u[n],"inserted",e,t)};a?it(e.data.hook||(e.data.hook={}),"insert",d):d()}if(l.length&&it(e.data.hook||(e.data.hook={}),"postpatch",function(){for(var n=0;n<l.length;n++)un(l[n],"componentUpdated",e,t)}),!a)for(n in s)c[n]||un(s[n],"unbind",t,t,o)}function sn(t,e){var n=Object.create(null);if(!t)return n;var i,r;for(i=0;i<t.length;i++)r=t[i],r.modifiers||(r.modifiers=Nr),n[cn(r)]=r,r.def=q(e.$options,"directives",r.name,!0);return n}function cn(t){return t.rawName||t.name+"."+Object.keys(t.modifiers||{}).join(".")}function un(t,e,n,i,r){var a=t.def&&t.def[e];if(a)try{a(n.elm,t,n,i,r)}catch(i){S(i,n.context,"directive "+t.name+" "+e+" hook")}}function ln(t,e){var r=e.componentOptions;if(!(i(r)&&!1===r.Ctor.options.inheritAttrs||n(t.data.attrs)&&n(e.data.attrs))){var a,o,s=e.elm,c=t.data.attrs||{},u=e.data.attrs||{};i(u.__ob__)&&(u=e.data.attrs=b({},u));for(a in u)o=u[a],c[a]!==o&&dn(s,a,o);ki&&u.value!==c.value&&dn(s,"value",u.value);for(a in c)n(u[a])&&($r(a)?s.removeAttributeNS(Cr,Dr(a)):kr(a)||s.removeAttribute(a))}}function dn(t,e,n){xr(e)?Ar(n)?t.removeAttribute(e):t.setAttribute(e,e):kr(e)?t.setAttribute(e,Ar(n)||"false"===n?"false":"true"):$r(e)?Ar(n)?t.removeAttributeNS(Cr,Dr(e)):t.setAttributeNS(Cr,e,n):Ar(n)?t.removeAttribute(e):t.setAttribute(e,n)}function fn(t,e){var r=e.elm,a=e.data,o=t.data;if(!(n(a.staticClass)&&n(a.class)&&(n(o)||n(o.staticClass)&&n(o.class)))){var s=Te(e),c=r._transitionClasses;i(c)&&(s=je(s,Ie(c))),s!==r._prevClass&&(r.setAttribute("class",s),r._prevClass=s)}}function pn(t){var e;i(t[zr])&&(e=wi?"change":"input",t[e]=[].concat(t[zr],t[e]||[]),delete t[zr]),i(t[Hr])&&(e=Di?"click":"change",t[e]=[].concat(t[Hr],t[e]||[]),delete t[Hr])}function hn(t,e,n,i,r){if(n){var a=e,o=yr;e=function(n){null!==(1===arguments.length?a(n):a.apply(null,arguments))&&vn(t,e,i,o)}}yr.addEventListener(t,e,Si?{capture:i,passive:r}:i)}function vn(t,e,n,i){(i||yr).removeEventListener(t,e,n)}function mn(t,e){if(!n(t.data.on)||!n(e.data.on)){var i=e.data.on||{},r=t.data.on||{};yr=e.elm,pn(i),nt(i,r,hn,vn,e.context)}}function yn(t,e){if(!n(t.data.domProps)||!n(e.data.domProps)){var r,a,o=e.elm,s=t.data.domProps||{},c=e.data.domProps||{};i(c.__ob__)&&(c=e.data.domProps=b({},c));for(r in s)n(c[r])&&(o[r]="");for(r in c)if(a=c[r],"textContent"!==r&&"innerHTML"!==r||(e.children&&(e.children.length=0),a!==s[r]))if("value"===r){o._value=a;var u=n(a)?"":String(a);gn(o,e,u)&&(o.value=u)}else o[r]=a}}function gn(t,e,n){return!t.composing&&("option"===e.tag||bn(t,n)||_n(t,n))}function bn(t,e){var n=!0;try{n=document.activeElement!==t}catch(t){}return n&&t.value!==e}function _n(t,e){var n=t.value,r=t._vModifiers;return i(r)&&r.number?f(n)!==f(e):i(r)&&r.trim?n.trim()!==e.trim():n!==e}function wn(t){var e=kn(t.style);return t.staticStyle?b(t.staticStyle,e):e}function kn(t){return Array.isArray(t)?_(t):"string"==typeof t?Wr(t):t}function xn(t,e){var n,i={};if(e)for(var r=t;r.componentInstance;)r=r.componentInstance._vnode,r.data&&(n=wn(r.data))&&b(i,n);(n=wn(t.data))&&b(i,n);for(var a=t;a=a.parent;)a.data&&(n=wn(a.data))&&b(i,n);return i}function Cn(t,e){var r=e.data,a=t.data;if(!(n(r.staticStyle)&&n(r.style)&&n(a.staticStyle)&&n(a.style))){var o,s,c=e.elm,u=a.staticStyle,l=a.normalizedStyle||a.style||{},d=u||l,f=kn(e.data.style)||{};e.data.normalizedStyle=i(f.__ob__)?b({},f):f;var p=xn(e,!0);for(s in d)n(p[s])&&Jr(c,s,"");for(s in p)(o=p[s])!==d[s]&&Jr(c,s,null==o?"":o)}}function $n(t,e){if(e&&(e=e.trim()))if(t.classList)e.indexOf(" ")>-1?e.split(/\s+/).forEach(function(e){return t.classList.add(e)}):t.classList.add(e);else{var n=" "+(t.getAttribute("class")||"")+" ";n.indexOf(" "+e+" ")<0&&t.setAttribute("class",(n+e).trim())}}function Dn(t,e){if(e&&(e=e.trim()))if(t.classList)e.indexOf(" ")>-1?e.split(/\s+/).forEach(function(e){return t.classList.remove(e)}):t.classList.remove(e),t.classList.length||t.removeAttribute("class");else{for(var n=" "+(t.getAttribute("class")||"")+" ",i=" "+e+" ";n.indexOf(i)>=0;)n=n.replace(i," ");n=n.trim(),n?t.setAttribute("class",n):t.removeAttribute("class")}}function An(t){if(t){if("object"==typeof t){var e={};return!1!==t.css&&b(e,Zr(t.name||"v")),b(e,t),e}return"string"==typeof t?Zr(t):void 0}}function Sn(t){sa(function(){sa(t)})}function On(t,e){var n=t._transitionClasses||(t._transitionClasses=[]);n.indexOf(e)<0&&(n.push(e),$n(t,e))}function Pn(t,e){t._transitionClasses&&h(t._transitionClasses,e),Dn(t,e)}function Mn(t,e,n){var i=Tn(t,e),r=i.type,a=i.timeout,o=i.propCount;if(!r)return n();var s=r===ea?ra:oa,c=0,u=function(){t.removeEventListener(s,l),n()},l=function(e){e.target===t&&++c>=o&&u()};setTimeout(function(){c<o&&u()},a+1),t.addEventListener(s,l)}function Tn(t,e){var n,i=window.getComputedStyle(t),r=i[ia+"Delay"].split(", "),a=i[ia+"Duration"].split(", "),o=Vn(r,a),s=i[aa+"Delay"].split(", "),c=i[aa+"Duration"].split(", "),u=Vn(s,c),l=0,d=0;return e===ea?o>0&&(n=ea,l=o,d=a.length):e===na?u>0&&(n=na,l=u,d=c.length):(l=Math.max(o,u),n=l>0?o>u?ea:na:null,d=n?n===ea?a.length:c.length:0),{type:n,timeout:l,propCount:d,hasTransform:n===ea&&ca.test(i[ia+"Property"])}}function Vn(t,e){for(;t.length<e.length;)t=t.concat(t);return Math.max.apply(null,e.map(function(e,n){return En(e)+En(t[n])}))}function En(t){return 1e3*Number(t.slice(0,-1))}function jn(t,e){var r=t.elm;i(r._leaveCb)&&(r._leaveCb.cancelled=!0,r._leaveCb());var a=An(t.data.transition);if(!n(a)&&!i(r._enterCb)&&1===r.nodeType){for(var o=a.css,c=a.type,u=a.enterClass,l=a.enterToClass,d=a.enterActiveClass,p=a.appearClass,h=a.appearToClass,v=a.appearActiveClass,m=a.beforeEnter,y=a.enter,g=a.afterEnter,b=a.enterCancelled,_=a.beforeAppear,w=a.appear,k=a.afterAppear,x=a.appearCancelled,$=a.duration,D=Xi,A=Xi.$vnode;A&&A.parent;)A=A.parent,D=A.context;var S=!D._isMounted||!t.isRootInsert;if(!S||w||""===w){var O=S&&p?p:u,P=S&&v?v:d,M=S&&h?h:l,T=S?_||m:m,V=S&&"function"==typeof w?w:y,E=S?k||g:g,j=S?x||b:b,I=f(s($)?$.enter:$),F=!1!==o&&!ki,N=Nn(V),R=r._enterCb=C(function(){F&&(Pn(r,M),Pn(r,P)),R.cancelled?(F&&Pn(r,O),j&&j(r)):E&&E(r),r._enterCb=null});t.data.show||it(t.data.hook||(t.data.hook={}),"insert",function(){var e=r.parentNode,n=e&&e._pending&&e._pending[t.key];n&&n.tag===t.tag&&n.elm._leaveCb&&n.elm._leaveCb(),V&&V(r,R)}),T&&T(r),F&&(On(r,O),On(r,P),Sn(function(){On(r,M),Pn(r,O),R.cancelled||N||(Fn(I)?setTimeout(R,I):Mn(r,c,R))})),t.data.show&&(e&&e(),V&&V(r,R)),F||N||R()}}}function In(t,e){function r(){x.cancelled||(t.data.show||((a.parentNode._pending||(a.parentNode._pending={}))[t.key]=t),h&&h(a),_&&(On(a,l),On(a,p),Sn(function(){On(a,d),Pn(a,l),x.cancelled||w||(Fn(k)?setTimeout(x,k):Mn(a,u,x))})),v&&v(a,x),_||w||x())}var a=t.elm;i(a._enterCb)&&(a._enterCb.cancelled=!0,a._enterCb());var o=An(t.data.transition);if(n(o))return e();if(!i(a._leaveCb)&&1===a.nodeType){var c=o.css,u=o.type,l=o.leaveClass,d=o.leaveToClass,p=o.leaveActiveClass,h=o.beforeLeave,v=o.leave,m=o.afterLeave,y=o.leaveCancelled,g=o.delayLeave,b=o.duration,_=!1!==c&&!ki,w=Nn(v),k=f(s(b)?b.leave:b),x=a._leaveCb=C(function(){a.parentNode&&a.parentNode._pending&&(a.parentNode._pending[t.key]=null),_&&(Pn(a,d),Pn(a,p)),x.cancelled?(_&&Pn(a,l),y&&y(a)):(e(),m&&m(a)),a._leaveCb=null});g?g(r):r()}}function Fn(t){return"number"==typeof t&&!isNaN(t)}function Nn(t){if(n(t))return!1;var e=t.fns;return i(e)?Nn(Array.isArray(e)?e[0]:e):(t._length||t.length)>1}function Rn(t,e){!0!==e.data.show&&jn(e)}function Bn(t,e,n){var i=e.value,r=t.multiple;if(!r||Array.isArray(i)){for(var a,o,s=0,c=t.options.length;s<c;s++)if(o=t.options[s],r)a=x(i,Ln(o))>-1,o.selected!==a&&(o.selected=a);else if(k(Ln(o),i))return void(t.selectedIndex!==s&&(t.selectedIndex=s));r||(t.selectedIndex=-1)}}function Ln(t){return"_value"in t?t._value:t.value}function zn(t){t.target.composing=!0}function Hn(t){t.target.composing&&(t.target.composing=!1,Yn(t.target,"input"))}function Yn(t,e){var n=document.createEvent("HTMLEvents");n.initEvent(e,!0,!0),t.dispatchEvent(n)}function Un(t){return!t.componentInstance||t.data&&t.data.transition?t:Un(t.componentInstance._vnode)}function Wn(t){var e=t&&t.componentOptions;return e&&e.Ctor.options.abstract?Wn(pt(e.children)):t}function qn(t){var e={},n=t.$options;for(var i in n.propsData)e[i]=t[i];var r=n._parentListeners;for(var a in r)e[ai(a)]=r[a];return e}function Kn(t,e){if(/\d-keep-alive$/.test(e.tag))return t("keep-alive",{props:e.componentOptions.propsData})}function Jn(t){for(;t=t.parent;)if(t.data.transition)return!0}function Gn(t,e){return e.key===t.key&&e.tag===t.tag}function Xn(t){return t.isComment&&t.asyncFactory}function Qn(t){t.elm._moveCb&&t.elm._moveCb(),t.elm._enterCb&&t.elm._enterCb()}function Zn(t){t.data.newPos=t.elm.getBoundingClientRect()}function ti(t){var e=t.data.pos,n=t.data.newPos,i=e.left-n.left,r=e.top-n.top;if(i||r){t.data.moved=!0;var a=t.elm.style;a.transform=a.WebkitTransform="translate("+i+"px,"+r+"px)",a.transitionDuration="0s"}}var ei=Object.prototype.toString,ni=(p("slot,component",!0),p("key,ref,slot,is")),ii=Object.prototype.hasOwnProperty,ri=/-(\w)/g,ai=m(function(t){return t.replace(ri,function(t,e){return e?e.toUpperCase():""})}),oi=m(function(t){return t.charAt(0).toUpperCase()+t.slice(1)}),si=/([^-])([A-Z])/g,ci=m(function(t){return t.replace(si,"$1-$2").replace(si,"$1-$2").toLowerCase()}),ui=function(t,e,n){return!1},li=function(t){return t},di="data-server-rendered",fi=["component","directive","filter"],pi=["beforeCreate","created","beforeMount","mounted","beforeUpdate","updated","beforeDestroy","destroyed","activated","deactivated"],hi={optionMergeStrategies:Object.create(null),silent:!1,productionTip:!1,devtools:!1,performance:!1,errorHandler:null,warnHandler:null,ignoredElements:[],keyCodes:Object.create(null),isReservedTag:ui,isReservedAttr:ui,isUnknownElement:ui,getTagNamespace:w,parsePlatformTagName:li,mustUseProp:ui,_lifecycleHooks:pi},vi=Object.freeze({}),mi=/[^\w.$]/,yi=w,gi="__proto__"in{},bi="undefined"!=typeof window,_i=bi&&window.navigator.userAgent.toLowerCase(),wi=_i&&/msie|trident/.test(_i),ki=_i&&_i.indexOf("msie 9.0")>0,xi=_i&&_i.indexOf("edge/")>0,Ci=_i&&_i.indexOf("android")>0,$i=_i&&/iphone|ipad|ipod|ios/.test(_i),Di=_i&&/chrome\/\d+/.test(_i)&&!xi,Ai={}.watch,Si=!1;if(bi)try{var Oi={};Object.defineProperty(Oi,"passive",{get:function(){Si=!0}}),window.addEventListener("test-passive",null,Oi)}catch(t){}var Pi,Mi,Ti=function(){return void 0===Pi&&(Pi=!bi&&void 0!==t&&"server"===t.process.env.VUE_ENV),Pi},Vi=bi&&window.__VUE_DEVTOOLS_GLOBAL_HOOK__,Ei="undefined"!=typeof Symbol&&O(Symbol)&&"undefined"!=typeof Reflect&&O(Reflect.ownKeys),ji=function(){function t(){i=!1;var t=n.slice(0);n.length=0;for(var e=0;e<t.length;e++)t[e]()}var e,n=[],i=!1;if("undefined"!=typeof Promise&&O(Promise)){var r=Promise.resolve(),a=function(t){console.error(t)};e=function(){r.then(t).catch(a),$i&&setTimeout(w)}}else if("undefined"==typeof MutationObserver||!O(MutationObserver)&&"[object MutationObserverConstructor]"!==MutationObserver.toString())e=function(){setTimeout(t,0)};else{var o=1,s=new MutationObserver(t),c=document.createTextNode(String(o));s.observe(c,{characterData:!0}),e=function(){o=(o+1)%2,c.data=String(o)}}return function(t,r){var a;if(n.push(function(){if(t)try{t.call(r)}catch(t){S(t,r,"nextTick")}else a&&a(r)}),i||(i=!0,e()),!t&&"undefined"!=typeof Promise)return new Promise(function(t,e){a=t})}}();Mi="undefined"!=typeof Set&&O(Set)?Set:function(){function t(){this.set=Object.create(null)}return t.prototype.has=function(t){return!0===this.set[t]},t.prototype.add=function(t){this.set[t]=!0},t.prototype.clear=function(){this.set=Object.create(null)},t}();var Ii=0,Fi=function(){this.id=Ii++,this.subs=[]};Fi.prototype.addSub=function(t){this.subs.push(t)},Fi.prototype.removeSub=function(t){h(this.subs,t)},Fi.prototype.depend=function(){Fi.target&&Fi.target.addDep(this)},Fi.prototype.notify=function(){for(var t=this.subs.slice(),e=0,n=t.length;e<n;e++)t[e].update()},Fi.target=null;var Ni=[],Ri=Array.prototype,Bi=Object.create(Ri);["push","pop","shift","unshift","splice","sort","reverse"].forEach(function(t){var e=Ri[t];D(Bi,t,function(){for(var n=[],i=arguments.length;i--;)n[i]=arguments[i];var r,a=e.apply(this,n),o=this.__ob__;switch(t){case"push":case"unshift":r=n;break;case"splice":r=n.slice(2)}return r&&o.observeArray(r),o.dep.notify(),a})});var Li=Object.getOwnPropertyNames(Bi),zi={shouldConvert:!0},Hi=function(t){if(this.value=t,this.dep=new Fi,this.vmCount=0,D(t,"__ob__",this),Array.isArray(t)){(gi?T:V)(t,Bi,Li),this.observeArray(t)}else this.walk(t)};Hi.prototype.walk=function(t){for(var e=Object.keys(t),n=0;n<e.length;n++)j(t,e[n],t[e[n]])},Hi.prototype.observeArray=function(t){for(var e=0,n=t.length;e<n;e++)E(t[e])};var Yi=hi.optionMergeStrategies;Yi.data=function(t,e,n){return n?B(t,e,n):e&&"function"!=typeof e?t:B.call(this,t,e)},pi.forEach(function(t){Yi[t]=L}),fi.forEach(function(t){Yi[t+"s"]=z}),Yi.watch=function(t,e){if(t===Ai&&(t=void 0),e===Ai&&(e=void 0),!e)return Object.create(t||null);if(!t)return e;var n={};b(n,t);for(var i in e){var r=n[i],a=e[i];r&&!Array.isArray(r)&&(r=[r]),n[i]=r?r.concat(a):Array.isArray(a)?a:[a]}return n},Yi.props=Yi.methods=Yi.inject=Yi.computed=function(t,e){if(!t)return e;var n=Object.create(null);return b(n,t),e&&b(n,e),n},Yi.provide=B;var Ui=function(t,e){return void 0===e?t:e},Wi=function(t,e,n,i,r,a,o,s){this.tag=t,this.data=e,this.children=n,this.text=i,this.elm=r,this.ns=void 0,this.context=a,this.functionalContext=void 0,this.key=e&&e.key,this.componentOptions=o,this.componentInstance=void 0,this.parent=void 0,this.raw=!1,this.isStatic=!1,this.isRootInsert=!0,this.isComment=!1,this.isCloned=!1,this.isOnce=!1,this.asyncFactory=s,this.asyncMeta=void 0,this.isAsyncPlaceholder=!1},qi={child:{}};qi.child.get=function(){return this.componentInstance},Object.defineProperties(Wi.prototype,qi);var Ki,Ji=function(t){void 0===t&&(t="");var e=new Wi;return e.text=t,e.isComment=!0,e},Gi=m(function(t){var e="&"===t.charAt(0);t=e?t.slice(1):t;var n="~"===t.charAt(0);t=n?t.slice(1):t;var i="!"===t.charAt(0);return t=i?t.slice(1):t,{name:t,once:n,capture:i,passive:e}}),Xi=null,Qi=[],Zi=[],tr={},er=!1,nr=!1,ir=0,rr=0,ar=function(t,e,n,i){this.vm=t,t._watchers.push(this),i?(this.deep=!!i.deep,this.user=!!i.user,this.lazy=!!i.lazy,this.sync=!!i.sync):this.deep=this.user=this.lazy=this.sync=!1,this.cb=n,this.id=++rr,this.active=!0,this.dirty=this.lazy,this.deps=[],this.newDeps=[],this.depIds=new Mi,this.newDepIds=new Mi,this.expression="","function"==typeof e?this.getter=e:(this.getter=A(e),this.getter||(this.getter=function(){})),this.value=this.lazy?void 0:this.get()};ar.prototype.get=function(){P(this);var t,e=this.vm;try{t=this.getter.call(e,e)}catch(t){if(!this.user)throw t;S(t,e,'getter for watcher "'+this.expression+'"')}finally{this.deep&&Et(t),M(),this.cleanupDeps()}return t},ar.prototype.addDep=function(t){var e=t.id;this.newDepIds.has(e)||(this.newDepIds.add(e),this.newDeps.push(t),this.depIds.has(e)||t.addSub(this))},ar.prototype.cleanupDeps=function(){for(var t=this,e=this.deps.length;e--;){var n=t.deps[e];t.newDepIds.has(n.id)||n.removeSub(t)}var i=this.depIds;this.depIds=this.newDepIds,this.newDepIds=i,this.newDepIds.clear(),i=this.deps,this.deps=this.newDeps,this.newDeps=i,this.newDeps.length=0},ar.prototype.update=function(){this.lazy?this.dirty=!0:this.sync?this.run():Vt(this)},ar.prototype.run=function(){if(this.active){var t=this.get();if(t!==this.value||s(t)||this.deep){var e=this.value;if(this.value=t,this.user)try{this.cb.call(this.vm,t,e)}catch(t){S(t,this.vm,'callback for watcher "'+this.expression+'"')}else this.cb.call(this.vm,t,e)}}},ar.prototype.evaluate=function(){this.value=this.get(),this.dirty=!1},ar.prototype.depend=function(){for(var t=this,e=this.deps.length;e--;)t.deps[e].depend()},ar.prototype.teardown=function(){var t=this;if(this.active){this.vm._isBeingDestroyed||h(this.vm._watchers,this);for(var e=this.deps.length;e--;)t.deps[e].removeSub(t);this.active=!1}};var or=new Mi,sr={enumerable:!0,configurable:!0,get:w,set:w},cr={lazy:!0},ur={init:function(t,e,n,i){if(!t.componentInstance||t.componentInstance._isDestroyed){(t.componentInstance=Zt(t,Xi,n,i)).$mount(e?t.elm:void 0,e)}else if(t.data.keepAlive){var r=t;ur.prepatch(r,r)}},prepatch:function(t,e){var n=e.componentOptions;xt(e.componentInstance=t.componentInstance,n.propsData,n.listeners,e,n.children)},insert:function(t){var e=t.context,n=t.componentInstance;n._isMounted||(n._isMounted=!0,At(n,"mounted")),t.data.keepAlive&&(e._isMounted?Mt(n):$t(n,!0))},destroy:function(t){var e=t.componentInstance;e._isDestroyed||(t.data.keepAlive?Dt(e,!0):e.$destroy())}},lr=Object.keys(ur),dr=1,fr=2,pr=0;(function(t){t.prototype._init=function(t){var e=this;e._uid=pr++;e._isVue=!0,t&&t._isComponent?ye(e,t):e.$options=W(ge(e.constructor),t||{},e),e._renderProxy=e,e._self=e,wt(e),ht(e),me(e),At(e,"beforeCreate"),Kt(e),Ft(e),qt(e),At(e,"created"),e.$options.el&&e.$mount(e.$options.el)}})(we),function(t){var e={};e.get=function(){return this._data};var n={};n.get=function(){return this._props},Object.defineProperty(t.prototype,"$data",e),Object.defineProperty(t.prototype,"$props",n),t.prototype.$set=I,t.prototype.$delete=F,t.prototype.$watch=function(t,e,n){var i=this;if(c(e))return Wt(i,t,e,n);n=n||{},n.user=!0;var r=new ar(i,t,e,n);return n.immediate&&e.call(i,r.value),function(){r.teardown()}}}(we),function(t){var e=/^hook:/;t.prototype.$on=function(t,n){var i=this,r=this;if(Array.isArray(t))for(var a=0,o=t.length;a<o;a++)i.$on(t[a],n);else(r._events[t]||(r._events[t]=[])).push(n),e.test(t)&&(r._hasHookEvent=!0);return r},t.prototype.$once=function(t,e){function n(){i.$off(t,n),e.apply(i,arguments)}var i=this;return n.fn=e,i.$on(t,n),i},t.prototype.$off=function(t,e){var n=this,i=this;if(!arguments.length)return i._events=Object.create(null),i;if(Array.isArray(t)){for(var r=0,a=t.length;r<a;r++)n.$off(t[r],e);return i}var o=i._events[t];if(!o)return i;if(1===arguments.length)return i._events[t]=null,i;for(var s,c=o.length;c--;)if((s=o[c])===e||s.fn===e){o.splice(c,1);break}return i},t.prototype.$emit=function(t){var e=this,n=e._events[t];if(n){n=n.length>1?g(n):n;for(var i=g(arguments,1),r=0,a=n.length;r<a;r++)try{n[r].apply(e,i)}catch(n){S(n,e,'event handler for "'+t+'"')}}return e}}(we),function(t){t.prototype._update=function(t,e){var n=this;n._isMounted&&At(n,"beforeUpdate");var i=n.$el,r=n._vnode,a=Xi;Xi=n,n._vnode=t,r?n.$el=n.__patch__(r,t):(n.$el=n.__patch__(n.$el,t,e,!1,n.$options._parentElm,n.$options._refElm),n.$options._parentElm=n.$options._refElm=null),Xi=a,i&&(i.__vue__=null),n.$el&&(n.$el.__vue__=n),n.$vnode&&n.$parent&&n.$vnode===n.$parent._vnode&&(n.$parent.$el=n.$el)},t.prototype.$forceUpdate=function(){var t=this;t._watcher&&t._watcher.update()},t.prototype.$destroy=function(){var t=this;if(!t._isBeingDestroyed){At(t,"beforeDestroy"),t._isBeingDestroyed=!0;var e=t.$parent;!e||e._isBeingDestroyed||t.$options.abstract||h(e.$children,t),t._watcher&&t._watcher.teardown();for(var n=t._watchers.length;n--;)t._watchers[n].teardown();t._data.__ob__&&t._data.__ob__.vmCount--,t._isDestroyed=!0,t.__patch__(t._vnode,null),At(t,"destroyed"),t.$off(),t.$el&&(t.$el.__vue__=null)}}}(we),function(t){t.prototype.$nextTick=function(t){return ji(t,this)},t.prototype._render=function(){var t=this,e=t.$options,n=e.render,i=e.staticRenderFns,r=e._parentVnode;if(t._isMounted)for(var a in t.$slots)t.$slots[a]=tt(t.$slots[a]);t.$scopedSlots=r&&r.data.scopedSlots||vi,i&&!t._staticTrees&&(t._staticTrees=[]),t.$vnode=r;var o;try{o=n.call(t._renderProxy,t.$createElement)}catch(e){S(e,t,"render function"),o=t._vnode}return o instanceof Wi||(o=Ji()),o.parent=r,o},t.prototype._o=fe,t.prototype._n=f,t.prototype._s=d,t.prototype._l=oe,t.prototype._t=se,t.prototype._q=k,t.prototype._i=x,t.prototype._m=de,t.prototype._f=ce,t.prototype._k=ue,t.prototype._b=le,t.prototype._v=Q,t.prototype._e=Ji,t.prototype._u=_t,t.prototype._g=ve}(we);var hr=[String,RegExp,Array],vr={name:"keep-alive",abstract:!0,props:{include:hr,exclude:hr},created:function(){this.cache=Object.create(null)},destroyed:function(){var t=this;for(var e in t.cache)Me(t.cache[e])},watch:{include:function(t){Pe(this.cache,this._vnode,function(e){return Oe(t,e)})},exclude:function(t){Pe(this.cache,this._vnode,function(e){return!Oe(t,e)})}},render:function(){var t=pt(this.$slots.default),e=t&&t.componentOptions;if(e){var n=Se(e);if(n&&(this.include&&!Oe(this.include,n)||this.exclude&&Oe(this.exclude,n)))return t;var i=null==t.key?e.Ctor.cid+(e.tag?"::"+e.tag:""):t.key;this.cache[i]?t.componentInstance=this.cache[i].componentInstance:this.cache[i]=t,t.data.keepAlive=!0}return t}},mr={KeepAlive:vr};(function(t){var e={};e.get=function(){return hi},Object.defineProperty(t,"config",e),t.util={warn:yi,extend:b,mergeOptions:W,defineReactive:j},t.set=I,t.delete=F,t.nextTick=ji,t.options=Object.create(null),fi.forEach(function(e){t.options[e+"s"]=Object.create(null)}),t.options._base=t,b(t.options.components,mr),ke(t),xe(t),Ce(t),Ae(t)})(we),Object.defineProperty(we.prototype,"$isServer",{get:Ti}),Object.defineProperty(we.prototype,"$ssrContext",{get:function(){return this.$vnode&&this.$vnode.ssrContext}}),we.version="2.4.2";var yr,gr,br=p("style,class"),_r=p("input,textarea,option,select"),wr=function(t,e,n){return"value"===n&&_r(t)&&"button"!==e||"selected"===n&&"option"===t||"checked"===n&&"input"===t||"muted"===n&&"video"===t},kr=p("contenteditable,draggable,spellcheck"),xr=p("allowfullscreen,async,autofocus,autoplay,checked,compact,controls,declare,default,defaultchecked,defaultmuted,defaultselected,defer,disabled,enabled,formnovalidate,hidden,indeterminate,inert,ismap,itemscope,loop,multiple,muted,nohref,noresize,noshade,novalidate,nowrap,open,pauseonexit,readonly,required,reversed,scoped,seamless,selected,sortable,translate,truespeed,typemustmatch,visible"),Cr="http://www.w3.org/1999/xlink",$r=function(t){return":"===t.charAt(5)&&"xlink"===t.slice(0,5)},Dr=function(t){return $r(t)?t.slice(6,t.length):""},Ar=function(t){return null==t||!1===t},Sr={svg:"http://www.w3.org/2000/svg",math:"http://www.w3.org/1998/Math/MathML"},Or=p("html,body,base,head,link,meta,style,title,address,article,aside,footer,header,h1,h2,h3,h4,h5,h6,hgroup,nav,section,div,dd,dl,dt,figcaption,figure,picture,hr,img,li,main,ol,p,pre,ul,a,b,abbr,bdi,bdo,br,cite,code,data,dfn,em,i,kbd,mark,q,rp,rt,rtc,ruby,s,samp,small,span,strong,sub,sup,time,u,var,wbr,area,audio,map,track,video,embed,object,param,source,canvas,script,noscript,del,ins,caption,col,colgroup,table,thead,tbody,td,th,tr,button,datalist,fieldset,form,input,label,legend,meter,optgroup,option,output,progress,select,textarea,details,dialog,menu,menuitem,summary,content,element,shadow,template,blockquote,iframe,tfoot"),Pr=p("svg,animate,circle,clippath,cursor,defs,desc,ellipse,filter,font-face,foreignObject,g,glyph,image,line,marker,mask,missing-glyph,path,pattern,polygon,polyline,rect,switch,symbol,text,textpath,tspan,use,view",!0),Mr=function(t){return Or(t)||Pr(t)},Tr=Object.create(null),Vr=Object.freeze({createElement:ze,createElementNS:He,createTextNode:Ye,createComment:Ue,insertBefore:We,removeChild:qe,appendChild:Ke,parentNode:Je,nextSibling:Ge,tagName:Xe,setTextContent:Qe,setAttribute:Ze}),Er={create:function(t,e){tn(e)},update:function(t,e){t.data.ref!==e.data.ref&&(tn(t,!0),tn(e))},destroy:function(t){tn(t,!0)}},jr=new Wi("",{},[]),Ir=["create","activate","update","remove","destroy"],Fr={create:an,update:an,destroy:function(t){an(t,jr)}},Nr=Object.create(null),Rr=[Er,Fr],Br={create:ln,update:ln},Lr={create:fn,update:fn},zr="__r",Hr="__c",Yr={create:mn,update:mn},Ur={create:yn,update:yn},Wr=m(function(t){var e={},n=/;(?![^(]*\))/g,i=/:(.+)/;return t.split(n).forEach(function(t){if(t){var n=t.split(i);n.length>1&&(e[n[0].trim()]=n[1].trim())}}),e}),qr=/^--/,Kr=/\s*!important$/,Jr=function(t,e,n){if(qr.test(e))t.style.setProperty(e,n);else if(Kr.test(n))t.style.setProperty(e,n.replace(Kr,""),"important");else{var i=Xr(e);if(Array.isArray(n))for(var r=0,a=n.length;r<a;r++)t.style[i]=n[r];else t.style[i]=n}},Gr=["Webkit","Moz","ms"],Xr=m(function(t){if(gr=gr||document.createElement("div").style,"filter"!==(t=ai(t))&&t in gr)return t;for(var e=t.charAt(0).toUpperCase()+t.slice(1),n=0;n<Gr.length;n++){var i=Gr[n]+e;if(i in gr)return i}}),Qr={create:Cn,update:Cn},Zr=m(function(t){return{enterClass:t+"-enter",enterToClass:t+"-enter-to",enterActiveClass:t+"-enter-active",leaveClass:t+"-leave",leaveToClass:t+"-leave-to",leaveActiveClass:t+"-leave-active"}}),ta=bi&&!ki,ea="transition",na="animation",ia="transition",ra="transitionend",aa="animation",oa="animationend";ta&&(void 0===window.ontransitionend&&void 0!==window.onwebkittransitionend&&(ia="WebkitTransition",ra="webkitTransitionEnd"),void 0===window.onanimationend&&void 0!==window.onwebkitanimationend&&(aa="WebkitAnimation",oa="webkitAnimationEnd"));var sa=bi&&window.requestAnimationFrame?window.requestAnimationFrame.bind(window):setTimeout,ca=/\b(transform|all)(,|$)/,ua=bi?{create:Rn,activate:Rn,remove:function(t,e){!0!==t.data.show?In(t,e):e()}}:{},la=[Br,Lr,Yr,Ur,Qr,ua],da=la.concat(Rr),fa=function(t){function e(t){return new Wi(P.tagName(t).toLowerCase(),{},[],void 0,t)}function a(t,e){function n(){0==--n.listeners&&s(t)}return n.listeners=e,n}function s(t){var e=P.parentNode(t);i(e)&&P.removeChild(e,t)}function c(t,e,n,a,o){if(t.isRootInsert=!o,!u(t,e,n,a)){var s=t.data,c=t.children,l=t.tag;i(l)?(t.elm=t.ns?P.createElementNS(t.ns,l):P.createElement(l,t),y(t),h(t,c,e),i(s)&&m(t,e),f(n,t.elm,a)):r(t.isComment)?(t.elm=P.createComment(t.text),f(n,t.elm,a)):(t.elm=P.createTextNode(t.text),f(n,t.elm,a))}}function u(t,e,n,a){var o=t.data;if(i(o)){var s=i(t.componentInstance)&&o.keepAlive;if(i(o=o.hook)&&i(o=o.init)&&o(t,!1,n,a),i(t.componentInstance))return l(t,e),r(s)&&d(t,e,n,a),!0}}function l(t,e){i(t.data.pendingInsert)&&(e.push.apply(e,t.data.pendingInsert),t.data.pendingInsert=null),t.elm=t.componentInstance.$el,v(t)?(m(t,e),y(t)):(tn(t),e.push(t))}function d(t,e,n,r){for(var a,o=t;o.componentInstance;)if(o=o.componentInstance._vnode,i(a=o.data)&&i(a=a.transition)){for(a=0;a<S.activate.length;++a)S.activate[a](jr,o);e.push(o);break}f(n,t.elm,r)}function f(t,e,n){i(t)&&(i(n)?n.parentNode===t&&P.insertBefore(t,e,n):P.appendChild(t,e))}function h(t,e,n){if(Array.isArray(e))for(var i=0;i<e.length;++i)c(e[i],n,t.elm,null,!0);else o(t.text)&&P.appendChild(t.elm,P.createTextNode(t.text))}function v(t){for(;t.componentInstance;)t=t.componentInstance._vnode;return i(t.tag)}function m(t,e){for(var n=0;n<S.create.length;++n)S.create[n](jr,t);D=t.data.hook,i(D)&&(i(D.create)&&D.create(jr,t),i(D.insert)&&e.push(t))}function y(t){for(var e,n=t;n;)i(e=n.context)&&i(e=e.$options._scopeId)&&P.setAttribute(t.elm,e,""),n=n.parent;i(e=Xi)&&e!==t.context&&i(e=e.$options._scopeId)&&P.setAttribute(t.elm,e,"")}function g(t,e,n,i,r,a){for(;i<=r;++i)c(n[i],a,t,e)}function b(t){var e,n,r=t.data;if(i(r))for(i(e=r.hook)&&i(e=e.destroy)&&e(t),e=0;e<S.destroy.length;++e)S.destroy[e](t);if(i(e=t.children))for(n=0;n<t.children.length;++n)b(t.children[n])}function _(t,e,n,r){for(;n<=r;++n){var a=e[n];i(a)&&(i(a.tag)?(w(a),b(a)):s(a.elm))}}function w(t,e){if(i(e)||i(t.data)){var n,r=S.remove.length+1;for(i(e)?e.listeners+=r:e=a(t.elm,r),i(n=t.componentInstance)&&i(n=n._vnode)&&i(n.data)&&w(n,e),n=0;n<S.remove.length;++n)S.remove[n](t,e);i(n=t.data.hook)&&i(n=n.remove)?n(t,e):e()}else s(t.elm)}function k(t,e,r,a,o){for(var s,u,l,d,f=0,p=0,h=e.length-1,v=e[0],m=e[h],y=r.length-1,b=r[0],w=r[y],k=!o;f<=h&&p<=y;)n(v)?v=e[++f]:n(m)?m=e[--h]:en(v,b)?(x(v,b,a),v=e[++f],b=r[++p]):en(m,w)?(x(m,w,a),m=e[--h],w=r[--y]):en(v,w)?(x(v,w,a),k&&P.insertBefore(t,v.elm,P.nextSibling(m.elm)),v=e[++f],w=r[--y]):en(m,b)?(x(m,b,a),k&&P.insertBefore(t,m.elm,v.elm),m=e[--h],b=r[++p]):(n(s)&&(s=rn(e,f,h)),u=i(b.key)?s[b.key]:null,n(u)?(c(b,a,t,v.elm),b=r[++p]):(l=e[u],en(l,b)?(x(l,b,a),e[u]=void 0,k&&P.insertBefore(t,l.elm,v.elm),b=r[++p]):(c(b,a,t,v.elm),b=r[++p])));f>h?(d=n(r[y+1])?null:r[y+1].elm,g(t,d,r,p,y,a)):p>y&&_(t,e,f,h)}function x(t,e,a,o){if(t!==e){var s=e.elm=t.elm;if(r(t.isAsyncPlaceholder))return void(i(e.asyncFactory.resolved)?$(t.elm,e,a):e.isAsyncPlaceholder=!0);if(r(e.isStatic)&&r(t.isStatic)&&e.key===t.key&&(r(e.isCloned)||r(e.isOnce)))return void(e.componentInstance=t.componentInstance);var c,u=e.data;i(u)&&i(c=u.hook)&&i(c=c.prepatch)&&c(t,e);var l=t.children,d=e.children;if(i(u)&&v(e)){for(c=0;c<S.update.length;++c)S.update[c](t,e);i(c=u.hook)&&i(c=c.update)&&c(t,e)}n(e.text)?i(l)&&i(d)?l!==d&&k(s,l,d,a,o):i(d)?(i(t.text)&&P.setTextContent(s,""),g(s,null,d,0,d.length-1,a)):i(l)?_(s,l,0,l.length-1):i(t.text)&&P.setTextContent(s,""):t.text!==e.text&&P.setTextContent(s,e.text),i(u)&&i(c=u.hook)&&i(c=c.postpatch)&&c(t,e)}}function C(t,e,n){if(r(n)&&i(t.parent))t.parent.data.pendingInsert=e;else for(var a=0;a<e.length;++a)e[a].data.hook.insert(e[a])}function $(t,e,n){if(r(e.isComment)&&i(e.asyncFactory))return e.elm=t,e.isAsyncPlaceholder=!0,!0;e.elm=t;var a=e.tag,o=e.data,s=e.children;if(i(o)&&(i(D=o.hook)&&i(D=D.init)&&D(e,!0),i(D=e.componentInstance)))return l(e,n),!0;if(i(a)){if(i(s))if(t.hasChildNodes()){for(var c=!0,u=t.firstChild,d=0;d<s.length;d++){if(!u||!$(u,s[d],n)){c=!1;break}u=u.nextSibling}if(!c||u)return!1}else h(e,s,n);if(i(o))for(var f in o)if(!M(f)){m(e,n);break}}else t.data!==e.text&&(t.data=e.text);return!0}var D,A,S={},O=t.modules,P=t.nodeOps;for(D=0;D<Ir.length;++D)for(S[Ir[D]]=[],A=0;A<O.length;++A)i(O[A][Ir[D]])&&S[Ir[D]].push(O[A][Ir[D]]);var M=p("attrs,style,class,staticClass,staticStyle,key");return function(t,a,o,s,u,l){if(n(a))return void(i(t)&&b(t));var d=!1,f=[];if(n(t))d=!0,c(a,f,u,l);else{var p=i(t.nodeType);if(!p&&en(t,a))x(t,a,f,s);else{if(p){if(1===t.nodeType&&t.hasAttribute(di)&&(t.removeAttribute(di),o=!0),r(o)&&$(t,a,f))return C(a,f,!0),t;t=e(t)}var h=t.elm,m=P.parentNode(h);if(c(a,f,h._leaveCb?null:m,P.nextSibling(h)),i(a.parent)){for(var y=a.parent;y;)y.elm=a.elm,y=y.parent;if(v(a))for(var g=0;g<S.create.length;++g)S.create[g](jr,a.parent)}i(m)?_(m,[t],0,0):i(t.tag)&&b(t)}}return C(a,f,d),a.elm}}({nodeOps:Vr,modules:da}),pa=p("text,number,password,search,email,tel,url");ki&&document.addEventListener("selectionchange",function(){var t=document.activeElement;t&&t.vmodel&&Yn(t,"input")});var ha={inserted:function(t,e,n){if("select"===n.tag){var i=function(){Bn(t,e,n.context)};i(),(wi||xi)&&setTimeout(i,0),t._vOptions=[].map.call(t.options,Ln)}else("textarea"===n.tag||pa(t.type))&&(t._vModifiers=e.modifiers,e.modifiers.lazy||(t.addEventListener("change",Hn),Ci||(t.addEventListener("compositionstart",zn),t.addEventListener("compositionend",Hn)),ki&&(t.vmodel=!0)))},componentUpdated:function(t,e,n){if("select"===n.tag){Bn(t,e,n.context);var i=t._vOptions;(t._vOptions=[].map.call(t.options,Ln)).some(function(t,e){return!k(t,i[e])})&&Yn(t,"change")}}},va={bind:function(t,e,n){var i=e.value;n=Un(n);var r=n.data&&n.data.transition,a=t.__vOriginalDisplay="none"===t.style.display?"":t.style.display;i&&r?(n.data.show=!0,jn(n,function(){t.style.display=a})):t.style.display=i?a:"none"},update:function(t,e,n){var i=e.value;i!==e.oldValue&&(n=Un(n),n.data&&n.data.transition?(n.data.show=!0,i?jn(n,function(){t.style.display=t.__vOriginalDisplay}):In(n,function(){t.style.display="none"})):t.style.display=i?t.__vOriginalDisplay:"none")},unbind:function(t,e,n,i,r){r||(t.style.display=t.__vOriginalDisplay)}},ma={model:ha,show:va},ya={name:String,appear:Boolean,css:Boolean,mode:String,type:String,enterClass:String,leaveClass:String,enterToClass:String,leaveToClass:String,enterActiveClass:String,leaveActiveClass:String,appearClass:String,appearActiveClass:String,appearToClass:String,duration:[Number,String,Object]},ga={name:"transition",props:ya,abstract:!0,render:function(t){var e=this,n=this.$options._renderChildren;if(n&&(n=n.filter(function(t){return t.tag||Xn(t)}),n.length)){var i=this.mode,r=n[0];if(Jn(this.$vnode))return r;var a=Wn(r);if(!a)return r;if(this._leaving)return Kn(t,r);var s="__transition-"+this._uid+"-";a.key=null==a.key?a.isComment?s+"comment":s+a.tag:o(a.key)?0===String(a.key).indexOf(s)?a.key:s+a.key:a.key;var c=(a.data||(a.data={})).transition=qn(this),u=this._vnode,l=Wn(u);if(a.data.directives&&a.data.directives.some(function(t){return"show"===t.name})&&(a.data.show=!0),l&&l.data&&!Gn(a,l)&&!Xn(l)){var d=l&&(l.data.transition=b({},c));if("out-in"===i)return this._leaving=!0,it(d,"afterLeave",function(){e._leaving=!1,e.$forceUpdate()}),Kn(t,r);if("in-out"===i){if(Xn(a))return u;var f,p=function(){f()};it(c,"afterEnter",p),it(c,"enterCancelled",p),it(d,"delayLeave",function(t){f=t})}}return r}}},ba=b({tag:String,moveClass:String},ya);delete ba.mode;var _a={props:ba,render:function(t){for(var e=this.tag||this.$vnode.data.tag||"span",n=Object.create(null),i=this.prevChildren=this.children,r=this.$slots.default||[],a=this.children=[],o=qn(this),s=0;s<r.length;s++){var c=r[s];if(c.tag)if(null!=c.key&&0!==String(c.key).indexOf("__vlist"))a.push(c),n[c.key]=c,(c.data||(c.data={})).transition=o;else;}if(i){for(var u=[],l=[],d=0;d<i.length;d++){var f=i[d];f.data.transition=o,f.data.pos=f.elm.getBoundingClientRect(),n[f.key]?u.push(f):l.push(f)}this.kept=t(e,null,u),this.removed=l}return t(e,null,a)},beforeUpdate:function(){this.__patch__(this._vnode,this.kept,!1,!0),this._vnode=this.kept},updated:function(){var t=this.prevChildren,e=this.moveClass||(this.name||"v")+"-move";if(t.length&&this.hasMove(t[0].elm,e)){t.forEach(Qn),t.forEach(Zn),t.forEach(ti);var n=document.body;n.offsetHeight;t.forEach(function(t){if(t.data.moved){var n=t.elm,i=n.style;On(n,e),i.transform=i.WebkitTransform=i.transitionDuration="",n.addEventListener(ra,n._moveCb=function t(i){i&&!/transform$/.test(i.propertyName)||(n.removeEventListener(ra,t),n._moveCb=null,Pn(n,e))})}})}},methods:{hasMove:function(t,e){if(!ta)return!1;if(this._hasMove)return this._hasMove;var n=t.cloneNode();t._transitionClasses&&t._transitionClasses.forEach(function(t){Dn(n,t)}),$n(n,e),n.style.display="none",this.$el.appendChild(n);var i=Tn(n);return this.$el.removeChild(n),this._hasMove=i.hasTransform}}},wa={Transition:ga,TransitionGroup:_a};we.config.mustUseProp=wr,we.config.isReservedTag=Mr,we.config.isReservedAttr=br,we.config.getTagNamespace=Re,we.config.isUnknownElement=Be,b(we.options.directives,ma),b(we.options.components,wa),we.prototype.__patch__=bi?fa:w,we.prototype.$mount=function(t,e){return t=t&&bi?Le(t):void 0,kt(this,t,e)},setTimeout(function(){hi.devtools&&Vi&&Vi.emit("init",we)},0),e.a=we}).call(e,n(62))},function(t,e){t.exports=function(t){return"object"==typeof t?null!==t:"function"==typeof t}},function(t,e){e.f={}.propertyIsEnumerable},function(t,e){var n=0,i=Math.random();t.exports=function(t){return"Symbol(".concat(void 0===t?"":t,")_",(++n+i).toString(36))}},function(t,e,n){"use strict";var i=n(163),r=n.n(i);e.a=r.a},function(t,e,n){"use strict";function i(t,e){return e.split(".").reduce(function(t,e){return t[e]},t)}function r(t,e,n){if(t){if(!n||"function"!=typeof n)return t.indexOf(e);for(var i=0;i<t.length;i++)if(n(t[i],e))return i}return-1}e.b=i,e.a=r,n.d(e,"c",function(){return a});var a={Android:function(){return"undefined"!=typeof window&&window.navigator.userAgent.match(/Android/i)},BlackBerry:function(){return"undefined"!=typeof window&&window.navigator.userAgent.match(/BlackBerry/i)},iOS:function(){return"undefined"!=typeof window&&window.navigator.userAgent.match(/iPhone|iPad|iPod/i)},Opera:function(){return"undefined"!=typeof window&&window.navigator.userAgent.match(/Opera Mini/i)},Windows:function(){return"undefined"!=typeof window&&window.navigator.userAgent.match(/IEMobile/i)},any:function(){return a.Android()||a.BlackBerry()||a.iOS()||a.Opera()||a.Windows()}}},function(t,e){var n={}.toString;t.exports=function(t){return n.call(t).slice(8,-1)}},function(t,e){t.exports=function(t){if(void 0==t)throw TypeError("Can't call method on  "+t);return t}},function(t,e){t.exports="constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf".split(",")},function(t,e){t.exports=!0},function(t,e){e.f=Object.getOwnPropertySymbols},function(t,e,n){var i=n(7).f,r=n(9),a=n(1)("toStringTag");t.exports=function(t,e,n){t&&!r(t=n?t:t.prototype,a)&&i(t,a,{configurable:!0,value:e})}},function(t,e,n){var i=n(34)("keys"),r=n(24);t.exports=function(t){return i[t]||(i[t]=r(t))}},function(t,e,n){var i=n(6),r=i["__core-js_shared__"]||(i["__core-js_shared__"]={});t.exports=function(t){return r[t]||(r[t]={})}},function(t,e){var n=Math.ceil,i=Math.floor;t.exports=function(t){return isNaN(t=+t)?0:(t>0?i:n)(t)}},function(t,e,n){var i=n(28);t.exports=function(t){return Object(i(t))}},function(t,e,n){var i=n(22);t.exports=function(t,e){if(!i(t))return t;var n,r;if(e&&"function"==typeof(n=t.toString)&&!i(r=n.call(t)))return r;if("function"==typeof(n=t.valueOf)&&!i(r=n.call(t)))return r;if(!e&&"function"==typeof(n=t.toString)&&!i(r=n.call(t)))return r;throw TypeError("Can't convert object to primitive value")}},function(t,e,n){var i=n(6),r=n(5),a=n(30),o=n(39),s=n(7).f;t.exports=function(t){var e=r.Symbol||(r.Symbol=a?{}:i.Symbol||{});"_"==t.charAt(0)||t in e||s(e,t,{value:o.f(t)})}},function(t,e,n){e.f=n(1)},function(t,e,n){"use strict";var i=n(142)(!0);n(53)(String,"String",function(t){this._t=String(t),this._i=0},function(){var t,e=this._t,n=this._i;return n>=e.length?{value:void 0,done:!0}:(t=i(e,n),this._i+=t.length,{value:t,done:!1})})},function(t,e,n){"use strict";var i=n(154),r=n.n(i);n.d(e,"a",function(){return r.a})},function(t,e,n){"use strict";var i=n(159),r=n.n(i),a=n(160),o=n.n(a);n.d(e,"a",function(){return r.a}),n.d(e,"b",function(){return o.a})},function(t,e,n){"use strict";var i=n(161),r=n.n(i);e.a=r.a},function(t,e,n){"use strict";var i=n(168),r=n.n(i);e.a=r.a},function(t,e,n){"use strict";var i=n(172),r=n.n(i);e.a=r.a},function(t,e,n){"use strict";var i=n(4),r=n.n(i),a=n(2);e.a={components:r()({},a.a.name,a.a),props:{active:{type:Boolean,default:!0},title:String,closable:{type:Boolean,default:!0},type:String,hasIcon:Boolean,size:String},data:function(){return{isActive:this.active}},watch:{active:function(t){this.isActive=t}},computed:{icon:function(){switch(this.type){case"is-info":return"info";case"is-success":return"check_circle";case"is-warning":return"warning";case"is-danger":return"error";default:return null}}},methods:{close:function(){this.isActive=!1,this.$emit("close"),this.$emit("update:active",!1)}}}},function(t,e,n){"use strict";var i=n(3);e.a={props:{type:{type:String,default:"is-dark"},message:String,duration:Number,position:{type:String,default:"is-top",validator:function(t){return["is-top-right","is-top","is-top-left","is-bottom-right","is-bottom","is-bottom-left"].indexOf(t)>-1}},container:String},data:function(){return{isActive:!1,parent:null,newContainer:this.container||i.b.defaultContainerElement}},computed:{transition:function(){switch(this.position){case"is-top-right":case"is-top":case"is-top-left":return{enter:"fadeInDown",leave:"fadeOutUp"};case"is-bottom-right":case"is-bottom":case"is-bottom-left":return{enter:"fadeInUp",leave:"fadeOutDown"}}}},methods:{hasChild:function(t){return null!==t&&t.childElementCount>0},close:function(){var t=this;clearTimeout(this.timer),this.isActive=!1,setTimeout(function(){t.$destroy(),t.$el.remove()},150)},show:function(){var t=this;if(this.hasChild(this.parent))return void setTimeout(function(){return t.show()},250);this.insertEl(),this.isActive=!0,this.timer=setTimeout(function(){return t.close()},this.newDuration)},init:function(){var t=void 0;t=document.querySelector(".notices");var e=null!==document.querySelector(this.newContainer)?document.querySelector(this.newContainer):document.body;t||(t=document.createElement("div")),this.parent=t,this.newContainer&&(t.style.position="absolute"),e.appendChild(t)}},beforeMount:function(){this.init()},mounted:function(){this.show()}}},function(t,e,n){t.exports={default:n(117),__esModule:!0}},function(t,e,n){var i=n(122);t.exports=function(t,e,n){if(i(t),void 0===e)return t;switch(n){case 1:return function(n){return t.call(e,n)};case 2:return function(n,i){return t.call(e,n,i)};case 3:return function(n,i,r){return t.call(e,n,i,r)}}return function(){return t.apply(e,arguments)}}},function(t,e,n){var i=n(22),r=n(6).document,a=i(r)&&i(r.createElement);t.exports=function(t){return a?r.createElement(t):{}}},function(t,e,n){t.exports=!n(8)&&!n(17)(function(){return 7!=Object.defineProperty(n(50)("div"),"a",{get:function(){return 7}}).a})},function(t,e,n){var i=n(27);t.exports=Object("z").propertyIsEnumerable(0)?Object:function(t){return"String"==i(t)?t.split(""):Object(t)}},function(t,e,n){"use strict";var i=n(30),r=n(16),a=n(57),o=n(14),s=n(9),c=n(18),u=n(132),l=n(32),d=n(141),f=n(1)("iterator"),p=!([].keys&&"next"in[].keys()),h=function(){return this};t.exports=function(t,e,n,v,m,y,g){u(n,e,v);var b,_,w,k=function(t){if(!p&&t in D)return D[t];switch(t){case"keys":case"values":return function(){return new n(this,t)}}return function(){return new n(this,t)}},x=e+" Iterator",C="values"==m,$=!1,D=t.prototype,A=D[f]||D["@@iterator"]||m&&D[m],S=A||k(m),O=m?C?k("entries"):S:void 0,P="Array"==e?D.entries||A:A;if(P&&(w=d(P.call(new t)))!==Object.prototype&&(l(w,x,!0),i||s(w,f)||o(w,f,h)),C&&A&&"values"!==A.name&&($=!0,S=function(){return A.call(this)}),i&&!g||!p&&!$&&D[f]||o(D,f,S),c[e]=S,c[x]=h,m)if(b={values:C?S:k("values"),keys:y?S:k("keys"),entries:O},g)for(_ in b)_ in D||a(D,_,b[_]);else r(r.P+r.F*(p||$),e,b);return b}},function(t,e,n){var i=n(13),r=n(138),a=n(29),o=n(33)("IE_PROTO"),s=function(){},c=function(){var t,e=n(50)("iframe"),i=a.length;for(e.style.display="none",n(128).appendChild(e),e.src="javascript:",t=e.contentWindow.document,t.open(),t.write("<script>document.F=Object<\/script>"),t.close(),c=t.F;i--;)delete c.prototype[a[i]];return c()};t.exports=Object.create||function(t,e){var n;return null!==t?(s.prototype=i(t),n=new s,s.prototype=null,n[o]=t):n=c(),void 0===e?n:r(n,e)}},function(t,e,n){var i=n(56),r=n(29).concat("length","prototype");e.f=Object.getOwnPropertyNames||function(t){return i(t,r)}},function(t,e,n){var i=n(9),r=n(10),a=n(124)(!1),o=n(33)("IE_PROTO");t.exports=function(t,e){var n,s=r(t),c=0,u=[];for(n in s)n!=o&&i(s,n)&&u.push(n);for(;e.length>c;)i(s,n=e[c++])&&(~a(u,n)||u.push(n));return u}},function(t,e,n){t.exports=n(14)},function(t,e,n){var i=n(35),r=Math.min;t.exports=function(t){return t>0?r(i(t),9007199254740991):0}},function(t,e,n){var i=n(125),r=n(1)("iterator"),a=n(18);t.exports=n(5).getIteratorMethod=function(t){if(void 0!=t)return t[r]||t["@@iterator"]||a[i(t)]}},function(t,e,n){n(146);for(var i=n(6),r=n(14),a=n(18),o=n(1)("toStringTag"),s=["NodeList","DOMTokenList","MediaList","StyleSheetList","CSSRuleList"],c=0;c<5;c++){var u=s[c],l=i[u],d=l&&l.prototype;d&&!d[o]&&r(d,o,u),a[u]=a.Array}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(11),r=n.n(i),a=n(41),o=n(42),s=n(102),c=n(105),u=n(106),l=n(107),d=n(94),f=n(95),p=n(43),h=n(2),v=n(25),m=n(98),y=n(100),g=n(44),b=n(101),_=n(45),w=n(104),k=n(109),x=n(110),C=n(96),$=n(97),D=n(99),A=n(103),S=n(108),O=n(3);n.d(e,"Dialog",function(){return C.a}),n.d(e,"LoadingProgrammatic",function(){return $.b}),n.d(e,"ModalProgrammatic",function(){return D.b}),n.d(e,"Snackbar",function(){return A.a}),n.d(e,"Toast",function(){return S.a});var P={Autocomplete:d.a,Checkbox:a.a,Datepicker:f.a,Dropdown:o.a,DropdownItem:o.b,Field:p.a,Icon:h.a,Input:v.a,Loading:$.a,Message:m.a,Modal:D.a,Notification:y.a,Pagination:g.a,Panel:b.a,Radio:s.a,RadioButton:s.b,Select:_.a,Switch:w.a,TabItem:u.a,Table:c.a,TableColumn:c.b,Tabs:u.b,Tag:l.a,Taglist:l.b,Tooltip:k.a,Upload:x.a};P.install=function(t){var e=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};n.i(O.a)(r()(O.b,e));for(var i in P){var a=P[i];a&&"install"!==i&&t.component(a.name,a)}t.prototype.$dialog=C.a,t.prototype.$loading=$.b,t.prototype.$modal=D.b,t.prototype.$snackbar=A.a,t.prototype.$toast=S.a},e.default=P},function(t,e){var n;n=function(){return this}();try{n=n||Function("return this")()||(0,eval)("this")}catch(t){"object"==typeof window&&(n=window)}t.exports=n},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(115),r=n.n(i),a=n(48),o=n.n(a),s=n(4),c=n.n(s),u=n(26),l=n(15),d=n(25);e.default={name:"bAutocomplete",inheritAttrs:!1,mixins:[l.a],components:c()({},d.a.name,d.a),props:{value:[Number,String],data:Array,field:{type:String,default:"value"},maxResults:{type:[Number,String],default:6},keepFirst:Boolean},data:function(){return{selected:null,hovered:null,isActive:!1,newValue:this.value,isListInViewportVertically:!0,_isAutocomplete:!0,_elementRef:"input"}},computed:{whiteList:function(){var t=[];if(t.push(this.$refs.input),t.push(this.$refs.dropdown),void 0!==this.$refs.dropdown){var e=this.$refs.dropdown.querySelectorAll("*"),n=!0,i=!1,r=void 0;try{for(var a,s=o()(e);!(n=(a=s.next()).done);n=!0){var c=a.value;t.push(c)}}catch(t){i=!0,r=t}finally{try{!n&&s.return&&s.return()}finally{if(i)throw r}}}return t},visibleData:function(){return this.data.length<=this.maxResults?this.data:this.data.slice(0,this.maxResults)},hasDefaultSlot:function(){return!!this.$scopedSlots.default},hasEmptySlot:function(){return!!this.$slots.empty}},watch:{isActive:function(t){var e=this;t?this.calcDropdownInViewportVertical():(this.$nextTick(function(){return e.setHovered(null)}),setTimeout(function(){e.calcDropdownInViewportVertical()},100))},newValue:function(t){var e=this;this.$emit("input",t),this.getValue(this.selected)!==t&&this.setSelected(null,!1),this.keepFirst&&this.visibleData.length&&this.$nextTick(function(){e.hovered!==e.visibleData[0]&&e.setHovered(e.visibleData[0])}),this.isActive=!!t},value:function(t){this.newValue=t,!this.isValid&&this.$refs.input.checkHtml5Validity()}},methods:{setHovered:function(t){void 0!==t&&(this.hovered=t)},setSelected:function(t){var e=this,n=!(arguments.length>1&&void 0!==arguments[1])||arguments[1];void 0!==t&&(this.selected=t,this.$emit("select",this.selected),null!==this.selected&&(this.newValue=this.getValue(this.selected)),n&&this.$nextTick(function(){e.isActive=!1}))},enterPressed:function(){null!==this.hovered&&this.setSelected(this.hovered)},clickedOutside:function(t){this.whiteList.indexOf(t.target)<0&&(this.isActive=!1)},getValue:function(t){var e=arguments.length>1&&void 0!==arguments[1]&&arguments[1];if(t){var i="object"===(void 0===t?"undefined":r()(t))?n.i(u.b)(t,this.field):t,a=new RegExp("("+this.newValue+")","gi");return e?i.replace(a,"<b>$1</b>"):i}},calcDropdownInViewportVertical:function(){var t=this;this.$nextTick(function(){var e=t.$refs.dropdown.getBoundingClientRect();t.isListInViewportVertically=e.top>=0&&e.bottom<=(window.innerHeight||document.documentElement.clientHeight)})},keyArrows:function(t){var e="down"===t?1:-1;if(this.isActive){var n=this.visibleData.indexOf(this.hovered)+e;n=n>this.visibleData.length-1?0:n,n=n<0?this.visibleData.length-1:n,this.setHovered(this.visibleData[n])}else this.isActive=!0},focused:function(t){this.getValue(this.selected)===this.newValue&&this.focus(),this.$emit("focus",t)}},created:function(){"undefined"!=typeof window&&(document.addEventListener("click",this.clickedOutside),window.addEventListener("resize",this.calcDropdownInViewportVertical))},beforeDestroy:function(){"undefined"!=typeof window&&(document.removeEventListener("click",this.clickedOutside),window.removeEventListener("resize",this.calcDropdownInViewportVertical))}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(12),r=n.n(i);e.default={name:"bCheckbox",props:{value:{},nativeValue:{},disabled:Boolean,name:String,trueValue:{type:[String,Number,Boolean,Function,Object,Array,r.a],default:!0},falseValue:{type:[String,Number,Boolean,Function,Object,Array,r.a],default:!1}},data:function(){return{newValue:this.value}},watch:{value:function(t){this.newValue=t},newValue:function(t){this.$emit("input",t)}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i,r=n(4),a=n.n(r),o=n(15),s=n(26),c=n(3),u=n(42),l=n(25),d=n(43),f=n(45),p=n(2),h=n(156),v=n.n(h);e.default={name:"bDatepicker",inheritAttrs:!1,mixins:[o.a],components:(i={},a()(i,v.a.name,v.a),a()(i,l.a.name,l.a),a()(i,d.a.name,d.a),a()(i,f.a.name,f.a),a()(i,p.a.name,p.a),a()(i,u.a.name,u.a),a()(i,u.b.name,u.b),i),props:{value:Date,dayNames:{type:Array,default:function(){return["Su","M","Tu","W","Th","F","S"]}},monthNames:{type:Array,default:function(){return["January","February","March","April","May","June","July","August","September","October","November","December"]}},firstDayOfWeek:{type:Number,default:0},inline:Boolean,minDate:Date,maxDate:Date,focusedDate:Date,placeholder:String,readonly:{type:Boolean,default:!0},disabled:{type:Boolean,default:!1},dateFormatter:{type:Function,default:function(t){return"function"==typeof c.b.defaultDateFormatter?c.b.defaultDateFormatter(t):t.toLocaleDateString()}},dateParser:{type:Function,default:function(t){return"function"==typeof c.b.defaultDateParser?c.b.defaultDateParser(t):new Date(Date.parse(t))}}},data:function(){var t=this.value||this.focusedDate||new Date;return{dateSelected:this.value,focusedDateData:{month:t.getMonth(),year:t.getFullYear()},_elementRef:"input",_isDatepicker:!0}},computed:{listOfYears:function(){for(var t=this.maxDate?this.maxDate.getFullYear():(new Date).getFullYear()+3,e=this.minDate?this.minDate.getFullYear():1900,n=[],i=e;i<=t;i++)n.push(i);return n.reverse()},isFirstMonth:function(){return!!this.minDate&&new Date(this.focusedDateData.year,this.focusedDateData.month)<=new Date(this.minDate.getFullYear(),this.minDate.getMonth())},isLastMonth:function(){return!!this.maxDate&&new Date(this.focusedDateData.year,this.focusedDateData.month)>=new Date(this.maxDate.getFullYear(),this.maxDate.getMonth())},isMobile:function(){return s.c.any()}},watch:{dateSelected:function(t){var e=t||new Date;this.focusedDateData={month:e.getMonth(),year:e.getFullYear()},this.$emit("input",t),this.$refs.dropdown&&(this.$refs.dropdown.isActive=!1)},value:function(t){this.dateSelected=t,!this.isValid&&this.$refs.input.checkHtml5Validity()}},methods:{updateSelectedDate:function(t){this.dateSelected=t},onChange:function(t){var e=this.dateParser(t);e&&!isNaN(e)?this.dateSelected=e:(this.dateSelected=null,this.$refs.input.newValue=this.dateSelected)},formatValue:function(t){return t&&!isNaN(t)?this.dateFormatter(t):null},decrementMonth:function(){this.focusedDateData.month>0?this.focusedDateData.month-=1:(this.focusedDateData.month=11,this.focusedDateData.year-=1)},incrementMonth:function(){this.focusedDateData.month<11?this.focusedDateData.month+=1:(this.focusedDateData.month=0,this.focusedDateData.year+=1)},nameOfMonth:function(t){for(var e={},n=0;n<this.monthNames.length;n++)e[n]=this.monthNames[n];return e[t]},formatYYYYMMDD:function(t){if(t&&!isNaN(new Date(t))){var e=new Date(t),n=e.getFullYear(),i=e.getMonth()+1,r=e.getDate();return n+"-"+(i<10?"0":"")+i+"-"+(r<10?"0":"")+r}return""},onChangeNativePicker:function(t){var e=t.target.value;this.dateSelected=e?new Date(e):null}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(157),r=n.n(i);e.default={name:"bDatepickerTable",components:{bDatepickerTableRow:r.a},props:{value:Date,dayNames:Array,monthNames:Array,firstDayOfWeek:Number,minDate:Date,maxDate:Date,focused:Object},computed:{visibleDayNames:function(){for(var t=[],e=this.firstDayOfWeek;t.length<this.dayNames.length;){var n=this.dayNames[e%this.dayNames.length];t.push(n),e++}return t}},methods:{updateSelectedDate:function(t){this.$emit("input",t)},nameOfMonth:function(t){for(var e={},n=0;n<this.monthNames.length;n++)e[n]=this.monthNames[n];return e[t]},weekBuilder:function(t,e,n){for(var i=new Date(n,e),r=[],a=new Date(n,e,t).getDay(),o=a>=this.firstDayOfWeek?a-this.firstDayOfWeek:7-this.firstDayOfWeek+a,s=1,c=0;c<o;c++)r.unshift(new Date(i.getFullYear(),i.getMonth(),t-s)),s++;r.push(new Date(n,e,t));for(var u=1;r.length<7;)r.push(new Date(n,e,t+u)),u++;return r},weeksInThisMonth:function(t,e){for(var n=[],i=new Date(e,t+1,0).getDate(),r=1;r<=i+6;){var a=this.weekBuilder(r,t,e),o=!1;a.forEach(function(e){e.getMonth()===t&&(o=!0)}),o&&n.push(a),r+=7}return n}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default={name:"bDatepickerTableRow",props:{selectedDate:Date,week:{type:Array,required:!0},month:{type:Number,required:!0},minDate:Date,maxDate:Date},methods:{selectableDate:function(t){var e=[];return this.minDate&&e.push(t>=this.minDate),this.maxDate&&e.push(t<=this.maxDate),e.push(t.getMonth()===this.month),!e.includes(!1)},emitChosenDate:function(t){this.selectableDate(t)&&this.$emit("select",t)},classObject:function(t){function e(t,e){return!(!t||!e)&&(t.getDate()===e.getDate()&&t.getFullYear()===e.getFullYear()&&t.getMonth()===e.getMonth())}return{"is-selected":e(t,this.selectedDate),"is-today":e(t,new Date),"is-selectable":this.selectableDate(t),"is-unselectable":!this.selectableDate(t)}}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(4),r=n.n(i),a=n(2);e.default={components:r()({},a.a.name,a.a),props:{title:String,message:String,hasIcon:Boolean,type:{type:String,default:"is-primary"},confirmText:{type:String,default:"OK"},cancelText:{type:String,default:"Cancel"},animation:{type:String,default:"zoom-out"},canCancel:{type:Boolean,default:!0},hasInput:Boolean,inputPlaceholder:String,inputName:String,inputMaxlength:[Number,String],onConfirm:{type:Function,default:function(){}},onCancel:{type:Function,default:function(){}}},data:function(){return{isActive:!1,prompt:"",validationMessage:""}},computed:{icon:function(){switch(this.type){case"is-info":return"info";case"is-success":return"check_circle";case"is-warning":return"warning";case"is-danger":return"error";default:return null}}},watch:{isActive:function(){if("undefined"!=typeof window){var t=this.isActive?"add":"remove";document.documentElement.classList[t]("is-clipped")}}},methods:{confirm:function(){var t=this;if(void 0!==this.$refs.input&&!this.$refs.input.checkValidity())return this.validationMessage=this.$refs.input.validationMessage,void this.$nextTick(function(){return t.$refs.input.select()});this.onConfirm(this.prompt),this.close()},cancel:function(){this.canCancel&&(this.onCancel(),this.close())},close:function(){var t=this;this.isActive=!1,setTimeout(function(){t.$destroy(),t.$el.remove()},150)},keyPress:function(t){27===t.keyCode&&this.cancel()}},created:function(){"undefined"!=typeof window&&document.addEventListener("keyup",this.keyPress)},beforeMount:function(){document.body.appendChild(this.$el)},mounted:function(){var t=this;this.isActive=!0,this.$nextTick(function(){t.hasInput?t.$refs.input.focus():t.$refs.confirmButton.focus()})},beforeDestroy:function(){"undefined"!=typeof window&&document.removeEventListener("keyup",this.keyPress)}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(48),r=n.n(i),a=n(12),o=n.n(a);e.default={name:"bDropdown",props:{value:{type:[String,Number,Boolean,Object,Array,o.a,Function],default:null},disabled:Boolean,hoverable:Boolean,inline:Boolean,position:{type:String,validator:function(t){return["is-top-right","is-top-left","is-bottom-left"].indexOf(t)>-1}}},data:function(){return{selected:this.value,isActive:!1,_isDropdown:!0}},watch:{value:function(t){this.selectItem(t)},isActive:function(t){this.$emit("active-change",t)}},computed:{whiteList:function(){var t=[];if(t.push(this.$refs.dropdownMenu),t.push(this.$refs.trigger),void 0!==this.$refs.dropdownMenu){var e=this.$refs.dropdownMenu.querySelectorAll("*"),n=!0,i=!1,a=void 0;try{for(var o,s=r()(e);!(n=(o=s.next()).done);n=!0){var c=o.value;t.push(c)}}catch(t){i=!0,a=t}finally{try{!n&&s.return&&s.return()}finally{if(i)throw a}}}if(void 0!==this.$refs.trigger){var u=this.$refs.trigger.querySelectorAll("*"),l=!0,d=!1,f=void 0;try{for(var p,h=r()(u);!(l=(p=h.next()).done);l=!0){var v=p.value;t.push(v)}}catch(t){d=!0,f=t}finally{try{!l&&h.return&&h.return()}finally{if(d)throw f}}}return t}},methods:{selectItem:function(t){this.selected=t,this.$emit("input",t),this.$emit("change",t),this.isActive=!1},clickedOutside:function(t){this.inline||this.whiteList.indexOf(t.target)<0&&(this.isActive=!1)},toggle:function(){this.disabled||this.hoverable||(this.isActive=!this.isActive)}},created:function(){"undefined"!=typeof window&&document.addEventListener("click",this.clickedOutside)},beforeDestroy:function(){"undefined"!=typeof window&&document.removeEventListener("click",this.clickedOutside)}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(12),r=n.n(i);e.default={name:"bDropdownItem",props:{value:{type:[String,Number,Boolean,Object,Array,r.a,Function],default:null},separator:Boolean,disabled:Boolean,custom:Boolean,paddingless:Boolean,hasLink:Boolean},computed:{isClickable:function(){return!this.separator&&!this.disabled&&!this.custom}},methods:{selectItem:function(){this.isClickable&&(this.$parent.selectItem(this.value),this.$emit("click"))}},created:function(){if(!this.$parent.$data._isDropdown)throw this.$destroy(),new Error("You should wrap bDropdownItem on a bDropdown")}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default={name:"bField",props:{type:String,label:String,message:[String,Array],grouped:Boolean,groupMultiline:Boolean,position:String,expanded:Boolean,addons:{type:Boolean,default:!0}},data:function(){return{newType:this.type,newMessage:this.message,_isField:!0}},watch:{type:function(t){this.newType=t},message:function(t){this.newMessage=t}},computed:{newPosition:function(){if(void 0!==this.position){var t=this.position.split("-");if(!(t.length<1)){var e=this.grouped?"is-grouped-":"has-addons-";return this.position?e+t[1]:void 0}}},fieldType:function(){return this.grouped?"is-grouped":void 0!==this.$slots.default&&this.$slots.default.length>1&&this.addons?"has-addons":void 0},formattedMessage:function(){return this.newMessage&&Array.isArray(this.newMessage)?this.newMessage.filter(function(t){if(t)return t}).join(" <br> "):this.newMessage}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(3);e.default={name:"bIcon",props:{type:String,pack:String,icon:String,both:Boolean,size:String},data:function(){return{newPack:this.pack||i.b.defaultIconPack}},computed:{newIcon:function(){return this.both?"mdi"===this.newPack?this.icon:this.equivalentIconOf(this.icon):this.icon}},methods:{equivalentIconOf:function(t){switch(t){case"done":return"check";case"info":return"info-circle";case"check_circle":return"check-circle";case"warning":return"exclamation-triangle";case"error":return"exclamation-circle";case"arrow_upward":return"arrow-up";case"chevron_right":return"angle-right";case"chevron_left":return"angle-left";case"keyboard_arrow_down":return"angle-down";case"visibility":return"eye";case"visibility_off":return"eye-slash";case"arrow_drop_down":return"caret-down";case"arrow_drop_up":return"caret-up";default:return null}}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(4),r=n.n(i),a=n(2),o=n(3),s=n(15);e.default={name:"bInput",inheritAttrs:!1,mixins:[s.a],components:r()({},a.a.name,a.a),props:{value:[Number,String],type:{type:String,default:"text"},passwordReveal:Boolean,hasCounter:{type:Boolean,default:!0}},data:function(){return{newValue:this.value,newType:this.type,newAutocomplete:this.autocomplete||o.b.defaultInputAutocomplete,isPasswordVisible:!1,_elementRef:"textarea"===this.type?"textarea":"input"}},computed:{hasIconRight:function(){return this.passwordReveal||this.loading||this.statusType},iconPosition:function(){return this.icon&&this.hasIconRight?"has-icons-left has-icons-right":!this.icon&&this.hasIconRight?"has-icons-right":this.icon?"has-icons-left":void 0},statusTypeIcon:function(){switch(this.statusType){case"is-success":return"done";case"is-danger":return"error";case"is-info":return"info";case"is-warning":return"warning"}},hasMessage:function(){return this.$parent.$data._isField&&this.$parent.newMessage},passwordVisibleIcon:function(){return this.isPasswordVisible?"visibility_off":"visibility"},valueLength:function(){return this.newValue?this.newValue.length:0}},watch:{value:function(t){this.newValue=t,!this.isValid&&this.checkHtml5Validity()}},methods:{input:function(t){var e=t.target.value;this.newValue=e,this.$emit("input",e),!this.isValid&&this.checkHtml5Validity()},togglePasswordVisibility:function(){var t=this;this.isPasswordVisible=!this.isPasswordVisible,this.newType=this.isPasswordVisible?"text":"password",this.$nextTick(function(){t.$refs.input.focus()})}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default={name:"bLoading",props:{active:Boolean,programmatic:Boolean,animation:{type:String,default:"fade"},canCancel:{type:Boolean,default:!1},onCancel:{type:Function,default:function(){}}},data:function(){return{isActive:this.active||!1}},watch:{active:function(t){this.isActive=t}},methods:{cancel:function(){this.canCancel&&this.close()},close:function(){var t=this;this.onCancel.apply(null,arguments),this.$emit("close"),this.$emit("update:active",!1),this.programmatic&&(this.isActive=!1,setTimeout(function(){t.$destroy(),t.$el.remove()},150))},keyPress:function(t){27===t.keyCode&&this.cancel()}},created:function(){"undefined"!=typeof window&&document.addEventListener("keyup",this.keyPress)},beforeMount:function(){this.programmatic&&document.body.appendChild(this.$el)},mounted:function(){this.programmatic&&(this.isActive=!0)},beforeDestroy:function(){"undefined"!=typeof window&&document.removeEventListener("keyup",this.keyPress)}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(46);e.default={name:"bMessage",mixins:[i.a]}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default={name:"bModal",props:{active:Boolean,component:Object,content:String,programmatic:Boolean,props:Object,width:{type:[String,Number],default:960},hasModalCard:Boolean,animation:{type:String,default:"zoom-out"},canCancel:{type:[Array,Boolean],default:["escape","x","outside"]},onCancel:{type:Function,default:function(){}}},data:function(){return{isActive:this.active||!1,newWidth:"number"==typeof this.width?this.width+"px":this.width}},computed:{cancelOptions:function(){return"boolean"==typeof this.canCancel?this.canCancel?["escape","x","outside"]:[]:this.canCancel},showX:function(){return this.cancelOptions.includes("x")}},watch:{active:function(t){this.isActive=t},isActive:function(){if("undefined"!=typeof window){var t=this.isActive?"add":"remove";document.documentElement.classList[t]("is-clipped")}}},methods:{cancel:function(t){this.cancelOptions.includes(t)&&this.close()},close:function(){var t=this;this.onCancel.apply(null,arguments),this.$emit("close"),this.$emit("update:active",!1),this.programmatic&&(this.isActive=!1,setTimeout(function(){t.$destroy(),t.$el.remove()},150))},keyPress:function(t){27===t.keyCode&&this.cancel("escape")}},created:function(){"undefined"!=typeof window&&document.addEventListener("keyup",this.keyPress)},beforeMount:function(){this.programmatic&&document.body.appendChild(this.$el)},mounted:function(){this.programmatic&&(this.isActive=!0)},beforeDestroy:function(){"undefined"!=typeof window&&document.removeEventListener("keyup",this.keyPress)}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(46);e.default={name:"bNotification",mixins:[i.a]}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(4),r=n.n(i),a=n(2);e.default={name:"bPagination",components:r()({},a.a.name,a.a),props:{total:[Number,String],perPage:{type:[Number,String],default:20},current:{type:[Number,String],default:1},size:String,simple:Boolean,order:String},computed:{pageCount:function(){return Math.ceil(this.total/this.perPage)},firstItem:function(){var t=this.current*this.perPage-this.perPage+1;return t>=0?t:0},hasPrev:function(){return this.current>1},hasFirst:function(){return this.current>=3},hasFirstEllipsis:function(){return this.current>=4},hasLast:function(){return this.current<=this.pageCount-2},hasLastEllipsis:function(){return this.current<this.pageCount-2&&this.current<=this.pageCount-3},hasNext:function(){return this.current<this.pageCount},pagesInRange:function(){var t=this;if(!this.simple){for(var e=Math.max(1,this.current-1),n=Math.min(this.current+1,this.pageCount),i=[],r=e;r<=n;r++)(function(e){i.push({number:e,isCurrent:t.current===e,click:function(){t.$emit("change",e),t.$emit("update:current",e)}})})(r);return i}}},watch:{pageCount:function(t){this.current>t&&this.last()}},methods:{prev:function(){this.hasPrev&&(this.$emit("change",this.current-1),this.$emit("update:current",this.current-1))},first:function(){this.$emit("change",1),this.$emit("update:current",1)},last:function(){this.$emit("change",this.pageCount),this.$emit("update:current",this.pageCount)},next:function(){this.hasNext&&(this.$emit("change",this.current+1),this.$emit("update:current",this.current+1))}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default={name:"bPanel",props:{collapsible:{type:Boolean,default:!1},open:{type:Boolean,default:!0},hasCustomTemplate:{type:Boolean,default:!1},header:String,content:String,animation:{type:String,default:"fade"}},data:function(){return{isOpen:this.open}},watch:{open:function(t){this.isOpen=t}},methods:{toggle:function(){this.collapsible&&(this.isOpen=!this.isOpen,this.$emit("update:open",this.isOpen),this.isOpen?this.$emit("open"):this.$emit("close"))}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default={name:"bRadio",props:{value:{},nativeValue:{},disabled:Boolean,name:String},data:function(){return{newValue:this.value}},watch:{value:function(t){this.newValue=t},newValue:function(t){t===this.nativeValue&&this.$emit("input",t)}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default={name:"bRadioButton",props:{value:{},nativeValue:{},type:{type:String,default:"is-primary"},disabled:Boolean,name:String},data:function(){return{newValue:this.value,size:null}},watch:{value:function(t){this.newValue=t},newValue:function(t){t===this.nativeValue&&this.$emit("input",t)}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(12),r=n.n(i),a=n(15);e.default={name:"bSelect",inheritAttrs:!1,mixins:[a.a],props:{value:{type:[String,Number,Boolean,Object,Array,r.a,Function],default:null},placeholder:String,multiple:Boolean,nativeSize:[String,Number]},data:function(){return{selected:this.value,_elementRef:"select"}},watch:{value:function(t){this.selected=t,!this.isValid&&this.checkHtml5Validity()},selected:function(t){this.$emit("input",t),!this.isValid&&this.checkHtml5Validity()}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(3),r=n(47);e.default={mixins:[r.a],props:{actionText:{type:String,default:"OK"},onAction:{type:Function,default:function(){}}},data:function(){return{newDuration:this.duration||i.b.defaultSnackbarDuration}},methods:{insertEl:function(){this.parent.className="",this.parent.classList.add("notices",this.position),this.parent.appendChild(this.$el)},action:function(){this.onAction(),this.close()}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(12),r=n.n(i);e.default={name:"bSwitch",props:{value:{},nativeValue:{},disabled:Boolean,type:String,name:String,size:String,trueValue:{type:[String,Number,Boolean,Function,Object,Array,r.a],default:!0},falseValue:{type:[String,Number,Boolean,Function,Object,Array,r.a],default:!1}},data:function(){return{newValue:this.value,isMouseDown:!1}},watch:{value:function(t){this.newValue=t},newValue:function(t){this.$emit("input",t)}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i,r=n(114),a=n.n(r),o=n(4),s=n.n(o),c=n(26),u=n(44),l=n(2),d=n(41);e.default={name:"bTable",components:(i={},s()(i,u.a.name,u.a),s()(i,l.a.name,l.a),s()(i,d.a.name,d.a),i),props:{data:{type:Array,default:function(){return[]}},bordered:Boolean,striped:Boolean,narrowed:Boolean,loading:Boolean,detailed:Boolean,checkable:Boolean,selected:Object,customIsChecked:Function,checkedRows:{type:Array,default:function(){return[]}},mobileCards:{type:Boolean,default:!0},defaultSort:[String,Array],defaultSortDirection:{type:String,default:"asc"},paginated:Boolean,perPage:{type:[Number,String],default:20},paginationSimple:Boolean,backendSorting:Boolean,rowClass:{type:Function,default:function(){return""}},backendPagination:Boolean,total:{type:[Number,String],default:0}},data:function(){return{columns:[],visibleDetailRows:[],newData:this.data,newDataTotal:this.backendPagination?this.total:this.data.length,newCheckedRows:[].concat(a()(this.checkedRows)),currentSortColumn:{},isAsc:!0,mobileSort:{},currentPage:1,firstTimeSort:!0,_isTable:!0}},watch:{data:function(t){var e=this,n=this.columns;this.columns=[],this.newData=t,this.$nextTick(function(){e.columns.length||(e.columns=n)}),this.backendSorting||this.sort(this.currentSortColumn,!0),this.backendPagination||(this.newDataTotal=t.length)},total:function(t){this.backendPagination&&(this.newDataTotal=t)},mobileSort:function(t){this.currentSortColumn!==t&&this.sort(t)},currentSortColumn:function(t){this.mobileSort=t},checkedRows:function(t){this.newCheckedRows=[].concat(a()(t))},columns:function(t){t.length&&this.firstTimeSort&&(this.initSort(),this.firstTimeSort=!1)}},computed:{visibleData:function(){if(!this.paginated)return this.newData;var t=this.currentPage,e=this.perPage;if(this.newData.length<=e)return this.newData;var n=(t-1)*e,i=parseInt(n,10)+parseInt(e,10);return this.newData.slice(n,i)},isAllChecked:function(){var t=this;return!this.visibleData.some(function(e){return n.i(c.a)(t.checkedRows,e,t.customIsChecked)<0})},hasSortableColumns:function(){return this.columns.some(function(t){return t.sortable})},columnCount:function(){var t=this.columns.length;return t+=this.checkable?1:0,t+=this.detailed?1:0}},methods:{sortBy:function(t,e,i,r){return i&&"function"==typeof i?[].concat(a()(t)).sort(i):[].concat(a()(t)).sort(function(t,i){var a=n.i(c.b)(t,e),o=n.i(c.b)(i,e);return a||0===a?o||0===o?a===o?0:(a="string"==typeof a?a.toUpperCase():a,o="string"==typeof o?o.toUpperCase():o,r?a>o?1:-1:a>o?-1:1):-1:1})},sort:function(t){var e=arguments.length>1&&void 0!==arguments[1]&&arguments[1];t&&t.sortable&&(e||(this.isAsc=t===this.currentSortColumn?!this.isAsc:this.isAsc="desc"!==this.defaultSortDirection.toLowerCase()),this.firstTimeSort||this.$emit("sort",t.field,this.isAsc?"asc":"desc"),this.backendSorting||(this.newData=this.sortBy(this.newData,t.field,t.customSort,this.isAsc)),this.currentSortColumn=t)},isRowChecked:function(t){return n.i(c.a)(this.checkedRows,t,this.customIsChecked)>=0},removeCheckedRow:function(t){var e=n.i(c.a)(this.newCheckedRows,t,this.customIsChecked);e>=0&&this.newCheckedRows.splice(e,1)},checkAll:function(){var t=this,e=this.isAllChecked;this.visibleData.forEach(function(n){t.removeCheckedRow(n),e||t.newCheckedRows.push(n)}),this.$emit("check",this.newCheckedRows),this.$emit("check-all",this.newCheckedRows),this.$emit("update:checkedRows",this.newCheckedRows)},checkRow:function(t){this.isRowChecked(t)?this.removeCheckedRow(t):this.newCheckedRows.push(t),this.$emit("check",this.newCheckedRows,t),this.$emit("update:checkedRows",this.newCheckedRows)},selectRow:function(t,e){this.$emit("click",t),this.selected!==t&&(this.$emit("select",t,this.selected),this.$emit("update:selected",t))},pageChanged:function(t){this.currentPage=t>0?t:1,this.$emit("page-change",this.currentPage)},toggleDetails:function(t){if(this.isVisibleDetailRow(t)){var e=this.visibleDetailRows.indexOf(t);return this.visibleDetailRows.splice(e,1),void this.$emit("details-close",t)}this.visibleDetailRows.push(t),this.$emit("details-open",t)},isVisibleDetailRow:function(t){return this.visibleDetailRows.indexOf(t)>=0},initSort:function(){var t=this;if(this.defaultSort){var e="",n=this.defaultSortDirection;Array.isArray(this.defaultSort)?(e=this.defaultSort[0],this.defaultSort[1]&&(n=this.defaultSort[1])):e=this.defaultSort,this.columns.forEach(function(i){i.field===e&&(t.isAsc="desc"!==n.toLowerCase(),t.sort(i,!0))})}}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default={name:"bTableColumn",props:{label:String,customKey:[String,Number],field:String,meta:{},width:[Number,String],numeric:Boolean,centered:Boolean,sortable:Boolean,visible:{type:Boolean,default:!0},customSort:Function},data:function(){return{newKey:this.customKey||this.label}},created:function(){var t=this;if(!this.$parent.$data._isTable)throw this.$destroy(),new Error("You should wrap bTableColumn on a bTable");!this.$parent.columns.some(function(e){return e.newKey===t.newKey})&&this.$parent.columns.push(this)}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default={name:"bTabItem",props:{label:String,icon:String,iconPack:String},data:function(){return{isActive:!1,transitionName:null}},methods:{activate:function(t,e){this.$parent.animated?this.transitionName=e<t?"slide-next":"slide-prev":this.transitionName=null,this.isActive=!0},deactivate:function(t,e){this.$parent.animated?this.transitionName=e<t?"slide-next":"slide-prev":this.transitionName=null,this.isActive=!1}},created:function(){if(!this.$parent.$data._isTabs)throw this.$destroy(),new Error("You should wrap bTabItem on a bTabs");this.$parent.tabItems.push(this)},beforeDestroy:function(){var t=this.$parent.tabItems.indexOf(this);t>=0&&this.$parent.tabItems.splice(t,1)}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(4),r=n.n(i),a=n(2);e.default={name:"bTabs",components:r()({},a.a.name,a.a),props:{value:[String,Number],expanded:Boolean,type:String,size:String,position:String,animated:{type:Boolean,default:!0}},data:function(){return{newValue:this.value||0,tabItems:[],contentHeight:0,_isTabs:!0}},watch:{value:function(t){this.changeTab(this.newValue,t),this.newValue=t},tabItems:function(){this.tabItems.length&&(this.tabItems[this.newValue].isActive=!0)}},methods:{changeTab:function(t,e){t!==e&&(this.tabItems[t].deactivate(t,e),this.tabItems[e].activate(t,e))},tabClick:function(t){this.$emit("input",t),this.$emit("change",t),this.changeTab(this.newValue,t),this.newValue=t}},mounted:function(){this.tabItems.length&&(this.tabItems[this.newValue].isActive=!0)}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default={name:"bTag",props:{attached:Boolean,closable:Boolean,type:String,size:String,rounded:Boolean},methods:{close:function(){this.$emit("close")}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default={name:"bTaglist",props:{attached:Boolean}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(3),r=n(47);e.default={mixins:[r.a],data:function(){return{newDuration:this.duration||i.b.defaultToastDuration}},methods:{insertEl:function(){this.parent.className="",this.parent.classList.add("notices","is-toast",this.position),this.parent.appendChild(this.$el)}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(3);e.default={name:"bTooltip",props:{active:{type:Boolean,default:!0},type:String,label:String,position:{type:String,default:"is-top",validator:function(t){return["is-top","is-bottom","is-left","is-right"].indexOf(t)>-1}},always:Boolean,animated:Boolean,square:Boolean,dashed:Boolean,multilined:Boolean,size:{type:String,default:"is-medium"}},data:function(){return{newType:this.type||i.b.defaultTooltipType,newAnimated:this.animated||i.b.defaultTooltipAnimated}}}},function(t,e,n){"use strict";Object.defineProperty(e,"__esModule",{value:!0});var i=n(15);e.default={name:"bUpload",mixins:[i.a],props:{value:{type:Array,default:function(){return[]}},multiple:Boolean,disabled:Boolean,dragDrop:Boolean,type:{type:String,default:"is-primary"}},data:function(){return{newValue:this.value||[],dragDropFocus:!1,_elementRef:"input"}},watch:{value:function(t){this.newValue=t,!this.isValid&&!this.dragDrop&&this.checkHtml5Validity()}},methods:{onFileChange:function(t){if(!this.disabled&&!this.loading){this.dragDrop&&this.updateDragDropFocus(!1);var e=t.target.files||t.dataTransfer.files;if(e&&e.length){if(!this.multiple)if(this.dragDrop){if(1!==e.length)return!1;this.newValue=[]}else this.newValue=[];for(var n=0;n<e.length;n++)this.newValue.push(e[n])}this.$emit("input",this.newValue),!this.dragDrop&&this.checkHtml5Validity()}},updateDragDropFocus:function(t){this.disabled||this.loading||(this.dragDropFocus=t)}}}},function(t,e,n){"use strict";var i=n(153),r=n.n(i);e.a=r.a},function(t,e,n){"use strict";var i=n(155),r=n.n(i);e.a=r.a},function(t,e,n){"use strict";function i(t){return new(o.a.extend(c.a))({el:document.createElement("div"),propsData:t})}var r=n(11),a=n.n(r),o=n(21),s=n(158),c=n.n(s);e.a={alert:function(t){var e=void 0;"string"==typeof t&&(e=t);var n={canCancel:!1,message:e};return i(a()(n,t))},confirm:function(t){var e={};return i(a()(e,t))},prompt:function(t){var e={hasInput:!0,confirmText:"Done"};return i(a()(e,t))}}},function(t,e,n){"use strict";var i=n(11),r=n.n(i),a=n(21),o=n(164),s=n.n(o);n.d(e,"a",function(){return s.a}),e.b={open:function(t){var e={programmatic:!0},n=r()(e,t);return new(a.a.extend(s.a))({el:document.createElement("div"),propsData:n})}}},function(t,e,n){"use strict";var i=n(165),r=n.n(i);e.a=r.a},function(t,e,n){"use strict";var i=n(11),r=n.n(i),a=n(21),o=n(166),s=n.n(o);n.d(e,"a",function(){return s.a}),e.b={open:function(t){var e=void 0;"string"==typeof t&&(e=t);var n={programmatic:!0,content:e},i=r()(n,t);return new(a.a.extend(s.a))({el:document.createElement("div"),propsData:i})}}},function(t,e,n){"use strict";var i=n(167),r=n.n(i);e.a=r.a},function(t,e,n){"use strict";var i=n(169),r=n.n(i);e.a=r.a},function(t,e,n){"use strict";var i=n(170),r=n.n(i),a=n(171),o=n.n(a);n.d(e,"a",function(){return r.a}),n.d(e,"b",function(){return o.a})},function(t,e,n){"use strict";var i=n(11),r=n.n(i),a=n(21),o=n(173),s=n.n(o);e.a={open:function(t){var e=void 0;"string"==typeof t&&(e=t);var n={type:"is-success",position:"is-bottom-right",message:e},i=r()(n,t);return new(a.a.extend(s.a))({el:document.createElement("div"),propsData:i})}}},function(t,e,n){"use strict";var i=n(174),r=n.n(i);e.a=r.a},function(t,e,n){"use strict";var i=n(175),r=n.n(i),a=n(176),o=n.n(a);n.d(e,"a",function(){return r.a}),n.d(e,"b",function(){return o.a})},function(t,e,n){"use strict";var i=n(178),r=n.n(i),a=n(177),o=n.n(a);n.d(e,"b",function(){return r.a}),n.d(e,"a",function(){return o.a})},function(t,e,n){"use strict";var i=n(179),r=n.n(i),a=n(180),o=n.n(a);n.d(e,"a",function(){return r.a}),n.d(e,"b",function(){return o.a})},function(t,e,n){"use strict";var i=n(11),r=n.n(i),a=n(21),o=n(181),s=n.n(o);e.a={open:function(t){var e=void 0;"string"==typeof t&&(e=t);var n={message:e},i=r()(n,t);return new(a.a.extend(s.a))({el:document.createElement("div"),propsData:i})}}},function(t,e,n){"use strict";var i=n(182),r=n.n(i);e.a=r.a},function(t,e,n){"use strict";var i=n(183),r=n.n(i);e.a=r.a},function(t,e,n){t.exports={default:n(116),__esModule:!0}},function(t,e,n){t.exports={default:n(119),__esModule:!0}},function(t,e,n){t.exports={default:n(121),__esModule:!0}},function(t,e,n){"use strict";e.__esModule=!0;var i=n(111),r=function(t){return t&&t.__esModule?t:{default:t}}(i);e.default=function(t){if(Array.isArray(t)){for(var e=0,n=Array(t.length);e<t.length;e++)n[e]=t[e];return n}return(0,r.default)(t)}},function(t,e,n){"use strict";function i(t){return t&&t.__esModule?t:{default:t}}e.__esModule=!0;var r=n(113),a=i(r),o=n(12),s=i(o),c="function"==typeof s.default&&"symbol"==typeof a.default?function(t){return typeof t}:function(t){return t&&"function"==typeof s.default&&t.constructor===s.default&&t!==s.default.prototype?"symbol":typeof t};e.default="function"==typeof s.default&&"symbol"===c(a.default)?function(t){return void 0===t?"undefined":c(t)}:function(t){return t&&"function"==typeof s.default&&t.constructor===s.default&&t!==s.default.prototype?"symbol":void 0===t?"undefined":c(t)}},function(t,e,n){n(40),n(145),t.exports=n(5).Array.from},function(t,e,n){n(60),n(40),t.exports=n(144)},function(t,e,n){n(147),t.exports=n(5).Object.assign},function(t,e,n){n(148);var i=n(5).Object;t.exports=function(t,e,n){return i.defineProperty(t,e,n)}},function(t,e,n){n(150),n(149),n(151),n(152),t.exports=n(5).Symbol},function(t,e,n){n(40),n(60),t.exports=n(39).f("iterator")},function(t,e){t.exports=function(t){if("function"!=typeof t)throw TypeError(t+" is not a function!");return t}},function(t,e){t.exports=function(){}},function(t,e,n){var i=n(10),r=n(58),a=n(143);t.exports=function(t){return function(e,n,o){var s,c=i(e),u=r(c.length),l=a(o,u);if(t&&n!=n){for(;u>l;)if((s=c[l++])!=s)return!0}else for(;u>l;l++)if((t||l in c)&&c[l]===n)return t||l||0;return!t&&-1}}},function(t,e,n){var i=n(27),r=n(1)("toStringTag"),a="Arguments"==i(function(){return arguments}()),o=function(t,e){try{return t[e]}catch(t){}};t.exports=function(t){var e,n,s;return void 0===t?"Undefined":null===t?"Null":"string"==typeof(n=o(e=Object(t),r))?n:a?i(e):"Object"==(s=i(e))&&"function"==typeof e.callee?"Arguments":s}},function(t,e,n){"use strict";var i=n(7),r=n(20);t.exports=function(t,e,n){e in t?i.f(t,e,r(0,n)):t[e]=n}},function(t,e,n){var i=n(19),r=n(31),a=n(23);t.exports=function(t){var e=i(t),n=r.f;if(n)for(var o,s=n(t),c=a.f,u=0;s.length>u;)c.call(t,o=s[u++])&&e.push(o);return e}},function(t,e,n){t.exports=n(6).document&&document.documentElement},function(t,e,n){var i=n(18),r=n(1)("iterator"),a=Array.prototype;t.exports=function(t){return void 0!==t&&(i.Array===t||a[r]===t)}},function(t,e,n){var i=n(27);t.exports=Array.isArray||function(t){return"Array"==i(t)}},function(t,e,n){var i=n(13);t.exports=function(t,e,n,r){try{return r?e(i(n)[0],n[1]):e(n)}catch(e){var a=t.return;throw void 0!==a&&i(a.call(t)),e}}},function(t,e,n){"use strict";var i=n(54),r=n(20),a=n(32),o={};n(14)(o,n(1)("iterator"),function(){return this}),t.exports=function(t,e,n){t.prototype=i(o,{next:r(1,n)}),a(t,e+" Iterator")}},function(t,e,n){var i=n(1)("iterator"),r=!1;try{var a=[7][i]();a.return=function(){r=!0},Array.from(a,function(){throw 2})}catch(t){}t.exports=function(t,e){if(!e&&!r)return!1;var n=!1;try{var a=[7],o=a[i]();o.next=function(){return{done:n=!0}},a[i]=function(){return o},t(a)}catch(t){}return n}},function(t,e){t.exports=function(t,e){return{value:e,done:!!t}}},function(t,e,n){var i=n(19),r=n(10);t.exports=function(t,e){for(var n,a=r(t),o=i(a),s=o.length,c=0;s>c;)if(a[n=o[c++]]===e)return n}},function(t,e,n){var i=n(24)("meta"),r=n(22),a=n(9),o=n(7).f,s=0,c=Object.isExtensible||function(){return!0},u=!n(17)(function(){return c(Object.preventExtensions({}))}),l=function(t){o(t,i,{value:{i:"O"+ ++s,w:{}}})},d=function(t,e){if(!r(t))return"symbol"==typeof t?t:("string"==typeof t?"S":"P")+t;if(!a(t,i)){if(!c(t))return"F";if(!e)return"E";l(t)}return t[i].i},f=function(t,e){if(!a(t,i)){if(!c(t))return!0;if(!e)return!1;l(t)}return t[i].w},p=function(t){return u&&h.NEED&&c(t)&&!a(t,i)&&l(t),t},h=t.exports={KEY:i,NEED:!1,fastKey:d,getWeak:f,onFreeze:p}},function(t,e,n){"use strict";var i=n(19),r=n(31),a=n(23),o=n(36),s=n(52),c=Object.assign;t.exports=!c||n(17)(function(){var t={},e={},n=Symbol(),i="abcdefghijklmnopqrst";return t[n]=7,i.split("").forEach(function(t){e[t]=t}),7!=c({},t)[n]||Object.keys(c({},e)).join("")!=i})?function(t,e){for(var n=o(t),c=arguments.length,u=1,l=r.f,d=a.f;c>u;)for(var f,p=s(arguments[u++]),h=l?i(p).concat(l(p)):i(p),v=h.length,m=0;v>m;)d.call(p,f=h[m++])&&(n[f]=p[f]);return n}:c},function(t,e,n){var i=n(7),r=n(13),a=n(19);t.exports=n(8)?Object.defineProperties:function(t,e){r(t);for(var n,o=a(e),s=o.length,c=0;s>c;)i.f(t,n=o[c++],e[n]);return t}},function(t,e,n){var i=n(23),r=n(20),a=n(10),o=n(37),s=n(9),c=n(51),u=Object.getOwnPropertyDescriptor;e.f=n(8)?u:function(t,e){if(t=a(t),e=o(e,!0),c)try{return u(t,e)}catch(t){}if(s(t,e))return r(!i.f.call(t,e),t[e])}},function(t,e,n){var i=n(10),r=n(55).f,a={}.toString,o="object"==typeof window&&window&&Object.getOwnPropertyNames?Object.getOwnPropertyNames(window):[],s=function(t){try{return r(t)}catch(t){return o.slice()}};t.exports.f=function(t){return o&&"[object Window]"==a.call(t)?s(t):r(i(t))}},function(t,e,n){var i=n(9),r=n(36),a=n(33)("IE_PROTO"),o=Object.prototype;t.exports=Object.getPrototypeOf||function(t){return t=r(t),i(t,a)?t[a]:"function"==typeof t.constructor&&t instanceof t.constructor?t.constructor.prototype:t instanceof Object?o:null}},function(t,e,n){var i=n(35),r=n(28);t.exports=function(t){return function(e,n){var a,o,s=String(r(e)),c=i(n),u=s.length;return c<0||c>=u?t?"":void 0:(a=s.charCodeAt(c),a<55296||a>56319||c+1===u||(o=s.charCodeAt(c+1))<56320||o>57343?t?s.charAt(c):a:t?s.slice(c,c+2):o-56320+(a-55296<<10)+65536)}}},function(t,e,n){var i=n(35),r=Math.max,a=Math.min;t.exports=function(t,e){return t=i(t),t<0?r(t+e,0):a(t,e)}},function(t,e,n){var i=n(13),r=n(59);t.exports=n(5).getIterator=function(t){var e=r(t);if("function"!=typeof e)throw TypeError(t+" is not iterable!");return i(e.call(t))}},function(t,e,n){"use strict";var i=n(49),r=n(16),a=n(36),o=n(131),s=n(129),c=n(58),u=n(126),l=n(59);r(r.S+r.F*!n(133)(function(t){Array.from(t)}),"Array",{from:function(t){var e,n,r,d,f=a(t),p="function"==typeof this?this:Array,h=arguments.length,v=h>1?arguments[1]:void 0,m=void 0!==v,y=0,g=l(f);if(m&&(v=i(v,h>2?arguments[2]:void 0,2)),void 0==g||p==Array&&s(g))for(e=c(f.length),n=new p(e);e>y;y++)u(n,y,m?v(f[y],y):f[y]);else for(d=g.call(f),n=new p;!(r=d.next()).done;y++)u(n,y,m?o(d,v,[r.value,y],!0):r.value);return n.length=y,n}})},function(t,e,n){"use strict";var i=n(123),r=n(134),a=n(18),o=n(10);t.exports=n(53)(Array,"Array",function(t,e){this._t=o(t),this._i=0,this._k=e},function(){var t=this._t,e=this._k,n=this._i++;return!t||n>=t.length?(this._t=void 0,r(1)):"keys"==e?r(0,n):"values"==e?r(0,t[n]):r(0,[n,t[n]])},"values"),a.Arguments=a.Array,i("keys"),i("values"),i("entries")},function(t,e,n){var i=n(16);i(i.S+i.F,"Object",{assign:n(137)})},function(t,e,n){var i=n(16);i(i.S+i.F*!n(8),"Object",{defineProperty:n(7).f})},function(t,e){},function(t,e,n){"use strict";var i=n(6),r=n(9),a=n(8),o=n(16),s=n(57),c=n(136).KEY,u=n(17),l=n(34),d=n(32),f=n(24),p=n(1),h=n(39),v=n(38),m=n(135),y=n(127),g=n(130),b=n(13),_=n(10),w=n(37),k=n(20),x=n(54),C=n(140),$=n(139),D=n(7),A=n(19),S=$.f,O=D.f,P=C.f,M=i.Symbol,T=i.JSON,V=T&&T.stringify,E=p("_hidden"),j=p("toPrimitive"),I={}.propertyIsEnumerable,F=l("symbol-registry"),N=l("symbols"),R=l("op-symbols"),B=Object.prototype,L="function"==typeof M,z=i.QObject,H=!z||!z.prototype||!z.prototype.findChild,Y=a&&u(function(){return 7!=x(O({},"a",{get:function(){return O(this,"a",{value:7}).a}})).a})?function(t,e,n){var i=S(B,e);i&&delete B[e],O(t,e,n),i&&t!==B&&O(B,e,i)}:O,U=function(t){var e=N[t]=x(M.prototype);return e._k=t,e},W=L&&"symbol"==typeof M.iterator?function(t){return"symbol"==typeof t}:function(t){return t instanceof M},q=function(t,e,n){return t===B&&q(R,e,n),b(t),e=w(e,!0),b(n),r(N,e)?(n.enumerable?(r(t,E)&&t[E][e]&&(t[E][e]=!1),n=x(n,{enumerable:k(0,!1)})):(r(t,E)||O(t,E,k(1,{})),t[E][e]=!0),Y(t,e,n)):O(t,e,n)},K=function(t,e){b(t);for(var n,i=y(e=_(e)),r=0,a=i.length;a>r;)q(t,n=i[r++],e[n]);return t},J=function(t,e){return void 0===e?x(t):K(x(t),e)},G=function(t){var e=I.call(this,t=w(t,!0));return!(this===B&&r(N,t)&&!r(R,t))&&(!(e||!r(this,t)||!r(N,t)||r(this,E)&&this[E][t])||e)},X=function(t,e){if(t=_(t),e=w(e,!0),t!==B||!r(N,e)||r(R,e)){var n=S(t,e);return!n||!r(N,e)||r(t,E)&&t[E][e]||(n.enumerable=!0),n}},Q=function(t){for(var e,n=P(_(t)),i=[],a=0;n.length>a;)r(N,e=n[a++])||e==E||e==c||i.push(e);return i},Z=function(t){for(var e,n=t===B,i=P(n?R:_(t)),a=[],o=0;i.length>o;)!r(N,e=i[o++])||n&&!r(B,e)||a.push(N[e]);return a};L||(M=function(){if(this instanceof M)throw TypeError("Symbol is not a constructor!");var t=f(arguments.length>0?arguments[0]:void 0),e=function(n){this===B&&e.call(R,n),r(this,E)&&r(this[E],t)&&(this[E][t]=!1),Y(this,t,k(1,n))};return a&&H&&Y(B,t,{configurable:!0,set:e}),U(t)},s(M.prototype,"toString",function(){return this._k}),$.f=X,D.f=q,n(55).f=C.f=Q,n(23).f=G,n(31).f=Z,a&&!n(30)&&s(B,"propertyIsEnumerable",G,!0),h.f=function(t){return U(p(t))}),o(o.G+o.W+o.F*!L,{Symbol:M});for(var tt="hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables".split(","),et=0;tt.length>et;)p(tt[et++]);for(var tt=A(p.store),et=0;tt.length>et;)v(tt[et++]);o(o.S+o.F*!L,"Symbol",{for:function(t){return r(F,t+="")?F[t]:F[t]=M(t)},keyFor:function(t){if(W(t))return m(F,t);throw TypeError(t+" is not a symbol!")},useSetter:function(){H=!0},useSimple:function(){H=!1}}),o(o.S+o.F*!L,"Object",{create:J,defineProperty:q,defineProperties:K,getOwnPropertyDescriptor:X,getOwnPropertyNames:Q,getOwnPropertySymbols:Z}),T&&o(o.S+o.F*(!L||u(function(){var t=M();return"[null]"!=V([t])||"{}"!=V({a:t})||"{}"!=V(Object(t))})),"JSON",{stringify:function(t){if(void 0!==t&&!W(t)){for(var e,n,i=[t],r=1;arguments.length>r;)i.push(arguments[r++]);return e=i[1],"function"==typeof e&&(n=e),!n&&g(e)||(e=function(t,e){if(n&&(e=n.call(this,t,e)),!W(e))return e}),i[1]=e,V.apply(T,i)}}}),M.prototype[j]||n(14)(M.prototype,j,M.prototype.valueOf),d(M,"Symbol"),d(Math,"Math",!0),d(i.JSON,"JSON",!0)},function(t,e,n){n(38)("asyncIterator")},function(t,e,n){n(38)("observable")},function(t,e,n){var i=n(0)(n(63),n(208),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(64),n(200),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(65),n(213),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(66),n(206),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(67),n(210),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(68),n(198),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(69),n(188),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(70),n(192),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(71),n(202),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(72),n(201),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(73),n(209),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(74),n(193),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(75),n(195),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(76),n(212),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(77),n(204),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(78),n(185),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(79),n(197),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(80),n(203),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(81),n(187),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(82),n(191),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(83),n(207),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(84),n(194),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(85),n(199),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(86),n(196),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(87),n(186),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(88),n(211),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(89),n(214),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(90),n(205),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(91),n(184),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(92),n(189),null,null,null);t.exports=i.exports},function(t,e,n){var i=n(0)(n(93),n(190),null,null,null);t.exports=i.exports},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("transition",{attrs:{"enter-active-class":t.transition.enter,"leave-active-class":t.transition.leave}},[n("div",{directives:[{name:"show",rawName:"v-show",value:t.isActive,expression:"isActive"}],staticClass:"toast",class:t.type},[n("div",{domProps:{innerHTML:t._s(t.message)}})])])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"pagination",class:[t.order,t.size,{"is-simple":t.simple}]},[n("a",{staticClass:"pagination-previous",attrs:{disabled:!t.hasPrev},on:{click:t.prev}},[n("b-icon",{attrs:{icon:"chevron_left",both:""}})],1),t._v(" "),n("a",{staticClass:"pagination-next",attrs:{disabled:!t.hasNext},on:{click:t.next}},[n("b-icon",{attrs:{icon:"chevron_right",both:""}})],1),t._v(" "),t.simple?t._e():n("ul",{staticClass:"pagination-list"},[t.hasFirst?n("li",[n("a",{staticClass:"pagination-link",on:{click:t.first}},[t._v("1")])]):t._e(),t._v(" "),t.hasFirstEllipsis?n("li",[n("span",{staticClass:"pagination-ellipsis"},[t._v("…")])]):t._e(),t._v(" "),t._l(t.pagesInRange,function(e){return n("li",{key:e.number},[n("a",{staticClass:"pagination-link",class:{"is-current":e.isCurrent},on:{click:e.click}},[t._v("\n                "+t._s(e.number)+"\n            ")])])}),t._v(" "),t.hasLastEllipsis?n("li",[n("span",{staticClass:"pagination-ellipsis"},[t._v("…")])]):t._e(),t._v(" "),t.hasLast?n("li",[n("a",{staticClass:"pagination-link",on:{click:t.last}},[t._v(t._s(t.pageCount))])]):t._e()],2),t._v(" "),t.simple?n("small",{staticClass:"info"},[t._v("\n        "+t._s(t.firstItem)+"-"+t._s(t.current*t.perPage)+" / "+t._s(t.total)+"\n    ")]):t._e()])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("transition",{attrs:{name:t.transitionName}},[n("div",{directives:[{name:"show",rawName:"v-show",value:t.isActive,expression:"isActive"}],staticClass:"tab-item"},[t._t("default")],2)])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"control"},[n("label",{ref:"label",staticClass:"radio button",class:[t.newValue===t.nativeValue?t.type:null,t.size],attrs:{disabled:t.disabled,tabindex:!t.disabled&&0},on:{keydown:function(e){if(!("button"in e)&&t._k(e.keyCode,"enter",13)&&t._k(e.keyCode,"space",32))return null;e.preventDefault(),t.$refs.label.click()}}},[t._t("default"),t._v(" "),n("input",{directives:[{name:"model",rawName:"v-model",value:t.newValue,expression:"newValue"}],attrs:{type:"radio",disabled:t.disabled,name:t.name},domProps:{value:t.nativeValue,checked:t._q(t.newValue,t.nativeValue)},on:{__c:function(e){t.newValue=t.nativeValue}}})],2)])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"dropdown",class:[t.position,{"is-disabled":t.disabled,"is-hoverable":t.hoverable,"is-inline":t.inline,"is-active":t.isActive||t.inline}]},[t.inline?t._e():n("div",{ref:"trigger",staticClass:"dropdown-trigger",attrs:{role:"button"},on:{click:t.toggle}},[t._t("trigger")],2),t._v(" "),n("transition",{attrs:{name:"fade"}},[t.inline?t._e():n("div",{directives:[{name:"show",rawName:"v-show",value:t.isActive,expression:"isActive"}],staticClass:"background"})]),t._v(" "),n("transition",{attrs:{name:"fade"}},[n("div",{directives:[{name:"show",rawName:"v-show",value:t.isActive||t.hoverable||t.inline,expression:"isActive || hoverable || inline"}],ref:"dropdownMenu",staticClass:"dropdown-menu"},[n("div",{staticClass:"dropdown-content"},[t._t("default")],2)])])],1)},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement;return(t._self._c||e)("span",{class:[t.newType,t.position,t.size,{tooltip:t.active,"is-square":t.square,"is-animated":t.newAnimated,"is-always":t.always,"is-multiline":t.multilined,"is-dashed":t.dashed}],attrs:{"data-label":t.label}},[t._t("default")],2)},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("label",{staticClass:"upload control"},[t.dragDrop?n("div",{staticClass:"upload-draggable",class:[t.type,{"is-loading":t.loading,"is-disabled":t.disabled,"is-hovered":t.dragDropFocus}],on:{dragover:function(e){e.preventDefault(),t.updateDragDropFocus(!0)},dragleave:function(e){e.preventDefault(),t.updateDragDropFocus(!1)},dragenter:function(e){e.preventDefault(),t.updateDragDropFocus(!0)},drop:function(e){e.preventDefault(),t.onFileChange(e)}}},[t._t("default")],2):[t._t("default")],t._v(" "),n("input",t._b({ref:"input",attrs:{type:"file",multiple:t.multiple,disabled:t.disabled},on:{change:t.onFileChange}},"input",t.$attrs,!1))],2)},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"control",class:{"is-expanded":t.expanded,"has-icons-left":t.icon}},[n("span",{staticClass:"select",class:[t.size,t.statusType,{"is-fullwidth":t.expanded,"is-loading":t.loading,"is-multiple":t.multiple,"is-empty":null===t.selected}]},[n("select",t._b({directives:[{name:"model",rawName:"v-model",value:t.selected,expression:"selected"}],ref:"select",attrs:{multiple:t.multiple,size:t.nativeSize},on:{blur:function(e){t.$emit("blur",e)&&t.checkHtml5Validity()},focus:function(e){t.$emit("focus",e)},change:function(e){var n=Array.prototype.filter.call(e.target.options,function(t){return t.selected}).map(function(t){return"_value"in t?t._value:t.value});t.selected=e.target.multiple?n:n[0]}}},"select",t.$attrs,!1),[t.placeholder?n("option",{attrs:{selected:"",disabled:"",hidden:""},domProps:{value:null}},[t._v("\n                "+t._s(t.placeholder)+"\n            ")]):t._e(),t._v(" "),t._t("default")],2)]),t._v(" "),t.icon?n("b-icon",{staticClass:"is-left",attrs:{icon:t.icon,pack:t.iconPack,size:t.size}}):t._e()],1)},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return t.separator?n("hr",{staticClass:"dropdown-divider"}):t.custom||t.hasLink?n("div",{class:{"dropdown-item":!t.hasLink,"is-disabled":t.disabled,"is-paddingless":t.paddingless,"is-active":null!==t.value&&t.value===t.$parent.selected,"has-link":t.hasLink},on:{click:t.selectItem}},[t._t("default")],2):n("a",{staticClass:"dropdown-item",class:{"is-disabled":t.disabled,"is-paddingless":t.paddingless,"is-active":null!==t.value&&t.value===t.$parent.selected},on:{click:t.selectItem}},[t._t("default")],2)},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("transition",{attrs:{name:t.animation}},[t.isActive?n("div",{staticClass:"loading-overlay is-active"},[n("div",{staticClass:"loading-background",on:{click:t.cancel}}),t._v(" "),n("div",{staticClass:"loading-icon"})]):t._e()])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("label",{ref:"label",staticClass:"switch",class:[t.size,{"is-disabled":t.disabled}],attrs:{disabled:t.disabled,tabindex:!t.disabled&&0},on:{keydown:function(e){if(!("button"in e)&&t._k(e.keyCode,"enter",13)&&t._k(e.keyCode,"space",32))return null;e.preventDefault(),t.$refs.label.click()},mousedown:function(e){t.isMouseDown=!0},mouseup:function(e){t.isMouseDown=!1},mouseout:function(e){t.isMouseDown=!1},blur:function(e){t.isMouseDown=!1}}},[n("input",{directives:[{name:"model",rawName:"v-model",value:t.newValue,expression:"newValue"}],attrs:{type:"checkbox",name:t.name,disabled:t.disabled,"true-value":t.trueValue,"false-value":t.falseValue},domProps:{checked:Array.isArray(t.newValue)?t._i(t.newValue,null)>-1:t._q(t.newValue,t.trueValue)},on:{__c:function(e){var n=t.newValue,i=e.target,r=i.checked?t.trueValue:t.falseValue;if(Array.isArray(n)){var a=t._i(n,null);i.checked?a<0&&(t.newValue=n.concat(null)):a>-1&&(t.newValue=n.slice(0,a).concat(n.slice(a+1)))}else t.newValue=r}}}),t._v(" "),n("span",{staticClass:"check",class:[{"is-elastic":t.isMouseDown},t.type]}),t._v(" "),n("span",{staticClass:"control-label"},[t._t("default")],2)])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("transition",{attrs:{name:"fade"}},[t.isActive?n("article",{staticClass:"message",class:[t.type,t.size]},[t.title?n("header",{staticClass:"message-header"},[n("p",[t._v(t._s(t.title))]),t._v(" "),t.closable?n("button",{staticClass:"delete",attrs:{type:"button"},on:{click:t.close}}):t._e()]):t._e(),t._v(" "),n("section",{staticClass:"message-body"},[n("div",{staticClass:"media"},[t.icon&&t.hasIcon?n("div",{staticClass:"media-left"},[n("b-icon",{class:t.type,attrs:{icon:t.icon,both:"",size:"is-large"}})],1):t._e(),t._v(" "),n("div",{staticClass:"media-content"},[t._t("default")],2)])])]):t._e()])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return t.visible?n("td",{class:{"has-text-right":t.numeric&&!t.centered,"has-text-centered":t.centered},attrs:{"data-label":t.label}},[n("span",[t._t("default")],2)]):t._e()},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("nav",{staticClass:"panel"},[n("div",{staticClass:"panel-heading",class:{"is-collapsible":t.collapsible},on:{click:t.toggle}},[t.header?n("span",{domProps:{innerHTML:t._s(t.header)}}):t._t("header"),t._v(" "),t.collapsible?n("b-icon",{staticClass:"is-pulled-right",attrs:{both:"",icon:t.isOpen?"arrow_drop_up":"arrow_drop_down"}}):t._e()],2),t._v(" "),n("transition",{attrs:{name:t.animation}},[n("div",{directives:[{name:"show",rawName:"v-show",value:t.isOpen,expression:"isOpen"}],staticClass:"panel-content",class:{"panel-block":!t.hasCustomTemplate}},[t.content?n("div",{domProps:{innerHTML:t._s(t.content)}}):t._t("default")],2)])],1)},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("transition",{attrs:{name:t.animation}},[t.isActive?n("div",{staticClass:"dialog modal is-active"},[n("div",{staticClass:"modal-background",on:{click:t.cancel}}),t._v(" "),n("div",{staticClass:"modal-card animation-content"},[t.title?n("header",{staticClass:"modal-card-head"},[n("p",{staticClass:"modal-card-title"},[t._v(t._s(t.title))])]):t._e(),t._v(" "),n("section",{staticClass:"modal-card-body",class:{"is-titleless":!t.title,"is-flex":t.hasIcon}},[n("div",{staticClass:"media"},[t.icon&&t.hasIcon?n("div",{staticClass:"media-left"},[n("b-icon",{class:t.type,attrs:{icon:t.icon,both:"",size:"is-large custom-icon"}})],1):t._e(),t._v(" "),n("div",{staticClass:"media-content"},[n("p",{domProps:{innerHTML:t._s(t.message)}}),t._v(" "),t.hasInput?n("div",{staticClass:"field"},[n("div",{staticClass:"control"},[n("input",{directives:[{name:"model",rawName:"v-model",value:t.prompt,expression:"prompt"}],ref:"input",staticClass:"input",class:{"is-danger":t.validationMessage},attrs:{required:"",placeholder:t.inputPlaceholder,maxlength:t.inputMaxlength,name:t.inputName},domProps:{value:t.prompt},on:{keyup:function(e){if(!("button"in e)&&t._k(e.keyCode,"enter",13))return null;t.confirm(e)},input:function(e){e.target.composing||(t.prompt=e.target.value)}}})]),t._v(" "),n("p",{staticClass:"help is-danger"},[t._v(t._s(t.validationMessage))])]):t._e()])])]),t._v(" "),n("footer",{staticClass:"modal-card-foot"},[t.canCancel?n("button",{ref:"cancelButton",staticClass:"button is-light",on:{click:t.cancel}},[t._v("\n                    "+t._s(t.cancelText)+"\n                ")]):t._e(),t._v(" "),n("button",{ref:"confirmButton",staticClass:"button",class:t.type,on:{click:t.confirm}},[t._v("\n                    "+t._s(t.confirmText)+"\n                ")])])])]):t._e()])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"b-table",class:{"is-loading":t.loading}},[t.mobileCards&&t.hasSortableColumns?n("div",{staticClass:"field is-hidden-tablet"},[t.mobileCards&&t.hasSortableColumns?n("div",{staticClass:"field is-hidden-tablet has-addons"},[n("b-select",{attrs:{expanded:""},model:{value:t.mobileSort,callback:function(e){t.mobileSort=e},expression:"mobileSort"}},t._l(t.columns,function(e,i){return e.sortable?n("option",{key:i,domProps:{value:e}},[t._v("\n                    "+t._s(e.label)+"\n                ")]):t._e()})),t._v(" "),n("p",{staticClass:"control"},[n("button",{staticClass:"button is-primary",on:{click:function(e){t.sort(t.mobileSort)}}},[n("b-icon",{class:{"is-desc":!t.isAsc,"is-visible":t.currentSortColumn===t.mobileSort},attrs:{icon:"arrow_upward",both:"",size:"is-small"}})],1)])],1):t._e()]):t._e(),t._v(" "),n("div",{staticClass:"table-wrapper"},[n("table",{staticClass:"table",class:{"is-bordered":t.bordered,"is-striped":t.striped,"is-narrow":t.narrowed,"has-mobile-cards":t.mobileCards}},[n("thead",[n("tr",[t.detailed?n("th",{attrs:{width:"40px"}}):t._e(),t._v(" "),t.checkable?n("th",{staticClass:"checkbox-cell"},[n("b-checkbox",{attrs:{value:t.isAllChecked},nativeOn:{change:function(e){t.checkAll(e)}}})],1):t._e(),t._v(" "),t._l(t.columns,function(e,i){return e.visible?n("th",{key:i,class:{"is-current-sort":t.currentSortColumn===e,"is-sortable":e.sortable},style:{width:e.width+"px"},on:{click:function(n){n.stopPropagation(),t.sort(e)}}},[n("div",{staticClass:"th-wrap",class:{"is-numeric":e.numeric,"is-centered":e.centered}},[t.$scopedSlots.header?t._t("header",null,{column:e,index:i}):[t._v(t._s(e.label))],t._v(" "),n("b-icon",{class:{"is-desc":!t.isAsc,"is-visible":t.currentSortColumn===e},attrs:{icon:"arrow_upward",both:"",size:"is-small"}})],2)]):t._e()})],2)]),t._v(" "),t.visibleData.length?n("tbody",[t._l(t.visibleData,function(e,i){return[n("tr",{key:i,class:[t.rowClass(e,i),{"is-selected":e===t.selected,"is-checked":t.isRowChecked(e)}],on:{click:function(n){t.selectRow(e)},dblclick:function(n){t.$emit("dblclick",e)}}},[t.detailed?n("td",[n("a",{attrs:{role:"button"},on:{click:function(n){n.stopPropagation(),t.toggleDetails(e)}}},[n("b-icon",{class:{"is-expanded":t.isVisibleDetailRow(e)},attrs:{icon:"chevron_right",both:""}})],1)]):t._e(),t._v(" "),t.checkable?n("td",{staticClass:"checkbox-cell"},[n("b-checkbox",{attrs:{value:t.isRowChecked(e)},nativeOn:{change:function(n){t.checkRow(e)}}})],1):t._e(),t._v(" "),t._t("default",null,{row:e,index:i})],2),t._v(" "),t.detailed&&t.isVisibleDetailRow(e)?n("tr",{key:i,staticClass:"detail"},[n("td",{attrs:{colspan:t.columnCount}},[n("div",{staticClass:"detail-container"},[t._t("detail",null,{row:e,index:i})],2)])]):t._e()]})],2):n("tbody",[n("tr",{staticClass:"is-empty"},[n("td",{attrs:{colspan:t.columnCount}},[t._t("empty")],2)])])])]),t._v(" "),t.checkable||t.paginated?n("div",{staticClass:"level"},[n("div",{staticClass:"level-left"},[t.checkable&&this.checkedRows.length>0?n("div",{staticClass:"level-item"},[n("p",[t._v("("+t._s(this.checkedRows.length)+")")])]):t._e()]),t._v(" "),n("div",{staticClass:"level-right"},[t.paginated?n("div",{staticClass:"level-item"},[n("b-pagination",{attrs:{total:t.newDataTotal,"per-page":t.perPage,simple:t.paginationSimple,current:t.currentPage},on:{change:t.pageChanged}})],1):t._e()])]):t._e()])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("label",{ref:"label",staticClass:"checkbox",class:{"is-disabled":t.disabled},attrs:{disabled:t.disabled,tabindex:!t.disabled&&0},on:{keydown:function(e){if(!("button"in e)&&t._k(e.keyCode,"enter",13)&&t._k(e.keyCode,"space",32))return null;e.preventDefault(),t.$refs.label.click()}}},[n("input",{directives:[{name:"model",rawName:"v-model",value:t.newValue,expression:"newValue"}],attrs:{type:"checkbox",disabled:t.disabled,name:t.name,"true-value":t.trueValue,"false-value":t.falseValue},domProps:{value:t.nativeValue,checked:Array.isArray(t.newValue)?t._i(t.newValue,t.nativeValue)>-1:t._q(t.newValue,t.trueValue)},on:{__c:function(e){var n=t.newValue,i=e.target,r=i.checked?t.trueValue:t.falseValue;if(Array.isArray(n)){var a=t.nativeValue,o=t._i(n,a);i.checked?o<0&&(t.newValue=n.concat(a)):o>-1&&(t.newValue=n.slice(0,o).concat(n.slice(o+1)))}else t.newValue=r}}}),t._v(" "),n("span",{staticClass:"check"}),t._v(" "),n("span",{staticClass:"control-label"},[t._t("default")],2)])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("span",{staticClass:"icon",class:[t.type,t.size]},[n("i",{class:[t.newPack,"fa"===t.newPack?"fa-"+t.newIcon:null]},[t._v(t._s("mdi"===t.newPack?t.newIcon:null))])])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"field",class:[t.fieldType,t.newPosition,{"is-expanded":t.expanded,"is-grouped-multiline":t.groupMultiline}]},[t.label?n("label",{staticClass:"label"},[t._v(t._s(t.label))]):t._e(),t._v(" "),t._t("default"),t._v(" "),t.newMessage?n("p",{staticClass:"help",class:t.newType,domProps:{innerHTML:t._s(t.formattedMessage)}}):t._e()],2)},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("label",{ref:"label",staticClass:"radio",class:{"is-disabled":t.disabled},attrs:{disabled:t.disabled,tabindex:!t.disabled&&0},on:{keydown:function(e){if(!("button"in e)&&t._k(e.keyCode,"enter",13)&&t._k(e.keyCode,"space",32))return null;e.preventDefault(),t.$refs.label.click()}}},[n("input",{directives:[{name:"model",rawName:"v-model",value:t.newValue,expression:"newValue"}],attrs:{type:"radio",disabled:t.disabled,name:t.name},domProps:{value:t.nativeValue,checked:t._q(t.newValue,t.nativeValue)},on:{__c:function(e){t.newValue=t.nativeValue}}}),t._v(" "),n("span",{staticClass:"check"}),t._v(" "),n("span",{staticClass:"control-label"},[t._t("default")],2)])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("transition",{attrs:{name:"fade"}},[t.isActive?n("article",{staticClass:"notification",class:t.type},[t.closable?n("button",{staticClass:"delete",attrs:{type:"button"},on:{click:t.close}}):t._e(),t._v(" "),n("div",{staticClass:"media"},[t.icon&&t.hasIcon?n("div",{staticClass:"media-left"},[n("b-icon",{attrs:{icon:t.icon,both:"",size:"is-large"}})],1):t._e(),t._v(" "),n("div",{staticClass:"media-content"},[t._t("default")],2)])]):t._e()])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement;return(t._self._c||e)("div",{staticClass:"tags",class:{"has-addons":t.attached}},[t._t("default")],2)},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("section",{staticClass:"datepicker-table"},[n("header",{staticClass:"datepicker-header"},t._l(t.visibleDayNames,function(e){return n("div",{key:e,staticClass:"datepicker-cell"},[t._v("\n            "+t._s(e)+"\n        ")])})),t._v(" "),n("div",{staticClass:"datepicker-body"},t._l(t.weeksInThisMonth(t.focused.month,t.focused.year),function(e,i){return n("b-datepicker-table-row",{key:i,attrs:{selectedDate:t.value,week:e,month:t.focused.month,"min-date":t.minDate,"max-date":t.maxDate},on:{select:t.updateSelectedDate}})}))])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("transition",{attrs:{"enter-active-class":t.transition.enter,"leave-active-class":t.transition.leave}},[n("div",{directives:[{name:"show",rawName:"v-show",value:t.isActive,expression:"isActive"}],staticClass:"snackbar"},[n("p",{staticClass:"text"},[t._v(t._s(t.message))]),t._v(" "),t.actionText?n("div",{staticClass:"action",class:t.type,on:{click:t.action}},[n("button",{staticClass:"button is-dark"},[t._v(t._s(t.actionText))])]):t._e()])])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"autocomplete control",class:{size:t.size,"is-expanded":t.expanded}},[n("b-input",t._b({ref:"input",attrs:{size:t.size,loading:t.loading,icon:t.icon,"icon-pack":t.iconPack,maxlength:t.maxlength,autocomplete:"off"},on:{focus:t.focused,blur:function(e){t.$emit("blur",e)}},nativeOn:{keyup:function(e){if(!("button"in e)&&t._k(e.keyCode,"esc",27))return null;e.preventDefault(),t.isActive=!1},keydown:[function(e){if(!("button"in e)&&t._k(e.keyCode,"enter",13))return null;e.preventDefault(),t.enterPressed(e)},function(e){if(!("button"in e)&&t._k(e.keyCode,"up",38))return null;e.preventDefault(),t.keyArrows("up")},function(e){if(!("button"in e)&&t._k(e.keyCode,"down",40))return null;e.preventDefault(),t.keyArrows("down")}]},model:{value:t.newValue,callback:function(e){t.newValue=e},expression:"newValue"}},"b-input",t.$attrs,!1)),t._v(" "),n("transition",{attrs:{name:"fade"}},[n("div",{directives:[{name:"show",rawName:"v-show",value:t.isActive&&(t.visibleData.length>0||t.hasEmptySlot),expression:"isActive && (visibleData.length > 0 || hasEmptySlot)"}],ref:"dropdown",staticClass:"dropdown-menu",class:{"is-opened-top":!t.isListInViewportVertically}},[n("div",{staticClass:"dropdown-content"},[t._l(t.visibleData,function(e,i){return n("a",{key:i,staticClass:"dropdown-item",class:{"is-hovered":e===t.hovered},on:{click:function(n){t.setSelected(e)}}},[t.hasDefaultSlot?t._t("default",null,{option:e,index:i}):n("span",{domProps:{innerHTML:t._s(t.getValue(e,!0))}})],2)}),t._v(" "),t.data.length>t.maxResults?n("div",{staticClass:"dropdown-item is-disabled"},[t._v("\n                    …\n                ")]):0===t.visibleData.length?n("div",{staticClass:"dropdown-item is-disabled"},[t._t("empty")],2):t._e()],2)])])],1)},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"control",class:[t.iconPosition,{"is-expanded":t.expanded,"is-loading":t.loading,"is-clearfix":!t.hasMessage}]},["textarea"!==t.type?n("input",t._b({ref:"input",staticClass:"input",class:[t.statusType,t.size],attrs:{type:t.newType,autocomplete:t.newAutocomplete,maxlength:t.maxlength},domProps:{value:t.newValue},on:{input:t.input,blur:function(e){t.$emit("blur",e)&&t.checkHtml5Validity()},focus:function(e){t.$emit("focus",e)}}},"input",t.$attrs,!1)):n("textarea",t._b({ref:"textarea",staticClass:"textarea",class:[t.statusType,t.size],attrs:{maxlength:t.maxlength},domProps:{value:t.newValue},on:{input:t.input,blur:function(e){t.$emit("blur",e)&&t.checkHtml5Validity()},focus:function(e){t.$emit("focus",e)}}},"textarea",t.$attrs,!1)),t._v(" "),t.icon?n("b-icon",{staticClass:"is-left",attrs:{icon:t.icon,pack:t.iconPack,size:t.size}}):t._e(),t._v(" "),t.loading||!t.passwordReveal&&!t.statusType?t._e():n("b-icon",{staticClass:"is-right",class:[t.passwordReveal?null:t.statusType,{"is-primary is-clickable":t.passwordReveal}],attrs:{icon:t.passwordReveal?t.passwordVisibleIcon:t.statusTypeIcon,size:t.size,both:""},nativeOn:{click:function(e){t.togglePasswordVisibility(e)}}}),t._v(" "),t.maxlength&&t.hasCounter?n("small",{staticClass:"help counter"},[t._v(t._s(t.valueLength)+" / "+t._s(t.maxlength))]):t._e()],1)},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"datepicker-row"},[t._l(t.week,function(e,i){return[t.selectableDate(e)?n("a",{key:i,staticClass:"datepicker-cell",class:t.classObject(e),attrs:{role:"button",tabindex:"0","aria-label":"Select Date"},on:{click:function(n){t.emitChosenDate(e)},keydown:[function(n){if(!("button"in n)&&t._k(n.keyCode,"enter",13))return null;t.emitChosenDate(e)},function(n){if(!("button"in n)&&t._k(n.keyCode,"space",32))return null;n.preventDefault(),t.emitChosenDate(e)}]}},[t._v("\n            "+t._s(e.getDate())+"\n        ")]):n("div",{key:i,staticClass:"datepicker-cell",class:t.classObject(e)},[t._v("\n            "+t._s(e.getDate())+"\n        ")])]})],2)},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"b-tabs"},[n("nav",{staticClass:"tabs",class:[t.type,t.size,t.position,{"is-fullwidth":t.expanded}]},[n("ul",t._l(t.tabItems,function(e,i){return n("li",{key:i,class:{"is-active":t.newValue===i}},[n("a",{on:{click:function(e){t.tabClick(i)}}},[e.icon?n("b-icon",{attrs:{icon:e.icon,pack:e.iconPack,size:t.size}}):t._e(),t._v(" "),n("span",[t._v(t._s(e.label))])],1)])}))]),t._v(" "),n("section",{staticClass:"tab-content"},[t._t("default")],2)])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("transition",{attrs:{name:t.animation}},[t.isActive?n("div",{staticClass:"modal is-active"},[n("div",{staticClass:"modal-background",on:{click:function(e){t.cancel("outside")}}}),t._v(" "),n("div",{staticClass:"animation-content",class:{"modal-content":!t.hasModalCard},style:{maxWidth:t.newWidth}},[t.component?n(t.component,t._b({tag:"component",on:{close:t.close}},"component",t.props,!1)):t.content?n("div",{domProps:{innerHTML:t._s(t.content)}}):t._t("default")],2),t._v(" "),t.showX?n("button",{staticClass:"modal-close is-large",on:{click:function(e){t.cancel("x")}}}):t._e()]):t._e()])},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",{staticClass:"datepicker control",class:[t.size,{"is-expanded":t.expanded}]},[!t.isMobile||t.inline?n("b-dropdown",{ref:"dropdown",attrs:{disabled:t.disabled,inline:t.inline}},[t.inline?t._e():n("b-input",t._b({ref:"input",attrs:{autocomplete:"off",value:t.formatValue(t.dateSelected),placeholder:t.placeholder,size:t.size,icon:t.icon,"icon-pack":t.iconPack,loading:t.loading,disabled:t.disabled,readonly:t.readonly},on:{focus:function(e){t.$emit("focus",e)},blur:function(e){t.$emit("blur",e)&&t.checkHtml5Validity()}},nativeOn:{change:function(e){(function(e){t.onChange(e.target.value)})(e)}},slot:"trigger"},"b-input",t.$attrs,!1)),t._v(" "),n("b-dropdown-item",{attrs:{custom:""}},[n("header",{staticClass:"datepicker-header"},[n("div",{staticClass:"pagination field is-centered"},[t.isFirstMonth?t._e():n("a",{staticClass:"pagination-previous",attrs:{role:"button",tabindex:"0","aria-label":"Decrement Month"},on:{click:t.decrementMonth,keydown:[function(e){if(!("button"in e)&&t._k(e.keyCode,"enter",13))return null;t.decrementMonth(e)},function(e){if(!("button"in e)&&t._k(e.keyCode,"space",32))return null;e.preventDefault(),t.decrementMonth(e)}]}},[n("b-icon",{attrs:{icon:"chevron_left",both:"",type:"is-primary is-clickable"}})],1),t._v(" "),n("a",{directives:[{name:"show",rawName:"v-show",value:!t.isLastMonth,expression:"!isLastMonth"}],staticClass:"pagination-next",attrs:{role:"button",tabindex:"0","aria-label":"Increment Month"},on:{click:t.incrementMonth,keydown:[function(e){if(!("button"in e)&&t._k(e.keyCode,"enter",13))return null;t.incrementMonth(e)},function(e){if(!("button"in e)&&t._k(e.keyCode,"space",32))return null;e.preventDefault(),t.incrementMonth(e)}]}},[n("b-icon",{attrs:{icon:"chevron_right",both:"",type:"is-primary is-clickable"}})],1),t._v(" "),n("div",{staticClass:"pagination-list"},[n("b-field",[n("b-select",{attrs:{"aria-label":"Select Month"},model:{value:t.focusedDateData.month,callback:function(e){t.focusedDateData.month=e},expression:"focusedDateData.month"}},t._l(Object.values(t.monthNames),function(e,i){return n("option",{key:e,domProps:{value:i}},[t._v("\n                                    "+t._s(e)+"\n                                ")])})),t._v(" "),n("b-select",{attrs:{"aria-label":"Select Year"},model:{value:t.focusedDateData.year,callback:function(e){t.focusedDateData.year=e},expression:"focusedDateData.year"}},t._l(t.listOfYears,function(e){return n("option",{key:e,domProps:{value:e}},[t._v("\n                                    "+t._s(e)+"\n                                ")])}))],1)],1)])]),t._v(" "),n("b-datepicker-table",{attrs:{"day-names":t.dayNames,"month-names":t.monthNames,"first-day-of-week":t.firstDayOfWeek,"min-date":t.minDate,"max-date":t.maxDate,focused:t.focusedDateData},on:{close:function(e){t.$refs.dropdown.isActive=!1}},model:{value:t.dateSelected,callback:function(e){t.dateSelected=e},expression:"dateSelected"}}),t._v(" "),void 0!==t.$slots.default&&t.$slots.default.length?n("footer",{staticClass:"datepicker-footer"},[t._t("default")],2):t._e()],1)],1):n("b-input",t._b({ref:"input",attrs:{type:"date",autocomplete:"off",value:t.formatYYYYMMDD(t.value),placeholder:t.placeholder,size:t.size,icon:t.icon,"icon-pack":t.iconPack,loading:t.loading,max:t.formatYYYYMMDD(t.maxDate),min:t.formatYYYYMMDD(t.minDate),disabled:t.disabled,readonly:!1},on:{focus:function(e){t.$emit("focus",e)},blur:function(e){t.$emit("blur",e)&&t.checkHtml5Validity()}},nativeOn:{change:function(e){t.onChangeNativePicker(e)}}},"b-input",t.$attrs,!1))],1)},staticRenderFns:[]}},function(t,e){t.exports={render:function(){var t=this,e=t.$createElement,n=t._self._c||e;return t.attached&&t.closable?n("div",{staticClass:"tags has-addons"},[n("span",{staticClass:"tag",class:[t.type,t.size,{"is-rounded":t.rounded}]},[t._t("default")],2),t._v(" "),n("a",{staticClass:"tag is-delete",class:[t.size,{"is-rounded":t.rounded}],attrs:{tabindex:"0",role:"button"},on:{click:function(e){t.close()},keyup:function(e){if(!("button"in e)&&t._k(e.keyCode,"delete",[8,46]))return null;e.preventDefault(),t.close()}}})]):n("span",{staticClass:"tag",class:[t.type,t.size,{"is-rounded":t.rounded}]},[t._t("default"),t._v(" "),t.closable?n("button",{staticClass:"delete is-small",attrs:{type:"button"},on:{click:function(e){t.close()},keyup:function(e){if(!("button"in e)&&t._k(e.keyCode,"delete",[8,46]))return null;e.preventDefault(),t.close()}}}):t._e()],2)},staticRenderFns:[]}},function(t,e,n){t.exports=n(61)}])});
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 184 */
+/* 172 */
 /***/ (function(module, exports) {
 
 Vue.filter('currency', function (value) {
@@ -77403,7 +77188,7 @@ Vue.filter('duration', function (value) {
 });
 
 /***/ }),
-/* 185 */
+/* 173 */
 /***/ (function(module, exports) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -77440,7 +77225,7 @@ window.ForiaEvent = new (function () {
 }())();
 
 /***/ }),
-/* 186 */
+/* 174 */
 /***/ (function(module, exports) {
 
 var asyncGenerator = function () {
@@ -78226,7 +78011,7 @@ var Echo = function () {
 module.exports = Echo;
 
 /***/ }),
-/* 187 */
+/* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -82364,7 +82149,7 @@ return /******/ (function(modules) { // webpackBootstrap
 ;
 
 /***/ }),
-/* 188 */
+/* 176 */
 /***/ (function(module, exports) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -82463,136 +82248,47 @@ window.Stream = function () {
 }();
 
 /***/ }),
-/* 189 */
-/***/ (function(module, exports) {
+/* 177 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__publisher__ = __webpack_require__(284);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__subscriber__ = __webpack_require__(285);
+
+
 
 window.LiveStream = {
-    // ws: new WebSocket(`wss://${location.host}/one2many`),
-    ws: new WebSocket('wss://media.foria.io:8433/kurento'),
-    video: null,
-    webRtcPeer: null,
-
-    setVideo: function setVideo(video) {
-        LiveStream.video = video;
+    config: {
+        port: 8081,
+        app: 'live',
+        protocol: 'ws',
+        host: 'localhost',
+        streamName: 'mystream',
+        iceServers: [{ urls: 'stun:stun2.l.google.com:19302' }],
+        mediaConstraints: { audio: true, video: true }
     },
-    presenter: function presenter() {
-        if (!LiveStream.webRtcPeer) {
-            LiveStream.webRtcPeer = kurentoUtils.WebRtcPeer.WebRtcPeerSendonly({
-                localVideo: LiveStream.video,
-                onicecandidate: LiveStream.onIceCandidate
-            }, function (error) {
-                if (error) return console.error(error);
-                this.generateOffer(LiveStream.onOfferPresenter);
-            });
-        }
+
+    Publisher: function Publisher(params) {
+        return new __WEBPACK_IMPORTED_MODULE_0__publisher__["a" /* default */](params);
     },
-    viewer: function viewer() {
-        if (!LiveStream.webRtcPeer) {
-            LiveStream.webRtcPeer = kurentoUtils.WebRtcPeer.WebRtcPeerRecvonly({
-                remoteVideo: LiveStream.video,
-                onicecandidate: LiveStream.onIceCandidate
-            }, function (error) {
-                if (error) return console.error(error);
-                this.generateOffer(LiveStream.onOfferViewer);
-            });
-        }
-    },
-    listen: function listen() {
-        LiveStream.ws.onmessage = function (message) {
-            var m = JSON.parse(message.data);
-            console.info('Received message: ' + message.data);
-
-            switch (m.id) {
-                case 'presenterResponse':
-                    if (m.response != 'accepted') {
-                        LiveStream.dispose('Call not accepted: ' + m.message);
-                    } else {
-                        LiveStream.webRtcPeer.processAnswer(m.sdpAnswer);
-                    }
-                    break;
-
-                case 'viewerResponse':
-                    if (m.response != 'accepted') {
-                        LiveStream.dispose('Call not accepted: ' + m.message);
-                    } else {
-                        LiveStream.webRtcPeer.processAnswer(m.sdpAnswer);
-                    }
-                    break;
-
-                case 'stopCommunication':
-                    LiveStream.dispose();
-                    break;
-
-                case 'iceCandidate':
-                    LiveStream.webRtcPeer.addIceCandidate(m.candidate);
-                    break;
-
-                default:
-                    console.error('Unrecognized message', m);
-            }
-        };
-    },
-    dispose: function dispose(message) {
-        console.error(message);
-
-        if (LiveStream.webRtcPeer) {
-            LiveStream.webRtcPeer.dispose();
-            LiveStream.webRtcPeer = null;
-        }
-    },
-    onIceCandidate: function onIceCandidate(candidate) {
-        console.log('Local candidate', candidate);
-
-        LiveStream.sendMessage({
-            id: 'onIceCandidate',
-            candidate: candidate
-        });
-    },
-    onOfferPresenter: function onOfferPresenter(error, offerSdp) {
-        if (error) return console.error(error);
-
-        LiveStream.sendMessage({
-            id: 'presenter',
-            sdpOffer: offerSdp
-        });
-    },
-    onOfferViewer: function onOfferViewer(error, offerSdp) {
-        if (error) return console.error(error);
-
-        LiveStream.sendMessage({
-            id: 'viewer',
-            sdpOffer: offerSdp
-        });
-    },
-    stop: function stop() {
-        if (LiveStream.webRtcPeer) {
-            LiveStream.sendMessage({
-                id: 'stop'
-            });
-
-            LiveStream.dispose();
-        }
-    },
-    sendMessage: function sendMessage(message) {
-        var jsonMessage = JSON.stringify(message);
-        console.log('Senging message', jsonMessage);
-        LiveStream.ws.send(jsonMessage);
-    },
-    unload: function unload() {
-        LiveStream.ws.close();
+    Subscriber: function Subscriber(params) {
+        return new __WEBPACK_IMPORTED_MODULE_1__subscriber__["a" /* default */](params);
     }
 };
 
 /***/ }),
-/* 190 */
+/* 178 */,
+/* 179 */,
+/* 180 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(191)
+var __vue_script__ = __webpack_require__(181)
 /* template */
-var __vue_template__ = __webpack_require__(192)
+var __vue_template__ = __webpack_require__(182)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -82630,7 +82326,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 191 */
+/* 181 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -82706,7 +82402,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 192 */
+/* 182 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -82803,15 +82499,15 @@ if (false) {
 }
 
 /***/ }),
-/* 193 */
+/* 183 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(194)
+var __vue_script__ = __webpack_require__(184)
 /* template */
-var __vue_template__ = __webpack_require__(195)
+var __vue_template__ = __webpack_require__(185)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -82849,7 +82545,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 194 */
+/* 184 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -82877,7 +82573,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 195 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -82897,15 +82593,15 @@ if (false) {
 }
 
 /***/ }),
-/* 196 */
+/* 186 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(197)
+var __vue_script__ = __webpack_require__(187)
 /* template */
-var __vue_template__ = __webpack_require__(198)
+var __vue_template__ = __webpack_require__(188)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -82943,7 +82639,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 197 */
+/* 187 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -83032,7 +82728,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 198 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -83149,15 +82845,15 @@ if (false) {
 }
 
 /***/ }),
-/* 199 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(200)
+var __vue_script__ = __webpack_require__(190)
 /* template */
-var __vue_template__ = __webpack_require__(201)
+var __vue_template__ = __webpack_require__(191)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -83195,7 +82891,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 200 */
+/* 190 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -83333,7 +83029,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 201 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -83487,15 +83183,15 @@ if (false) {
 }
 
 /***/ }),
-/* 202 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(203)
+var __vue_script__ = __webpack_require__(193)
 /* template */
-var __vue_template__ = __webpack_require__(204)
+var __vue_template__ = __webpack_require__(194)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -83533,7 +83229,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 203 */
+/* 193 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -83595,7 +83291,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 204 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -83670,15 +83366,15 @@ if (false) {
 }
 
 /***/ }),
-/* 205 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(206)
+var __vue_script__ = __webpack_require__(196)
 /* template */
-var __vue_template__ = __webpack_require__(207)
+var __vue_template__ = __webpack_require__(197)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -83716,7 +83412,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 206 */
+/* 196 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -83869,7 +83565,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 207 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -84083,15 +83779,15 @@ if (false) {
 }
 
 /***/ }),
-/* 208 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(209)
+var __vue_script__ = __webpack_require__(199)
 /* template */
-var __vue_template__ = __webpack_require__(210)
+var __vue_template__ = __webpack_require__(200)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -84129,7 +83825,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 209 */
+/* 199 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -84201,7 +83897,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 210 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -84273,15 +83969,15 @@ if (false) {
 }
 
 /***/ }),
-/* 211 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(212)
+var __vue_script__ = __webpack_require__(202)
 /* template */
-var __vue_template__ = __webpack_require__(213)
+var __vue_template__ = __webpack_require__(203)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -84319,7 +84015,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 212 */
+/* 202 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -84399,7 +84095,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 213 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -84495,15 +84191,15 @@ if (false) {
 }
 
 /***/ }),
-/* 214 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(215)
+var __vue_script__ = __webpack_require__(205)
 /* template */
-var __vue_template__ = __webpack_require__(216)
+var __vue_template__ = __webpack_require__(206)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -84541,7 +84237,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 215 */
+/* 205 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -84631,7 +84327,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 216 */
+/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -84687,15 +84383,15 @@ if (false) {
 }
 
 /***/ }),
-/* 217 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(218)
+var __vue_script__ = __webpack_require__(208)
 /* template */
-var __vue_template__ = __webpack_require__(219)
+var __vue_template__ = __webpack_require__(209)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -84733,7 +84429,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 218 */
+/* 208 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -84831,7 +84527,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 219 */
+/* 209 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -84934,15 +84630,15 @@ if (false) {
 }
 
 /***/ }),
-/* 220 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(221)
+var __vue_script__ = __webpack_require__(211)
 /* template */
-var __vue_template__ = __webpack_require__(222)
+var __vue_template__ = __webpack_require__(212)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -84980,7 +84676,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 221 */
+/* 211 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -85104,7 +84800,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 222 */
+/* 212 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -85181,15 +84877,15 @@ if (false) {
 }
 
 /***/ }),
-/* 223 */
+/* 213 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(224)
+var __vue_script__ = __webpack_require__(214)
 /* template */
-var __vue_template__ = __webpack_require__(225)
+var __vue_template__ = __webpack_require__(215)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -85227,7 +84923,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 224 */
+/* 214 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -85446,7 +85142,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 225 */
+/* 215 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -85729,15 +85425,15 @@ if (false) {
 }
 
 /***/ }),
-/* 226 */
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(227)
+var __vue_script__ = __webpack_require__(217)
 /* template */
-var __vue_template__ = __webpack_require__(228)
+var __vue_template__ = __webpack_require__(218)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -85775,7 +85471,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 227 */
+/* 217 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -85837,7 +85533,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 228 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -85872,15 +85568,15 @@ if (false) {
 }
 
 /***/ }),
-/* 229 */
+/* 219 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(230)
+var __vue_script__ = __webpack_require__(220)
 /* template */
-var __vue_template__ = __webpack_require__(231)
+var __vue_template__ = __webpack_require__(221)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -85918,7 +85614,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 230 */
+/* 220 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -85977,109 +85673,110 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['user'],
+    props: ['user', 'broadcast'],
 
     data: function data() {
         return {
             offline: {},
             stream: null,
-            hasWebcam: false,
             editingTopic: false,
             subscriberMode: false,
-            topic: this.hasBroadcast ? this.stream.broadcast.topic : 'Untitled'
+            topic: this.broadcast ? this.broadcast.topic : 'Untitled',
+            online: this.hasBroadcast ? this.broadcast.online : false,
+            videoSetup: {
+                fluid: true
+            }
         };
     },
 
 
     computed: {
         hasBroadcast: function hasBroadcast() {
-            return this.stream !== null && 'broadcast' in this.stream;
+            return this.broadcast !== null;
         },
-        online: function online() {
-            if (!this.hasBroadcast) return false;
-
-            return this.stream.broadcast.online;
+        videoClasses: function videoClasses() {
+            return {
+                'video-js': true,
+                'vjs-default-skin': true,
+                'vjs-big-play-centered': true,
+                'vjs-16-9': true
+            };
+        },
+        videoSetupJson: function videoSetupJson() {
+            return JSON.stringify(this.videoSetup);
         }
     },
 
     methods: {
-        verifyWebcam: function verifyWebcam() {
-            var _this = this;
-
-            navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: true
-            }).then(function (d) {
-                return _this.hasWebcam = true;
-            }).catch(function (e) {
-                return _this.hasWebcam = false;
-            });
-        },
         startOrStop: function startOrStop() {
-            var _this2 = this;
-
             if (this.online) {
                 // Stop broadcast
-                axios.delete('/api/broadcast/stop').then(function (r) {
-                    _this2.closeStream();
-                });
+                // console.log(this.stream.driver.unpublish);
+                this.stream.stop();
             } else {
-                if (!this.hasWebcam) return;
-
                 // Start broadcast
-                axios.post('/api/broadcast/start', {
-                    topic: this.topic,
-                    subscriberMode: this.subscriberMode
-                }).then(function (r) {
-                    _this2.openStream();
-                });
+                this.publish();
             }
         },
-        openStream: function openStream() {
+        publish: function publish() {
             var vm = this;
 
-            this.stream = new Stream(this.user.name, {
-                onError: function onError(status, text) {
-                    switch (status) {
-                        case 404:
-                            vm.offline = {
-                                icon: 'cloud_off',
-                                title: 'Offline',
-                                text: vm.user.name + ' is offline.'
-                            };
+            this.stream = LiveStream.Publisher({
+                driver: {
+                    streamName: this.user.name,
+                    mediaElementId: 'watch-video-driver'
+                },
 
-                            break;
-
-                        case 1500:
-                            vm.offline = {
-                                icon: 'error_outline',
-                                title: 'Error',
-                                text: 'No webcam detected.<br />Refresh the page once connected.'
-                            };
-
-                            break;
-                    }
+                onBroadcasting: function onBroadcasting(broadcast) {
+                    this.online = broadcast.online;
+                },
+                onFail: function onFail() {
+                    vm.offline = {
+                        icon: 'error_outline',
+                        title: 'Error',
+                        text: 'Failed to start live stream.'
+                    };
                 }
             });
         },
-        closeStream: function closeStream() {
-            this.stream.close();
+        subscribe: function subscribe() {
+            this.stream = LiveStream.Subscriber({
+                driver: {
+                    streamName: this.user.name,
+                    mediaElementId: 'watch-video-driver'
+                }
+            });
         },
         changeTopic: function changeTopic() {
             this.editingTopic = true;
         },
         saveTopic: function saveTopic() {
-            var _this3 = this;
+            var _this = this;
 
             if (!this.hasBroadcast) {
                 this.editingTopic = false;
                 return;
             }
 
-            axios.post('/api/broadcast/topic', { topic: this.topic }).then(function (r) {
-                _this3.editingTopic = false;
+            ajax.post('/api/broadcast/topic', { topic: this.topic }).then(function (r) {
+                _this.editingTopic = false;
             });
         },
         cancelTopic: function cancelTopic() {
@@ -86088,14 +85785,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         }
     },
 
-    created: function created() {
-        var _this4 = this;
+    mounted: function mounted() {
+        var _this2 = this;
 
-        this.verifyWebcam();
-        this.openStream();
+        if (this.user.is_mine) {
+            if (this.broadcast.online) {
+                this.publish();
+            }
+        } else {
+            if (this.broadcast.online) {
+                this.subscribe();
+            }
+        }
 
         Echo.channel('watch-' + this.user.id).listen('TopicChanged', function (e) {
-            _this4.topic = e.topic;
+            _this2.topic = e.topic;
         }).listen('NewSubscription', function (e) {
             //
         });
@@ -86103,7 +85807,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 231 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -86227,7 +85931,6 @@ var render = function() {
                         {
                           staticClass:
                             "button is-primary is-pulled-right has-icon m-r-2",
-                          attrs: { disabled: !_vm.hasWebcam },
                           on: { click: _vm.startOrStop }
                         },
                         [
@@ -86265,7 +85968,24 @@ var render = function() {
                 _vm._v(" "),
                 _c("p", { domProps: { innerHTML: _vm._s(_vm.offline.text) } })
               ])
-            : _vm._e()
+            : _vm._e(),
+          _vm._v(" "),
+          _c("div", [
+            _c("video", {
+              class: _vm.videoClasses,
+              attrs: {
+                loop: "",
+                controls: "",
+                autoplay: "",
+                preload: "auto",
+                width: "100%",
+                height: "540",
+                id: "watch-video-driver",
+                poster: _vm.user.avatar_url,
+                "data-setup": _vm.videoSetupJson
+              }
+            })
+          ])
         ]
       )
     ]),
@@ -86277,7 +85997,7 @@ var render = function() {
         [
           _vm.hasBroadcast
             ? _c("f-watch-chat", {
-                attrs: { user: _vm.user, broadcast: _vm.stream.broadcast }
+                attrs: { user: _vm.user, broadcast: _vm.broadcast }
               })
             : _vm._e()
         ],
@@ -86297,15 +86017,15 @@ if (false) {
 }
 
 /***/ }),
-/* 232 */
+/* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(233)
+var __vue_script__ = __webpack_require__(223)
 /* template */
-var __vue_template__ = __webpack_require__(234)
+var __vue_template__ = __webpack_require__(224)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -86343,7 +86063,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 233 */
+/* 223 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -86436,7 +86156,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 234 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -86522,15 +86242,15 @@ if (false) {
 }
 
 /***/ }),
-/* 235 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(236)
+var __vue_script__ = __webpack_require__(226)
 /* template */
-var __vue_template__ = __webpack_require__(237)
+var __vue_template__ = __webpack_require__(227)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -86568,7 +86288,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 236 */
+/* 226 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -86704,7 +86424,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 237 */
+/* 227 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -86887,15 +86607,15 @@ if (false) {
 }
 
 /***/ }),
-/* 238 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(239)
+var __vue_script__ = __webpack_require__(229)
 /* template */
-var __vue_template__ = __webpack_require__(240)
+var __vue_template__ = __webpack_require__(230)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -86933,7 +86653,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 239 */
+/* 229 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -86965,7 +86685,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 240 */
+/* 230 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -86993,15 +86713,15 @@ if (false) {
 }
 
 /***/ }),
-/* 241 */
+/* 231 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(242)
+var __vue_script__ = __webpack_require__(232)
 /* template */
-var __vue_template__ = __webpack_require__(243)
+var __vue_template__ = __webpack_require__(233)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -87039,7 +86759,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 242 */
+/* 232 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -87068,7 +86788,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 243 */
+/* 233 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -87109,15 +86829,15 @@ if (false) {
 }
 
 /***/ }),
-/* 244 */
+/* 234 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(245)
+var __vue_script__ = __webpack_require__(235)
 /* template */
-var __vue_template__ = __webpack_require__(246)
+var __vue_template__ = __webpack_require__(236)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -87155,7 +86875,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 245 */
+/* 235 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -87237,7 +86957,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 246 */
+/* 236 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -87294,15 +87014,15 @@ if (false) {
 }
 
 /***/ }),
-/* 247 */
+/* 237 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(248)
+var __vue_script__ = __webpack_require__(238)
 /* template */
-var __vue_template__ = __webpack_require__(249)
+var __vue_template__ = __webpack_require__(239)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -87340,7 +87060,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 248 */
+/* 238 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -87500,7 +87220,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 249 */
+/* 239 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -87720,15 +87440,15 @@ if (false) {
 }
 
 /***/ }),
-/* 250 */
+/* 240 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(251)
+var __vue_script__ = __webpack_require__(241)
 /* template */
-var __vue_template__ = __webpack_require__(252)
+var __vue_template__ = __webpack_require__(242)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -87766,7 +87486,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 251 */
+/* 241 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -88011,7 +87731,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 252 */
+/* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -88253,15 +87973,15 @@ if (false) {
 }
 
 /***/ }),
-/* 253 */
+/* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(254)
+var __vue_script__ = __webpack_require__(244)
 /* template */
-var __vue_template__ = __webpack_require__(255)
+var __vue_template__ = __webpack_require__(245)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -88299,7 +88019,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 254 */
+/* 244 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -88375,7 +88095,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 255 */
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -88486,15 +88206,15 @@ if (false) {
 }
 
 /***/ }),
-/* 256 */
+/* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(257)
+var __vue_script__ = __webpack_require__(247)
 /* template */
-var __vue_template__ = __webpack_require__(258)
+var __vue_template__ = __webpack_require__(248)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -88532,7 +88252,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 257 */
+/* 247 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -88547,7 +88267,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 258 */
+/* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -88567,15 +88287,15 @@ if (false) {
 }
 
 /***/ }),
-/* 259 */
+/* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(260)
+var __vue_script__ = __webpack_require__(250)
 /* template */
-var __vue_template__ = __webpack_require__(261)
+var __vue_template__ = __webpack_require__(251)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -88613,7 +88333,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 260 */
+/* 250 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -88700,7 +88420,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 261 */
+/* 251 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -88793,15 +88513,15 @@ if (false) {
 }
 
 /***/ }),
-/* 262 */
+/* 252 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(263)
+var __vue_script__ = __webpack_require__(253)
 /* template */
-var __vue_template__ = __webpack_require__(264)
+var __vue_template__ = __webpack_require__(254)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -88839,7 +88559,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 263 */
+/* 253 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -88881,7 +88601,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 264 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -88942,15 +88662,15 @@ if (false) {
 }
 
 /***/ }),
-/* 265 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(266)
+var __vue_script__ = __webpack_require__(256)
 /* template */
-var __vue_template__ = __webpack_require__(267)
+var __vue_template__ = __webpack_require__(257)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -88988,7 +88708,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 266 */
+/* 256 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -89065,7 +88785,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 267 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -89119,15 +88839,15 @@ if (false) {
 }
 
 /***/ }),
-/* 268 */
+/* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(269)
+var __vue_script__ = __webpack_require__(259)
 /* template */
-var __vue_template__ = __webpack_require__(270)
+var __vue_template__ = __webpack_require__(260)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -89165,7 +88885,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 269 */
+/* 259 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -89202,7 +88922,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 270 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -89227,15 +88947,15 @@ if (false) {
 }
 
 /***/ }),
-/* 271 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(272)
+var __vue_script__ = __webpack_require__(262)
 /* template */
-var __vue_template__ = __webpack_require__(273)
+var __vue_template__ = __webpack_require__(263)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -89273,7 +88993,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 272 */
+/* 262 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -89308,7 +89028,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 273 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -89331,15 +89051,15 @@ if (false) {
 }
 
 /***/ }),
-/* 274 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(275)
+var __vue_script__ = __webpack_require__(265)
 /* template */
-var __vue_template__ = __webpack_require__(276)
+var __vue_template__ = __webpack_require__(266)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -89377,7 +89097,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 275 */
+/* 265 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -89458,7 +89178,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 276 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -89542,15 +89262,15 @@ if (false) {
 }
 
 /***/ }),
-/* 277 */
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(278)
+var __vue_script__ = __webpack_require__(268)
 /* template */
-var __vue_template__ = __webpack_require__(279)
+var __vue_template__ = __webpack_require__(269)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -89588,7 +89308,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 278 */
+/* 268 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -89695,7 +89415,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 279 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -89784,15 +89504,15 @@ if (false) {
 }
 
 /***/ }),
-/* 280 */
+/* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(281)
+var __vue_script__ = __webpack_require__(271)
 /* template */
-var __vue_template__ = __webpack_require__(282)
+var __vue_template__ = __webpack_require__(272)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -89830,7 +89550,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 281 */
+/* 271 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -89907,7 +89627,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 282 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -89951,15 +89671,15 @@ if (false) {
 }
 
 /***/ }),
-/* 283 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(284)
+var __vue_script__ = __webpack_require__(274)
 /* template */
-var __vue_template__ = __webpack_require__(285)
+var __vue_template__ = __webpack_require__(275)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -89997,7 +89717,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 284 */
+/* 274 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -90020,58 +89740,88 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
-            //
+            stream: null
         };
     },
 
 
     methods: {
-        presenter: function presenter() {
-            LiveStream.presenter();
+        broadcast: function broadcast() {
+            this.stream = LiveStream.Publisher({
+                //
+            });
+
+            console.log(this.stream);
         },
-        viewer: function viewer() {
-            LiveStream.viewer();
+        view: function view() {
+            this.stream = LiveStream.Subscriber({
+                //
+            });
+
+            console.log(this.stream);
         },
-        terminate: function terminate() {
-            LiveStream.stop();
+        stop: function stop() {
+            this.stream.stop();
+
+            this.stream = null;
         }
     },
 
     mounted: function mounted() {
-        LiveStream.setVideo(this.$refs.video);
+        //
     }
 });
 
 /***/ }),
-/* 285 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "card" }, [
+  return _c("div", { staticClass: "card p-3" }, [
     _c(
       "button",
-      { staticClass: "button m-r-2", on: { click: _vm.presenter } },
-      [_vm._v("\n        Presenter\n    ")]
+      { staticClass: "button m-r-2", on: { click: _vm.broadcast } },
+      [_vm._v("\n        Broadcast\n    ")]
     ),
     _vm._v(" "),
-    _c("button", { staticClass: "button m-r-2", on: { click: _vm.viewer } }, [
-      _vm._v("\n        Viewer\n    ")
+    _c("button", { staticClass: "button m-r-2", on: { click: _vm.view } }, [
+      _vm._v("\n        View\n    ")
     ]),
     _vm._v(" "),
-    _c("button", { staticClass: "button", on: { click: _vm.terminate } }, [
+    _c("button", { staticClass: "button", on: { click: _vm.stop } }, [
       _vm._v("\n        Stop\n    ")
     ]),
     _vm._v(" "),
     _c("video", {
-      ref: "video",
-      attrs: { controls: "", autoplay: "", width: "640px", height: "480px" }
+      ref: "broadcaster",
+      attrs: {
+        id: "red5pro-publisher",
+        controls: "",
+        autoplay: "",
+        muted: "",
+        width: "100%",
+        height: "640px"
+      }
+    }),
+    _vm._v(" "),
+    _c("video", {
+      ref: "viewer",
+      attrs: {
+        id: "red5pro-subscriber",
+        controls: "",
+        autoplay: "",
+        muted: "",
+        width: "100%",
+        height: "640px"
+      }
     })
   ])
 }
@@ -90086,10 +89836,179 @@ if (false) {
 }
 
 /***/ }),
-/* 286 */
+/* 276 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 277 */,
+/* 278 */,
+/* 279 */,
+/* 280 */,
+/* 281 */,
+/* 282 */,
+/* 283 */,
+/* 284 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__events__ = __webpack_require__(286);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+var Publisher = function () {
+    function Publisher(config) {
+        var _this = this;
+
+        _classCallCheck(this, Publisher);
+
+        this.config = config;
+        this.redConfig = _.extend({}, LiveStream.config, this.config.driver);
+
+        this.driver = new Red5.RTCPublisher();
+        this.driver.on('*', function (e) {
+            return _this.pipeEvent(e);
+        });
+
+        this.start();
+    }
+
+    _createClass(Publisher, [{
+        key: 'pipeEvent',
+        value: function pipeEvent(e) {
+            var method = __WEBPACK_IMPORTED_MODULE_0__events__["a" /* default */][e.type];
+
+            if (method in this) {
+                this[method](e.data);
+            }
+
+            if (method in this.config) {
+                this.config[method](e.data);
+            }
+        }
+    }, {
+        key: 'start',
+        value: function start() {
+            var _this2 = this;
+
+            this.driver.init(this.redConfig).then(function () {
+                // On broadcast started, subscribe.
+                // this.driver.on(Red5.PublisherEventTypes.PUBLISH_START, subscribe);
+                return _this2.driver.publish();
+            }).then(function () {
+                console.log('Publishing!');
+            }).catch(function (error) {
+                console.error('Could not publish: ' + error);
+            });
+        }
+    }, {
+        key: 'stop',
+        value: function stop() {
+            return ajax.delete('/api/broadcast');
+        }
+    }, {
+        key: 'onStart',
+        value: function onStart() {
+            var _this3 = this;
+
+            return ajax.post('/api/broadcast').then(function (r) {
+                if (!'onBroadcasting' in _this3.config) return;
+                _this3.config.onBroadcasting(r.data);
+            });
+        }
+    }]);
+
+    return Publisher;
+}();
+
+/* harmony default export */ __webpack_exports__["a"] = (Publisher);
+
+/***/ }),
+/* 285 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__events__ = __webpack_require__(286);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+var Subscriber = function () {
+    function Subscriber(config) {
+        var _this = this;
+
+        _classCallCheck(this, Subscriber);
+
+        this.config = config;
+        this.redConfig = _.extend({}, LiveStream.config, this.config.driver);
+
+        this.driver = new Red5.RTCSubscriber();
+        this.driver.on('*', function (e) {
+            return _this.pipeEvent(e);
+        });
+
+        this.start();
+    }
+
+    _createClass(Subscriber, [{
+        key: 'pipeEvent',
+        value: function pipeEvent(e) {
+            var method = __WEBPACK_IMPORTED_MODULE_0__events__["a" /* default */][e.type];
+
+            if (method in this) {
+                this[method](e.data);
+            }
+
+            if (method in this.config) {
+                this.config[method](e.data);
+            }
+        }
+    }, {
+        key: 'start',
+        value: function start() {
+            var _this2 = this;
+
+            this.driver.init(this.redConfig).then(function () {
+                return _this2.driver.subscribe();
+            }).catch(function (error) {
+                console.log('Could not play: ' + error);
+            });
+        }
+    }, {
+        key: 'stop',
+        value: function stop() {
+            //
+        }
+    }]);
+
+    return Subscriber;
+}();
+
+/* harmony default export */ __webpack_exports__["a"] = (Subscriber);
+
+/***/ }),
+/* 286 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = ({
+    'Publisher.Video.DimensionChange': 'onDimensionChange',
+    'WebRTC.MediaStream.Available': 'onMediaAvailable',
+    'Connect.Success': 'onConnected',
+    'Connect.Failure': 'onConnectionFailure',
+    'WebRTC.PeerConnection.Available': 'onConnectionAvailable',
+    'WebRTC.Offer.Start': 'onOfferStart',
+    'WebRTC.Offer.End': 'onOfferEnd',
+    'WebRTC.IceTrickle.Complete': 'onIceTrickleComplete',
+    'Publish.Start': 'onStart',
+    'Publish.Fail': 'onFail'
+});
 
 /***/ })
 /******/ ]);

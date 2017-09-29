@@ -20,9 +20,8 @@ Route::get('/api/watch/{user}', 'WatchController@show');
 // Broadcasts
 Route::resource('/api/broadcast-query', 'BroadcastQueryController');
 Route::post('/api/broadcast/topic', 'BroadcastController@topic');
-Route::post('/api/broadcast/start', 'BroadcastController@start');
-Route::delete('/api/broadcast/stop', 'BroadcastController@stop');
-Route::resource('/api/broadcast', 'BroadcastController');
+Route::post('/api/broadcast', 'BroadcastController@store');
+Route::delete('/api/broadcast', 'BroadcastController@destroy');
 
 // Videos
 Route::get('/api/videos/list/{user}', 'VideoController@index');
