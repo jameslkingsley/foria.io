@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use OpenTok\Role;
 use App\Models\User;
-use OpenTok\OpenTok;
-use OpenTok\MediaMode;
 use App\Models\Broadcast;
-use App\Support\LiveStream;
 use Illuminate\Http\Request;
 
 class WatchController extends Controller
@@ -20,15 +16,6 @@ class WatchController extends Controller
     protected $user;
 
     /**
-     * Default OpenTok session options.
-     *
-     * @var array
-     */
-    protected $sessionOptions = [
-        'mediaMode' => MediaMode::ROUTED
-    ];
-
-    /**
      * Constructor method.
      *
      * @return void
@@ -38,11 +25,6 @@ class WatchController extends Controller
         // $this->middleware('auth');
 
         $this->user = $user;
-
-        $this->openTok = new OpenTok(
-            config('opentok.key'),
-            config('opentok.secret')
-        );
     }
 
     /**
@@ -53,6 +35,10 @@ class WatchController extends Controller
     public function index(Request $request, User $user)
     {
         $broadcast = Broadcast::latest($user);
+
+        if (! optional($broadcast)->online && ! $user->is_mine) {
+            return redirect($user->profile_url);
+        }
 
         return vue('f-watch', compact('user', 'broadcast'));
     }
@@ -68,16 +54,8 @@ class WatchController extends Controller
             return abort(404);
         }
 
-        $token = LiveStream::token(
-            $broadcast,
-            $broadcast->is_mine
-                ? Role::PUBLISHER
-                : Role::SUBSCRIBER
-        );
-
         return response()->json(compact(
-            'broadcast',
-            'token'
+            'broadcast'
         ));
     }
 }

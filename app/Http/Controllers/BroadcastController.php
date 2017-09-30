@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Broadcast;
 use App\Support\LiveStream;
 use App\Events\TopicChanged;
 use Illuminate\Http\Request;
+use App\Http\Requests\BroadcastRequest;
 
 class BroadcastController extends Controller
 {
@@ -55,7 +57,12 @@ class BroadcastController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return auth()->user()->broadcasts()->save(
+            new Broadcast([
+                'online' => true,
+                'topic' => request('topic', 'Untitled')
+            ])
+        );
     }
 
     /**
@@ -87,9 +94,17 @@ class BroadcastController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(BroadcastRequest $request)
     {
-        //
+        $attributes = $request->validate([
+            'topic' => 'required|string|min:1'
+        ]);
+
+        dd($attributes);
+
+        $request->broadcast()->update($attributes);
+
+        event(new TopicChanged($request->broadcast()));
     }
 
     /**
@@ -98,44 +113,10 @@ class BroadcastController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(BroadcastRequest $request)
     {
-        //
-    }
-
-    /**
-     * Starts the broadcast.
-     *
-     * @return App\Models\Broadcast
-     */
-    public function start(Request $request)
-    {
-        return $this->stream->start(request('topic', 'Untitled'));
-    }
-
-    /**
-     * Stops the broadcast.
-     *
-     * @return mixed
-     */
-    public function stop(Request $request)
-    {
-        return $this->stream->stop();
-    }
-
-    /**
-     * Changes the topic of the broadcast.
-     *
-     * @return void
-     */
-    public function topic(Request $request)
-    {
-        $broadcast = $this->stream->getBroadcast();
-
-        $broadcast->update([
-            'topic' => $request->topic
+        $request->broadcast()->update([
+            'online' => false
         ]);
-
-        event(new TopicChanged($request->topic, $broadcast->user));
     }
 }

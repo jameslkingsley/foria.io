@@ -1,7 +1,7 @@
 require('./bootstrap');
 require('./stream');
 
-require('./livestream/client');
+require('./livestream/index');
 
 // Profile
 Vue.component('f-profile', require('./components/profile/Index.vue'));
@@ -30,6 +30,7 @@ Vue.component('f-follow', require('./components/Follow.vue'));
 
 // Watch
 Vue.component('f-watch', require('./components/watch/Index.vue'));
+Vue.component('f-watch-topic', require('./components/watch/Topic.vue'));
 Vue.component('f-watch-chat', require('./components/watch/Chat.vue'));
 
 // Tokens
