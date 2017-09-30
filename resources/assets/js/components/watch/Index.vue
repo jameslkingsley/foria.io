@@ -5,7 +5,7 @@
                 <div class="watch-header">
                     <div class="watch-title">
                         <f-watch-topic :text="topic" :editable="user.is_mine"></f-watch-topic>
-                        <span class="watch-user">{{ user.name }}</span>
+                        <a :href="user.profile_url" class="watch-user">{{ user.name }}</a>
                     </div>
 
                     <div class="watch-controls">
@@ -18,7 +18,6 @@
                             </button>
 
                             <b-dropdown-item>Subscriber mode</b-dropdown-item>
-                            <b-dropdown-item @click.native="changeTopic">Change topic</b-dropdown-item>
                         </b-dropdown>
 
                         <button v-if="user.is_mine" class="button is-primary is-pulled-right has-icon m-r-2" @click="startOrStop">
@@ -70,8 +69,8 @@
                 offline: {},
                 stream: null,
                 subscriberMode: false,
-                topic: this.broadcast ? this.broadcast.topic : 'Untitled',
-                online: this.hasBroadcast ? this.broadcast.online : false,
+                topic: this.broadcast.topic || 'My First Stream!',
+                online: this.broadcast.online || false,
                 videoSetup: {
                     fluid: true
                 }
@@ -80,7 +79,7 @@
 
         computed: {
             hasBroadcast() {
-                return this.broadcast !== null;
+                return typeof this.broadcast === 'object';
             },
 
             videoClasses() {

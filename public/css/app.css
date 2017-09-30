@@ -15325,6 +15325,10 @@ hr {
   font-weight: 500;
 }
 
+.watch-header .watch-title .watch-user {
+  font-weight: 500;
+}
+
 .subscription-content {
   padding: 1rem;
   width: 20rem;

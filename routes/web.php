@@ -23,6 +23,9 @@ Route::patch('/api/broadcast', 'BroadcastController@update');
 Route::post('/api/broadcast', 'BroadcastController@store');
 Route::delete('/api/broadcast', 'BroadcastController@destroy');
 
+// Topic
+Route::patch('/api/topic', 'TopicController@update');
+
 // Videos
 Route::get('/api/videos/list/{user}', 'VideoController@index');
 Route::get('/api/videos/{ref}', 'VideoController@showJson');

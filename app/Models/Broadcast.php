@@ -23,7 +23,8 @@ class Broadcast extends Model
      * @var array
      */
     protected $appends = [
-        'is_mine'
+        'is_mine',
+        'online'
     ];
 
     /**
@@ -38,7 +39,7 @@ class Broadcast extends Model
         }
 
         return static::where('user_id', $user->id)
-            ->where('online', true)
+            ->where('ended_at', null)
             ->orderBy('created_at', 'desc')
             ->first();
     }
@@ -52,7 +53,17 @@ class Broadcast extends Model
     {
         // TODO Order by user preference (followed, starred)
 
-        return static::where('online', true)->with('user')->get();
+        return static::where('ended_at', null)->with('user')->get();
+    }
+
+    /**
+     * Determines whether the broadcast is online.
+     *
+     * @return boolean
+     */
+    public function getOnlineAttribute()
+    {
+        return is_null($this->ended_at);
     }
 
     /**

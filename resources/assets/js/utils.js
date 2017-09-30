@@ -13,3 +13,13 @@ window.Util = {
         });
     }
 }
+
+window.opt = window.optional = (object) => {
+    return new Proxy(object || {}, {
+        get(target, name) {
+            return (name in target)
+                ? target[name]
+                : null;
+        }
+    });
+}

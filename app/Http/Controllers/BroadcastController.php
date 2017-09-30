@@ -7,6 +7,7 @@ use App\Support\LiveStream;
 use App\Events\TopicChanged;
 use Illuminate\Http\Request;
 use App\Http\Requests\BroadcastRequest;
+use Illuminate\Support\Facades\Validator;
 
 class BroadcastController extends Controller
 {
@@ -59,7 +60,6 @@ class BroadcastController extends Controller
     {
         return auth()->user()->broadcasts()->save(
             new Broadcast([
-                'online' => true,
                 'topic' => request('topic', 'Untitled')
             ])
         );
@@ -96,13 +96,13 @@ class BroadcastController extends Controller
      */
     public function update(BroadcastRequest $request)
     {
-        $attributes = $request->validate([
+        Validator::make($request->all(), [
             'topic' => 'required|string|min:1'
+        ])->validate();
+
+        $request->broadcast()->update([
+            'topic' => $request->topic
         ]);
-
-        dd($attributes);
-
-        $request->broadcast()->update($attributes);
 
         event(new TopicChanged($request->broadcast()));
     }
@@ -116,7 +116,7 @@ class BroadcastController extends Controller
     public function destroy(BroadcastRequest $request)
     {
         $request->broadcast()->update([
-            'online' => false
+            'ended_at' => now()
         ]);
     }
 }

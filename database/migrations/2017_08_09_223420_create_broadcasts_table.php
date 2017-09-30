@@ -18,8 +18,8 @@ class CreateBroadcastsTable extends Migration
             $table->string('topic')->nullable();
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->boolean('online')->default(false);
             $table->enum('required_subscription', ['bronze', 'silver', 'gold'])->nullable()->index();
+            $table->timestamp('ended_at')->nullable();
             $table->timestamps();
         });
     }
