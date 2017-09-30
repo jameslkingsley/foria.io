@@ -2,21 +2,15 @@
     <div class="columns">
         <div class="column is-9">
             <div class="m-b-3">
-                <div v-if="editingTopic && user.is_mine">
-                    <input type="text" class="input is-pulled-left w-auto m-r-2" v-model="topic">
-                    <button class="button is-primary m-r-2" @click="saveTopic">Save</button>
-                    <button class="button" @click="cancelTopic">Cancel</button>
-                </div>
-
-                <div class="watch-header" v-else>
+                <div class="watch-header">
                     <div class="watch-title">
-                        <span class="watch-topic">{{ topic }}</span>
+                        <f-watch-topic :text="topic" :editable="user.is_mine"></f-watch-topic>
                         <span class="watch-user">{{ user.name }}</span>
                     </div>
 
                     <div class="watch-controls">
                         <f-subscribe v-if="! user.is_mine" class="is-pulled-right m-l-2" :user="user"></f-subscribe>
-                        <f-watch-follow v-if="! user.is_mine" class="is-pulled-right" :user="user"></f-watch-follow>
+                        <f-follow v-if="! user.is_mine" class="is-pulled-right" :user="user"></f-follow>
 
                         <b-dropdown v-if="user.is_mine" class="is-pulled-right" position="is-bottom-left">
                             <button class="button" slot="trigger">
@@ -75,7 +69,6 @@
             return {
                 offline: {},
                 stream: null,
-                editingTopic: false,
                 subscriberMode: false,
                 topic: this.broadcast ? this.broadcast.topic : 'Untitled',
                 online: this.hasBroadcast ? this.broadcast.online : false,
@@ -146,26 +139,6 @@
                         mediaElementId: 'watch-video-driver'
                     }
                 });
-            },
-
-            changeTopic() {
-                this.editingTopic = true;
-            },
-
-            saveTopic() {
-                if (! this.hasBroadcast) {
-                    this.editingTopic = false;
-                    return;
-                }
-
-                ajax.post('/api/broadcast/topic', { topic: this.topic }).then(r => {
-                    this.editingTopic = false;
-                });
-            },
-
-            cancelTopic() {
-                this.editingTopic = false;
-                this.topic = this.topic;
             }
         },
 

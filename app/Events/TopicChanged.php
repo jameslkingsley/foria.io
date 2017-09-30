@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\User;
+use App\Models\Broadcast;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -16,28 +16,20 @@ class TopicChanged implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * New topic.
+     * Broadcast model instance.
      *
-     * @var string
+     * @var App\Models\Broadcast
      */
-    public $topic;
-
-    /**
-     * Broadcast user model.
-     *
-     * @var App\Models\User
-     */
-    protected $user;
+    public $broadcast;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(string $topic, User $user)
+    public function __construct(Broadcast $broadcast)
     {
-        $this->topic = $topic;
-        $this->user = $user;
+        $this->broadcast = $broadcast;
     }
 
     /**
@@ -47,6 +39,6 @@ class TopicChanged implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel("watch-{$this->user->id}");
+        return new Channel("watch-{$this->broadcast->user->id}");
     }
 }

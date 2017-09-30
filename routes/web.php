@@ -19,7 +19,7 @@ Route::get('/api/watch/{user}', 'WatchController@show');
 
 // Broadcasts
 Route::resource('/api/broadcast-query', 'BroadcastQueryController');
-Route::post('/api/broadcast/topic', 'BroadcastController@topic');
+Route::patch('/api/broadcast', 'BroadcastController@update');
 Route::post('/api/broadcast', 'BroadcastController@store');
 Route::delete('/api/broadcast', 'BroadcastController@destroy');
 

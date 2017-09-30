@@ -6,6 +6,7 @@ use App\Models\Broadcast;
 use App\Support\LiveStream;
 use App\Events\TopicChanged;
 use Illuminate\Http\Request;
+use App\Http\Requests\BroadcastRequest;
 
 class BroadcastController extends Controller
 {
@@ -93,15 +94,17 @@ class BroadcastController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(BroadcastRequest $request)
     {
-        if (! $broadcast = Broadcast::latest(auth()->user())) {
-            return abort(404);
-        }
-
-        $broadcast->update([
-            'online' => false
+        $attributes = $request->validate([
+            'topic' => 'required|string|min:1'
         ]);
+
+        dd($attributes);
+
+        $request->broadcast()->update($attributes);
+
+        event(new TopicChanged($request->broadcast()));
     }
 
     /**
@@ -110,24 +113,10 @@ class BroadcastController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(BroadcastRequest $request)
     {
-        //
-    }
-
-    /**
-     * Changes the topic of the broadcast.
-     *
-     * @return void
-     */
-    public function topic(Request $request)
-    {
-        $broadcast = $this->stream->getBroadcast();
-
-        $broadcast->update([
-            'topic' => $request->topic
+        $request->broadcast()->update([
+            'online' => false
         ]);
-
-        event(new TopicChanged($request->topic, $broadcast->user));
     }
 }

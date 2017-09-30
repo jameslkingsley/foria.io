@@ -1,1 +1,0 @@
-docker run -p  3000:3000 -p 30000-30050:30000-30050/udp -p 3001:3001  -p 8080:8080 -e "MIN_PORT=30000" -e "MAX_PORT=30050" -e "PUBLIC_IP=127.0.0.1" lynckia/licode

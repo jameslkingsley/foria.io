@@ -62,6 +62,7 @@ class Broadcast extends Model
      */
     public function getIsMineAttribute()
     {
-        return ! auth()->guest() && $this->user_id == auth()->user()->id;
+        return ! auth()->guest()
+            && $this->user_id == auth()->user()->id;
     }
 }

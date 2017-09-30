@@ -42,7 +42,7 @@
 
     .watch-title {
         float: left;
-        width: 80%;
+        width: 75%;
 
         .watch-topic {
             float: left;
@@ -64,5 +64,41 @@
         font-size: 28px;
         font-weight: 300;
         margin: 1rem 0 1.5rem 0;
+    }
+}
+
+.watch-topic-control {
+    float: left;
+    margin-left: -40px;
+    border: none;
+    background: transparent;
+    height: 33px;
+    line-height: 38px;
+    color: $text;
+    outline: 0;
+    cursor: pointer;
+
+    &.watch-topic-save {
+        margin-left: -70px;
+    }
+
+    &.watch-topic-save, &.watch-topic-cancel {
+        line-height: 42px;
+
+        i {
+            font-size: 24px;
+        }
+    }
+
+    &:hover {
+        color: $text-hovered;
+    }
+
+    &:active {
+        color: $primary;
+    }
+
+    i {
+        font-size: 18px;
     }
 }
