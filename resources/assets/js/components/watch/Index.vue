@@ -20,7 +20,7 @@
                             <b-dropdown-item>Subscriber mode</b-dropdown-item>
                         </b-dropdown>
 
-                        <button v-if="user.is_mine" class="button is-primary is-pulled-right has-icon m-r-2" @click="startOrStop">
+                        <button v-if="user.is_mine" :class="startStopClasses" :disabled="! online && startingStream" @click="startOrStop">
                             <i class="material-icons m-r-2">{{ online ? 'stop' : 'play_arrow' }}</i>
                             {{ online ? 'Stop' : 'Start' }} Broadcast
                         </button>
@@ -37,10 +37,8 @@
 
                 <div>
                     <video
-                        loop
                         controls
                         autoplay
-                        preload="auto"
                         width="100%"
                         height="540"
                         id="watch-video-driver"
@@ -69,6 +67,7 @@
                 offline: {},
                 stream: null,
                 subscriberMode: false,
+                startingStream: false,
                 topic: this.broadcast.topic || 'My First Stream!',
                 online: this.broadcast.online || false,
                 videoSetup: {
@@ -91,6 +90,17 @@
                 };
             },
 
+            startStopClasses() {
+                return {
+                    'm-r-2': true,
+                    'button': true,
+                    'has-icon': true,
+                    'is-primary': true,
+                    'is-pulled-right': true,
+                    'is-loading': this.startingStream && !this.online
+                };
+            },
+
             videoSetupJson() {
                 return JSON.stringify(this.videoSetup);
             }
@@ -109,7 +119,10 @@
             },
 
             publish() {
+                console.log('Watch: Publishing');
                 var vm = this;
+
+                this.startingStream = true;
 
                 this.stream = LiveStream.Publisher({
                     driver: {
@@ -117,8 +130,12 @@
                         mediaElementId: 'watch-video-driver'
                     },
 
+                    createNew: ! this.online,
+
                     onBroadcasting(broadcast) {
-                        this.online = broadcast.online;
+                        vm.online = broadcast.online;
+                        vm.startingStream = false;
+                        location.reload();
                     },
 
                     onFail() {
@@ -132,7 +149,8 @@
             },
 
             subscribe() {
-                this.stream = LiveStream.Subscriber({
+                console.log('Watch: Subscribing');
+                LiveStream.Subscriber({
                     driver: {
                         streamName: this.user.name,
                         mediaElementId: 'watch-video-driver'
@@ -152,7 +170,7 @@
                 }
             }
 
-            Echo.channel(`watch-${this.user.id}`)
+            Echo.channel(`watch-${this.user.name}`)
                 .listen('TopicChanged', e => {
                     this.topic = e.topic;
                 })

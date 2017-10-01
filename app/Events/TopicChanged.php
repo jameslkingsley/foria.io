@@ -20,7 +20,14 @@ class TopicChanged implements ShouldBroadcast
      *
      * @var App\Models\Broadcast
      */
-    public $broadcast;
+    protected $broadcast;
+
+    /**
+     * The new topic string.
+     *
+     * @var string
+     */
+    public $topic;
 
     /**
      * Create a new event instance.
@@ -30,6 +37,7 @@ class TopicChanged implements ShouldBroadcast
     public function __construct(Broadcast $broadcast)
     {
         $this->broadcast = $broadcast;
+        $this->topic = $broadcast->topic;
     }
 
     /**
@@ -39,6 +47,6 @@ class TopicChanged implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel("watch-{$this->broadcast->user->id}");
+        return new Channel("watch-{$this->broadcast->user->name}");
     }
 }

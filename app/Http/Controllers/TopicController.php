@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Broadcast;
+use App\Events\TopicChanged;
 use Illuminate\Http\Request;
 
 class TopicController extends Controller
@@ -29,5 +31,11 @@ class TopicController extends Controller
         ]);
 
         auth()->user()->update($attributes);
+
+        if ($broadcast = Broadcast::latest()) {
+            $broadcast->update($attributes);
+
+            event(new TopicChanged($broadcast));
+        }
     }
 }

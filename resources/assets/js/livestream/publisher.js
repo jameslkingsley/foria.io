@@ -25,24 +25,21 @@ class Publisher {
 
     start() {
         this.driver.init(this.redConfig)
-            .then(() => {
-                // On broadcast started, subscribe.
-                // this.driver.on(Red5.PublisherEventTypes.PUBLISH_START, subscribe);
-                return this.driver.publish();
-            })
-            .then(() => {
-                console.log('Publishing!');
-            })
+            .then(() => this.driver.publish())
             .catch(error => {
                 console.error('Could not publish: ' + error);
             });
     }
 
     stop() {
+        console.log('Stopping...');
+        this.driver.unpublish();
         return ajax.delete('/api/broadcast');
     }
 
     onStart() {
+        if (! this.config.createNew) return;
+
         return ajax.post('/api/broadcast')
             .then(r => {
                 if (! 'onBroadcasting' in this.config) return;

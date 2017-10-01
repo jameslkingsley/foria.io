@@ -82352,11 +82352,7 @@ var Publisher = function () {
             var _this2 = this;
 
             this.driver.init(this.redConfig).then(function () {
-                // On broadcast started, subscribe.
-                // this.driver.on(Red5.PublisherEventTypes.PUBLISH_START, subscribe);
                 return _this2.driver.publish();
-            }).then(function () {
-                console.log('Publishing!');
             }).catch(function (error) {
                 console.error('Could not publish: ' + error);
             });
@@ -82364,12 +82360,16 @@ var Publisher = function () {
     }, {
         key: 'stop',
         value: function stop() {
+            console.log('Stopping...');
+            this.driver.unpublish();
             return ajax.delete('/api/broadcast');
         }
     }, {
         key: 'onStart',
         value: function onStart() {
             var _this3 = this;
+
+            if (!this.config.createNew) return;
 
             return ajax.post('/api/broadcast').then(function (r) {
                 if (!'onBroadcasting' in _this3.config) return;
@@ -85850,8 +85850,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 //
 //
 //
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user', 'broadcast'],
@@ -85861,6 +85859,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             offline: {},
             stream: null,
             subscriberMode: false,
+            startingStream: false,
             topic: this.broadcast.topic || 'My First Stream!',
             online: this.broadcast.online || false,
             videoSetup: {
@@ -85882,6 +85881,16 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 'vjs-16-9': true
             };
         },
+        startStopClasses: function startStopClasses() {
+            return {
+                'm-r-2': true,
+                'button': true,
+                'has-icon': true,
+                'is-primary': true,
+                'is-pulled-right': true,
+                'is-loading': this.startingStream && !this.online
+            };
+        },
         videoSetupJson: function videoSetupJson() {
             return JSON.stringify(this.videoSetup);
         }
@@ -85899,7 +85908,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
         },
         publish: function publish() {
+            console.log('Watch: Publishing');
             var vm = this;
+
+            this.startingStream = true;
 
             this.stream = LiveStream.Publisher({
                 driver: {
@@ -85907,8 +85919,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     mediaElementId: 'watch-video-driver'
                 },
 
+                createNew: !this.online,
+
                 onBroadcasting: function onBroadcasting(broadcast) {
-                    this.online = broadcast.online;
+                    vm.online = broadcast.online;
+                    vm.startingStream = false;
+                    location.reload();
                 },
                 onFail: function onFail() {
                     vm.offline = {
@@ -85920,7 +85936,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             });
         },
         subscribe: function subscribe() {
-            this.stream = LiveStream.Subscriber({
+            console.log('Watch: Subscribing');
+            LiveStream.Subscriber({
                 driver: {
                     streamName: this.user.name,
                     mediaElementId: 'watch-video-driver'
@@ -85942,7 +85959,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
         }
 
-        Echo.channel('watch-' + this.user.id).listen('TopicChanged', function (e) {
+        Echo.channel('watch-' + this.user.name).listen('TopicChanged', function (e) {
             _this.topic = e.topic;
         }).listen('NewSubscription', function (e) {
             //
@@ -86032,8 +86049,8 @@ var render = function() {
                 ? _c(
                     "button",
                     {
-                      staticClass:
-                        "button is-primary is-pulled-right has-icon m-r-2",
+                      class: _vm.startStopClasses,
+                      attrs: { disabled: !_vm.online && _vm.startingStream },
                       on: { click: _vm.startOrStop }
                     },
                     [
@@ -86077,10 +86094,8 @@ var render = function() {
             _c("video", {
               class: _vm.videoClasses,
               attrs: {
-                loop: "",
                 controls: "",
                 autoplay: "",
-                preload: "auto",
                 width: "100%",
                 height: "540",
                 id: "watch-video-driver",
@@ -86223,7 +86238,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         save: function save() {
             var _this = this;
 
-            return ajax.patch('/api/broadcast', { topic: this.topic }).then(function (r) {
+            return ajax.patch('/api/topic', { topic: this.topic }).then(function (r) {
                 return _this.editing = false;
             });
         },

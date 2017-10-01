@@ -47,7 +47,7 @@
 
         methods: {
             save() {
-                return ajax.patch('/api/broadcast', { topic: this.topic })
+                return ajax.patch('/api/topic', { topic: this.topic })
                     .then(r => this.editing = false);
             },
 

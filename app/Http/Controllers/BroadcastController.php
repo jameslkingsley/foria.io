@@ -60,7 +60,7 @@ class BroadcastController extends Controller
     {
         return auth()->user()->broadcasts()->save(
             new Broadcast([
-                'topic' => request('topic', 'Untitled')
+                'topic' => auth()->user()->topic ?: 'My First Stream!'
             ])
         );
     }
@@ -96,15 +96,7 @@ class BroadcastController extends Controller
      */
     public function update(BroadcastRequest $request)
     {
-        Validator::make($request->all(), [
-            'topic' => 'required|string|min:1'
-        ])->validate();
-
-        $request->broadcast()->update([
-            'topic' => $request->topic
-        ]);
-
-        event(new TopicChanged($request->broadcast()));
+        //
     }
 
     /**
