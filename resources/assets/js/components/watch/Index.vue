@@ -39,12 +39,25 @@
                     <video
                         controls
                         autoplay
+                        ref="video"
                         width="100%"
                         height="540"
                         id="watch-video-driver"
+                        v-if="online && !online"
                         :class="videoClasses"
                         :poster="user.avatar_url"
                         :data-setup="videoSetupJson">
+                    </video>
+
+                    <video
+                        controls
+                        autoplay
+                        ref="video"
+                        width="100%"
+                        height="540"
+                        id="watch-video-driver"
+                        class="is-pulled-left"
+                        :poster="user.avatar_url">
                     </video>
                 </div>
             </div>
@@ -132,16 +145,20 @@
 
                     createNew: ! this.online,
 
+                    onStart() {
+                        vm.$refs.video.load();
+                        vm.$refs.video.play();
+                    },
+
                     onBroadcasting(broadcast) {
                         vm.online = broadcast.online;
                         vm.startingStream = false;
-                        location.reload();
                     },
 
                     onFail() {
                         vm.offline = {
-                            icon: 'error_outline',
                             title: 'Error',
+                            icon: 'error_outline',
                             text: 'Failed to start live stream.'
                         };
                     }

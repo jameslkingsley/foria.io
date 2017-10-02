@@ -3,10 +3,10 @@ import EventMap from './events';
 class Publisher {
     constructor(config) {
         this.config = config;
-        this.redConfig = _.extend({}, LiveStream.config, this.config.driver);
+        this.driverConfig = _.extend({}, LiveStream.config, this.config.driver);
 
-        this.driver = new Red5.RTCPublisher();
-        this.driver.on('*', e => this.pipeEvent(e));
+        this.publisher = new Red5.RTCPublisher();
+        this.publisher.on('*', e => this.pipeEvent(e));
 
         this.start();
     }
@@ -24,8 +24,9 @@ class Publisher {
     }
 
     start() {
-        this.driver.init(this.redConfig)
-            .then(() => this.driver.publish())
+        console.log('Starting...');
+        this.publisher.init(this.driverConfig)
+            .then(publisher => publisher.publish())
             .catch(error => {
                 console.error('Could not publish: ' + error);
             });
@@ -33,8 +34,8 @@ class Publisher {
 
     stop() {
         console.log('Stopping...');
-        this.driver.unpublish();
-        return ajax.delete('/api/broadcast');
+        ajax.delete('/api/broadcast');
+        this.publisher.unpublish();
     }
 
     onStart() {

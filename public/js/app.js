@@ -82323,10 +82323,10 @@ var Publisher = function () {
         _classCallCheck(this, Publisher);
 
         this.config = config;
-        this.redConfig = _.extend({}, LiveStream.config, this.config.driver);
+        this.driverConfig = _.extend({}, LiveStream.config, this.config.driver);
 
-        this.driver = new Red5.RTCPublisher();
-        this.driver.on('*', function (e) {
+        this.publisher = new Red5.RTCPublisher();
+        this.publisher.on('*', function (e) {
             return _this.pipeEvent(e);
         });
 
@@ -82349,10 +82349,9 @@ var Publisher = function () {
     }, {
         key: 'start',
         value: function start() {
-            var _this2 = this;
-
-            this.driver.init(this.redConfig).then(function () {
-                return _this2.driver.publish();
+            console.log('Starting...');
+            this.publisher.init(this.driverConfig).then(function (publisher) {
+                return publisher.publish();
             }).catch(function (error) {
                 console.error('Could not publish: ' + error);
             });
@@ -82361,19 +82360,19 @@ var Publisher = function () {
         key: 'stop',
         value: function stop() {
             console.log('Stopping...');
-            this.driver.unpublish();
-            return ajax.delete('/api/broadcast');
+            ajax.delete('/api/broadcast');
+            this.publisher.unpublish();
         }
     }, {
         key: 'onStart',
         value: function onStart() {
-            var _this3 = this;
+            var _this2 = this;
 
             if (!this.config.createNew) return;
 
             return ajax.post('/api/broadcast').then(function (r) {
-                if (!'onBroadcasting' in _this3.config) return;
-                _this3.config.onBroadcasting(r.data);
+                if (!'onBroadcasting' in _this2.config) return;
+                _this2.config.onBroadcasting(r.data);
             });
         }
     }]);
@@ -85850,6 +85849,19 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user', 'broadcast'],
@@ -85921,15 +85933,18 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
                 createNew: !this.online,
 
+                onStart: function onStart() {
+                    vm.$refs.video.load();
+                    vm.$refs.video.play();
+                },
                 onBroadcasting: function onBroadcasting(broadcast) {
                     vm.online = broadcast.online;
                     vm.startingStream = false;
-                    location.reload();
                 },
                 onFail: function onFail() {
                     vm.offline = {
-                        icon: 'error_outline',
                         title: 'Error',
+                        icon: 'error_outline',
                         text: 'Failed to start live stream.'
                     };
                 }
@@ -86091,16 +86106,32 @@ var render = function() {
             : _vm._e(),
           _vm._v(" "),
           _c("div", [
+            _vm.online && !_vm.online
+              ? _c("video", {
+                  ref: "video",
+                  class: _vm.videoClasses,
+                  attrs: {
+                    controls: "",
+                    autoplay: "",
+                    width: "100%",
+                    height: "540",
+                    id: "watch-video-driver",
+                    poster: _vm.user.avatar_url,
+                    "data-setup": _vm.videoSetupJson
+                  }
+                })
+              : _vm._e(),
+            _vm._v(" "),
             _c("video", {
-              class: _vm.videoClasses,
+              ref: "video",
+              staticClass: "is-pulled-left",
               attrs: {
                 controls: "",
                 autoplay: "",
                 width: "100%",
                 height: "540",
                 id: "watch-video-driver",
-                poster: _vm.user.avatar_url,
-                "data-setup": _vm.videoSetupJson
+                poster: _vm.user.avatar_url
               }
             })
           ])

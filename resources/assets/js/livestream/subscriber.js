@@ -25,9 +25,7 @@ class Subscriber {
 
     start() {
         this.driver.init(this.redConfig)
-            .then(() => {
-                return this.driver.subscribe();
-            })
+            .then(() => this.driver.subscribe())
             .catch(error => {
                 console.log('Could not play: ' + error);
             });
