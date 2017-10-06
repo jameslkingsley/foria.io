@@ -15268,6 +15268,10 @@ hr {
   height: 2.25em;
 }
 
+.cursor-default {
+  cursor: default !important;
+}
+
 .watch-video-container {
   height: 640px;
   background: #fff;

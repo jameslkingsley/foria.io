@@ -113,14 +113,11 @@ class VideoController extends Controller
      */
     public function show(Video $video)
     {
-        if (! $video->is_mine && $video->privacy == 'private') {
+        if (! $video->previewable() && ! $video->viewable()) {
             return abort(404);
         }
 
-        $video->load('user')
-            ->load('comments');
-
-        $video->comments->load('user');
+        $video->load('user', 'comments.user');
 
         return vue('f-video', compact('video'));
     }
@@ -133,9 +130,7 @@ class VideoController extends Controller
      */
     public function showJson(Video $video)
     {
-        $video->load('user');
-
-        return $video;
+        return $video->load('user');
     }
 
     /**

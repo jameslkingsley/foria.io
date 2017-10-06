@@ -15,8 +15,16 @@ class ReportController extends Controller
      */
     public function index(Model $model)
     {
+        if (auth()->guest()) {
+            return response()->json([
+                'data' => null
+            ]);
+        }
+
         return response()->json([
-            'data' => $model->reports()->first()
+            'data' => $model->reports()
+                ->where('user_id', auth()->user()->id)
+                ->first()
         ]);
     }
 
@@ -43,11 +51,7 @@ class ReportController extends Controller
             'body' => 'string|nullable'
         ]);
 
-        if (! $model->reports()->empty()) {
-            return abort(403);
-        }
-
-        return $model->report($request->reason, $request->body);
+        $model->report($request->reason, $request->body);
     }
 
     /**

@@ -9,7 +9,13 @@
             </a>
 
             <b-dropdown-item custom v-if="loaded">
-                <div v-if="auth.has_card_on_file">
+                <div v-if="!auth || unauthorized" class="subscription-content has-text-centered">
+                    <p>You need to be logged in to subscribe. Click the buttons below to login or register.</p>
+                    <a href="/login" class="button is-primary m-t-3 m-b-3">Login</a>
+                    <a href="/register" class="button is-primary m-t-3 m-b-3">Register</a>
+                </div>
+
+                <div v-if="auth && auth.has_card_on_file">
                     <div class="subscription-content has-text-centered" v-if="subscribed">
                         <small class="is-muted">
                             {{ willCancel ? 'Expires' : 'Renews' }} on {{ subscription.ends_at | datetime }}
@@ -62,7 +68,7 @@
                     </div>
                 </div>
 
-                <div v-else class="subscription-content has-text-centered">
+                <div v-if="auth && !auth.has_card_on_file && !unauthorized" class="subscription-content has-text-centered">
                     <p>Before you can subscribe, you need to add a card to your account. Click the button below.</p>
                     <a href="/settings/#billing" class="button is-primary m-t-3 m-b-3">Add a card</a>
                 </div>
@@ -84,6 +90,7 @@
                 auth: null,
                 loaded: false,
                 subscription: null,
+                unauthorized: false,
                 isCancelling: false,
                 isCreating: false,
                 planId: this.plan || 'bronze',
@@ -98,7 +105,7 @@
 
         computed: {
             containerId() {
-                if (! this.loaded) {
+                if (! this.loaded || this.unauthorized) {
                     return '';
                 }
 
@@ -180,7 +187,7 @@
             create() {
                 this.isCreating = true;
 
-                axios.post('/api/subscription', { user_id: this.user.id, plan: this.planId }).then(r => {
+                ajax.post('/api/subscription', { user_id: this.user.id, plan: this.planId }).then(r => {
                     this.fetch();
                     this.isCreating = false;
                     this.$emit('success');
@@ -190,26 +197,34 @@
             cancel() {
                 this.isCancelling = true;
 
-                axios.delete(`/api/subscription/${this.user.name}`).then(r => {
+                ajax.delete(`/api/subscription/${this.user.name}`).then(r => {
                     this.fetch();
                     this.isCancelling = false;
                 });
             },
 
             fetch() {
-                axios.get(`/api/subscription/${this.user.name}`).then(r => {
-                    this.subscription = r.data.subscription;
-                    this.auth = r.data.user;
-                    this.plans = r.data.plans;
-                    this.loaded = true;
+                ajax.get(`/api/subscription/${this.user.name}`)
+                    .then(r => {
+                        this.subscription = r.data.subscription;
+                        this.auth = r.data.user;
+                        this.plans = r.data.plans;
+                        this.loaded = true;
 
-                    if (this.plan) {
-                        this.plans = _.map(this.plans, plan => {
-                            plan.disabled = this.planMap[plan.id] < this.planMap[this.plan];
-                            return plan;
-                        });
-                    }
-                });
+                        if (this.plan) {
+                            this.plans = _.map(this.plans, plan => {
+                                plan.disabled = this.planMap[plan.id] < this.planMap[this.plan];
+                                return plan;
+                            });
+                        }
+                    })
+                    .catch(e => {
+                        this.loaded = true;
+
+                        if (e.response.status == 401) {
+                            this.unauthorized = true;
+                        }
+                    });
             }
         },
 

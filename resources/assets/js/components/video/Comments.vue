@@ -2,7 +2,7 @@
     <div>
         <h1 class="subtitle m-b-3">Comments</h1>
 
-        <form method="post" @submit.prevent="post">
+        <form v-if="authorized" method="post" @submit.prevent="post">
             <input class="input" name="body" v-model="body" placeholder="Type a comment...">
         </form>
 
@@ -43,6 +43,12 @@
                 comments: this.preload,
                 body: ''
             };
+        },
+
+        computed: {
+            authorized() {
+                return Foria.user !== null;
+            }
         },
 
         methods: {

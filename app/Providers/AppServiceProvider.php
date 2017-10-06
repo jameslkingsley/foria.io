@@ -30,10 +30,6 @@ class AppServiceProvider extends ServiceProvider
         View::share('reportableReasons', Report::reasons());
 
         Stripe::setApiKey(config('services.stripe.secret'));
-
-        Route::bind('ref', function ($hash) {
-            return reference($hash);
-        });
     }
 
     /**
@@ -47,14 +43,6 @@ class AppServiceProvider extends ServiceProvider
             config('services.aws.cloudfront.key'),
             config('services.aws.cloudfront.secret')
         );
-
-        $this->app->bind('Aws\CloudFront\CloudFrontClient', function ($app) use ($awsCredentials) {
-            return CloudFrontClient::factory([
-                'credentials' => $awsCredentials,
-                'region' => config('services.aws.cloudfront.region'),
-                'version' => '2017-03-25',
-            ]);
-        });
 
         $this->app->bind('Aws\ElasticTranscoder\ElasticTranscoderClient', function ($app) use ($awsCredentials) {
             return ElasticTranscoderClient::factory([

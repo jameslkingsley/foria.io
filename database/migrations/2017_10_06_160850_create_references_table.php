@@ -13,13 +13,13 @@ class CreateReferencesTable extends Migration
      */
     public function up()
     {
-        Schema::create('references', function (Blueprint $table) {
+        Schema::create(config('references.table_name'), function (Blueprint $table) {
             $table->increments('id');
-            $table->string('hash');
+            $table->string('hash')->index();
             $table->morphs('model');
             $table->timestamps();
 
-            $table->unique('hash');
+            $table->unique(['hash', 'model_id', 'model_type']);
         });
     }
 
@@ -30,6 +30,6 @@ class CreateReferencesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('references');
+        Schema::dropIfExists(config('references.table_name'));
     }
 }

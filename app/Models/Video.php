@@ -174,6 +174,24 @@ class Video extends Model implements Purchase
     }
 
     /**
+     * Determines if the video can be previewed.
+     *
+     * @return boolean
+     */
+    public function previewable()
+    {
+        if ($this->is_mine) {
+            return true;
+        }
+
+        if ($this->privacy == 'private') {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Determines if the video can be viewed by the authenticated user.
      *
      * @return boolean

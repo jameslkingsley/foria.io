@@ -26,7 +26,6 @@ class SubscriptionController extends Controller
     public function index()
     {
         $subscriptions = Subscription::where('from_id', auth()->user()->id)
-            // ->with('from')
             ->with('to')
             ->orderBy('created_at', 'desc')
             ->get();

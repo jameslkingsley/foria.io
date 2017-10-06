@@ -20,7 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('avatar')->nullable();
             $table->longText('bio')->nullable();
-            $table->longText('topic')->nullable()->default('My First Stream!');
+            $table->string('topic')->nullable()->default('My First Stream!');
             $table->bigInteger('tokens')->default(0);
             $table->boolean('is_model')->default(false);
             $table->string('stripe_id')->nullable();

@@ -84236,6 +84236,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
 
 
+    computed: {
+        authorized: function authorized() {
+            return Foria.user !== null;
+        }
+    },
+
     methods: {
         post: function post() {
             var _this = this;
@@ -84273,41 +84279,43 @@ var render = function() {
   return _c("div", [
     _c("h1", { staticClass: "subtitle m-b-3" }, [_vm._v("Comments")]),
     _vm._v(" "),
-    _c(
-      "form",
-      {
-        attrs: { method: "post" },
-        on: {
-          submit: function($event) {
-            $event.preventDefault()
-            _vm.post($event)
-          }
-        }
-      },
-      [
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.body,
-              expression: "body"
-            }
-          ],
-          staticClass: "input",
-          attrs: { name: "body", placeholder: "Type a comment..." },
-          domProps: { value: _vm.body },
-          on: {
-            input: function($event) {
-              if ($event.target.composing) {
-                return
+    _vm.authorized
+      ? _c(
+          "form",
+          {
+            attrs: { method: "post" },
+            on: {
+              submit: function($event) {
+                $event.preventDefault()
+                _vm.post($event)
               }
-              _vm.body = $event.target.value
             }
-          }
-        })
-      ]
-    ),
+          },
+          [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.body,
+                  expression: "body"
+                }
+              ],
+              staticClass: "input",
+              attrs: { name: "body", placeholder: "Type a comment..." },
+              domProps: { value: _vm.body },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.body = $event.target.value
+                }
+              }
+            })
+          ]
+        )
+      : _vm._e(),
     _vm._v(" "),
     !_vm.loaded
       ? _c("p", { staticClass: "m-t-3" }, [_vm._v("Loading...")])
@@ -84449,6 +84457,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             return {
                 'rating': true,
                 'rating-like': true,
+                'cursor-default': !this.authorized,
                 'is-active': this.preloaded.has_liked || false
             };
         },
@@ -84456,13 +84465,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             return {
                 'rating': true,
                 'rating-dislike': true,
+                'cursor-default': !this.authorized,
                 'is-active': this.preloaded.has_disliked || false
             };
+        },
+        authorized: function authorized() {
+            return Foria.user !== null;
         }
     },
 
     methods: {
         like: function like() {
+            if (!this.authorized) return;
+
             if (this.preloaded.has_liked) return this.unrate();
 
             ajax.post('/api/ratings/' + this.reference, {
@@ -84470,6 +84485,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }).then(this.fetch);
         },
         dislike: function dislike() {
+            if (!this.authorized) return;
+
             if (this.preloaded.has_disliked) return this.unrate();
 
             ajax.post('/api/ratings/' + this.reference, {
@@ -84477,6 +84494,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }).then(this.fetch);
         },
         unrate: function unrate() {
+            if (!this.authorized) return;
+
             ajax.delete('/api/ratings/' + this.reference).then(this.fetch);
         },
         fetch: function fetch() {
@@ -85169,6 +85188,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: {
@@ -85182,6 +85207,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             auth: null,
             loaded: false,
             subscription: null,
+            unauthorized: false,
             isCancelling: false,
             isCreating: false,
             planId: this.plan || 'bronze',
@@ -85197,7 +85223,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     computed: {
         containerId: function containerId() {
-            if (!this.loaded) {
+            if (!this.loaded || this.unauthorized) {
                 return '';
             }
 
@@ -85269,7 +85295,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             this.isCreating = true;
 
-            axios.post('/api/subscription', { user_id: this.user.id, plan: this.planId }).then(function (r) {
+            ajax.post('/api/subscription', { user_id: this.user.id, plan: this.planId }).then(function (r) {
                 _this2.fetch();
                 _this2.isCreating = false;
                 _this2.$emit('success');
@@ -85280,7 +85306,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             this.isCancelling = true;
 
-            axios.delete('/api/subscription/' + this.user.name).then(function (r) {
+            ajax.delete('/api/subscription/' + this.user.name).then(function (r) {
                 _this3.fetch();
                 _this3.isCancelling = false;
             });
@@ -85288,7 +85314,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         fetch: function fetch() {
             var _this4 = this;
 
-            axios.get('/api/subscription/' + this.user.name).then(function (r) {
+            ajax.get('/api/subscription/' + this.user.name).then(function (r) {
                 _this4.subscription = r.data.subscription;
                 _this4.auth = r.data.user;
                 _this4.plans = r.data.plans;
@@ -85299,6 +85325,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                         plan.disabled = _this4.planMap[plan.id] < _this4.planMap[_this4.plan];
                         return plan;
                     });
+                }
+            }).catch(function (e) {
+                _this4.loaded = true;
+
+                if (e.response.status == 401) {
+                    _this4.unauthorized = true;
                 }
             });
         }
@@ -85349,7 +85381,39 @@ var render = function() {
           _vm._v(" "),
           _vm.loaded
             ? _c("b-dropdown-item", { attrs: { custom: "" } }, [
-                _vm.auth.has_card_on_file
+                !_vm.auth || _vm.unauthorized
+                  ? _c(
+                      "div",
+                      { staticClass: "subscription-content has-text-centered" },
+                      [
+                        _c("p", [
+                          _vm._v(
+                            "You need to be logged in to subscribe. Click the buttons below to login or register."
+                          )
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "a",
+                          {
+                            staticClass: "button is-primary m-t-3 m-b-3",
+                            attrs: { href: "/login" }
+                          },
+                          [_vm._v("Login")]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "a",
+                          {
+                            staticClass: "button is-primary m-t-3 m-b-3",
+                            attrs: { href: "/register" }
+                          },
+                          [_vm._v("Register")]
+                        )
+                      ]
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.auth && _vm.auth.has_card_on_file
                   ? _c("div", [
                       _vm.subscribed
                         ? _c(
@@ -85553,7 +85617,10 @@ var render = function() {
                             2
                           )
                     ])
-                  : _c(
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.auth && !_vm.auth.has_card_on_file && !_vm.unauthorized
+                  ? _c(
                       "div",
                       { staticClass: "subscription-content has-text-centered" },
                       [
@@ -85573,6 +85640,7 @@ var render = function() {
                         )
                       ]
                     )
+                  : _vm._e()
               ])
             : _vm._e()
         ],

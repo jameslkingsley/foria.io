@@ -36,6 +36,7 @@
                 return {
                     'rating': true,
                     'rating-like': true,
+                    'cursor-default': !this.authorized,
                     'is-active': this.preloaded.has_liked || false
                 };
             },
@@ -44,13 +45,20 @@
                 return {
                     'rating': true,
                     'rating-dislike': true,
+                    'cursor-default': !this.authorized,
                     'is-active': this.preloaded.has_disliked || false
                 };
+            },
+
+            authorized() {
+                return Foria.user !== null;
             }
         },
 
         methods: {
             like() {
+                if (!this.authorized) return;
+
                 if (this.preloaded.has_liked) return this.unrate();
 
                 ajax.post(`/api/ratings/${this.reference}`, {
@@ -59,6 +67,8 @@
             },
 
             dislike() {
+                if (!this.authorized) return;
+
                 if (this.preloaded.has_disliked) return this.unrate();
 
                 ajax.post(`/api/ratings/${this.reference}`, {
@@ -67,6 +77,8 @@
             },
 
             unrate() {
+                if (!this.authorized) return;
+
                 ajax.delete(`/api/ratings/${this.reference}`)
                     .then(this.fetch);
             },

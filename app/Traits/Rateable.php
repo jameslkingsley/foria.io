@@ -53,6 +53,10 @@ trait Rateable
      */
     public function hasLiked()
     {
+        if (auth()->guest()) {
+            return false;
+        }
+
         return $this->ratings()
             ->where('user_id', auth()->user()->id)
             ->where('type', 'like')
@@ -66,6 +70,10 @@ trait Rateable
      */
     public function hasDisliked()
     {
+        if (auth()->guest()) {
+            return false;
+        }
+
         return $this->ratings()
             ->where('user_id', auth()->user()->id)
             ->where('type', 'dislike')

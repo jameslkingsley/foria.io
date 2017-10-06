@@ -1,5 +1,9 @@
 <?php
 
+Route::get('/test', function () {
+    dd(reference('hash'));
+});
+
 // Homepage
 Route::get('/', 'HomeController@index')->name('home');
 
