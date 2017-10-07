@@ -15,7 +15,9 @@ Vue.component('f-video', require('./components/video/Index.vue'));
 Vue.component('f-video-upload', require('./components/video/Upload.vue'));
 Vue.component('f-video-edit', require('./components/video/Edit.vue'));
 Vue.component('f-video-list', require('./components/video/List.vue'));
+Vue.component('f-video-item', require('./components/video/Item.vue'));
 Vue.component('f-video-comments', require('./components/video/Comments.vue'));
+Vue.component('f-video-library', require('./components/video/Library.vue'));
 
 // Ratings
 Vue.component('f-rating', require('./components/Rating.vue'));

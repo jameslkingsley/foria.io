@@ -103,4 +103,17 @@ trait Followable
             ->where('user_id', $this->id)
             ->exists();
     }
+
+    /**
+     * Gets the followed models of this user.
+     *
+     * @return Illuminate\Database\Eloquent\Collection
+     */
+    public function follows()
+    {
+        return Follow::whereUserId($this->id)
+            ->orderBy('created_at', 'desc')
+            ->with('model')
+            ->get();
+    }
 }

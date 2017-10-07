@@ -4,11 +4,12 @@ namespace App\Models;
 
 use App\Traits\Rateable;
 use App\Traits\Reportable;
+use App\Contracts\Purchase;
 use App\Traits\Commentable;
 use App\Traits\Purchasable;
-use App\Contracts\Purchase;
 use App\Traits\BelongsToUser;
 use App\Traits\Referenceable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
@@ -116,10 +117,15 @@ class Video extends Model implements Purchase
      */
     public function getThumbnailsAttribute()
     {
-        $files = Storage::files($this->getPath('thumbnails'));
+        // TODO Store thumbnail URLs in database since they won't change
+        $video = $this;
 
-        return collect($files)->sort()->transform(function ($file) {
-            return Storage::url($file);
+        return Cache::remember("videos-thumbnails-{$this->id}", 60, function () use ($video) {
+            $files = Storage::files($video->getPath('thumbnails'));
+
+            return collect($files)->sort()->transform(function ($file) {
+                return Storage::url($file);
+            });
         });
     }
 
@@ -239,5 +245,52 @@ class Video extends Model implements Purchase
         }
 
         return null;
+    }
+
+    /**
+     * Gets a collection of recent videos.
+     *
+     * @return Illuminate\Database\Eloquent\Collection
+     */
+    public static function recent()
+    {
+        return Cache::remember('videos-trending', 60, function () {
+            return static::wherePrivacy('public')
+                ->whereHasProcessed(true)
+                ->with('user')
+                ->orderBy('created_at', 'desc')
+                ->take(12)
+                ->get();
+        });
+    }
+
+    /**
+     * Gets a collection of trending videos.
+     *
+     * @return Illuminate\Database\Eloquent\Collection
+     */
+    public static function trending()
+    {
+        // TODO Get the most viewed videos this week
+
+        return collect();
+    }
+
+    /**
+     * Gets a collection of the authenticated user's feed.
+     *
+     * @return Illuminate\Database\Eloquent\Collection
+     */
+    public static function feed()
+    {
+        return Cache::remember('videos-feed', 60, function () {
+            return auth()->user()->follows()->transform(function ($follow) {
+                return $follow->model->videos()
+                    ->where('created_at', '>=', now()->subMonth())
+                    ->with('user')
+                    ->take(6)
+                    ->get();
+            })->collapse();
+        });
     }
 }

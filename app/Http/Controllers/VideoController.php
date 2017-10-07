@@ -23,7 +23,7 @@ class VideoController extends Controller
      */
     public function index(User $user)
     {
-        return $user->videos();
+        return $user->videos;
     }
 
     /**

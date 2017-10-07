@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Video;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -11,8 +12,12 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Video $video)
     {
-        return view('home');
+        $trending = $video->trending();
+        $feed = $video->feed();
+        $recent = $video->recent();
+
+        return vue('f-video-library', compact('trending', 'feed', 'recent'));
     }
 }
