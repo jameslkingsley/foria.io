@@ -283,6 +283,10 @@ class Video extends Model implements Purchase
      */
     public static function feed()
     {
+        if (auth()->guest()) {
+            return collect();
+        }
+
         return Cache::remember('videos-feed', 60, function () {
             return auth()->user()->follows()->transform(function ($follow) {
                 return $follow->model->videos()

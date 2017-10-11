@@ -83445,7 +83445,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             axios.post('/api/videos', video.form).then(function (r) {
                 _this.uploaded = true;
-                window.location.href = r.data.edit_url;
+                // window.location.href = r.data.edit_url;
             });
         }
     },
@@ -84608,6 +84608,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
         // Recently uploaded by anyone
         recent: { type: Array, default: [] }
+    },
+
+    computed: {
+        auth: function auth() {
+            return Foria.user !== null;
+        }
     }
 });
 
@@ -84620,15 +84626,22 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("h3", { staticClass: "section-title" }, [_vm._v("Your Feed")]),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "video-list", staticStyle: { "margin-bottom": "7rem" } },
-      _vm._l(_vm.feed, function(video, index) {
-        return _c("f-video-item", { key: index, attrs: { video: video } })
-      })
-    ),
+    _vm.auth
+      ? _c("div", [
+          _c("h3", { staticClass: "section-title" }, [_vm._v("Your Feed")]),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              staticClass: "video-list",
+              staticStyle: { "margin-bottom": "7rem" }
+            },
+            _vm._l(_vm.feed, function(video, index) {
+              return _c("f-video-item", { key: index, attrs: { video: video } })
+            })
+          )
+        ])
+      : _vm._e(),
     _vm._v(" "),
     _c("h3", { staticClass: "section-title" }, [_vm._v("Recent")]),
     _vm._v(" "),

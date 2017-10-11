@@ -37,7 +37,7 @@
                 axios.post(`/api/videos`, video.form)
                     .then(r => {
                         this.uploaded = true;
-                        window.location.href = r.data.edit_url;
+                        // window.location.href = r.data.edit_url;
                     });
             }
         },

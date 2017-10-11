@@ -11,6 +11,7 @@ use App\Events\UploadProgress;
 use App\Jobs\TranscoderStatus;
 use Aws\CloudFront\CloudFrontClient;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\VideoUploadRequest;
 use Aws\Exception\MultipartUploadException;
 use Aws\ElasticTranscoder\ElasticTranscoderClient;
 
@@ -39,11 +40,20 @@ class VideoController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  App\Http\Requests\VideoUploadRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, ElasticTranscoderClient $transcoder)
+    public function store(VideoUploadRequest $request)
     {
+        try {
+            $request->handle();
+        } catch (\Exception $e) {
+            \Log::info($e);
+            return $e->getMessage();
+        }
+
+        return;
+
         // Validate file is video
         $request->validate([
             'video' => ['required'] // TODO Check if video

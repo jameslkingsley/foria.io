@@ -1,6 +1,6 @@
 <template>
     <div>
-        <!-- <div v-if="true"> -->
+        <div v-if="auth">
             <h3 class="section-title">Your Feed</h3>
 
             <div class="video-list" style="margin-bottom: 7rem">
@@ -10,7 +10,7 @@
                     :video="video">
                 </f-video-item>
             </div>
-        <!-- </div> -->
+        </div>
 
         <h3 class="section-title">Recent</h3>
 
@@ -35,6 +35,12 @@
 
             // Recently uploaded by anyone
             recent: { type: Array, default: [] }
+        },
+
+        computed: {
+            auth() {
+                return Foria.user !== null;
+            }
         }
     }
 </script>
