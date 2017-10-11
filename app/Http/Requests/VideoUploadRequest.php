@@ -4,10 +4,8 @@ namespace App\Http\Requests;
 
 use FFMpeg\FFMpeg;
 use App\Jobs\ProcessVideo;
-use FFMpeg\Format\Video as Format;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Http\FormRequest;
-use FFMpeg\Filters\Video\ExtractMultipleFramesFilter;
 
 class VideoUploadRequest extends FormRequest
 {
@@ -35,9 +33,11 @@ class VideoUploadRequest extends FormRequest
         $this->key = md5(microtime());
 
         $this->destination = (object) [
+            'key' => $this->key,
             'directory' => "videos/{$this->key}",
             'unprocessed' => "app/videos/{$this->key}/unprocessed.",
             'processed' => "app/videos/{$this->key}/processed.mp4",
+            'preview' => "app/videos/{$this->key}/preview.mp4",
             'thumbnails' => "app/videos/{$this->key}/thumbnails"
         ];
     }
@@ -66,21 +66,11 @@ class VideoUploadRequest extends FormRequest
     }
 
     /**
-     * Handles the video upload request.
-     *
-     * @return mixed
-     */
-    public function handle()
-    {
-        $this->upload();
-    }
-
-    /**
      * Uploads the video file.
      *
      * @return mixed
      */
-    protected function upload()
+    public function upload()
     {
         $file = $this->file('video');
 
@@ -94,47 +84,11 @@ class VideoUploadRequest extends FormRequest
         Storage::disk('root')
             ->put($destination, $source, 'private');
 
-        ProcessVideo::dispatch($this->destination, storage_path($destination));
-    }
-
-    /**
-     * Collects the meta data such as a preview video and thumbnails.
-     *
-     * @return mixed
-     */
-    protected function collect()
-    {
-        \Log::info('File exists? ' . file_exists(storage_path($this->destination->processed)));
-
-        $video = FFMpeg::create()
-            ->open(storage_path($this->destination->processed));
-
-        $duration = $video->getStreams()
-            ->videos()
-            ->first()
-            ->get('duration');
-
-        // Create thumbnails directory
-        mkdir(storage_path($this->destination->thumbnails));
-
-        $video
-            ->filters()
-            ->extractMultipleFrames(
-                ExtractMultipleFramesFilter::FRAMERATE_EVERY_60SEC,
-                storage_path($this->destination->thumbnails)
-            )
-            ->synchronize();
-
-        $this->saveEncoding($video);
-    }
-
-    /**
-     * Deploy the converted video to cloud storage.
-     *
-     * @return mixed
-     */
-    protected function deploy()
-    {
-        //
+        ProcessVideo::dispatch(
+            $this->destination,
+            storage_path($destination),
+            $file->getClientOriginalName(),
+            auth()->user()
+        );
     }
 }

@@ -83425,14 +83425,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
+            total: 100,
+            progress: 0,
             uploaded: false,
             filePicked: false,
-            progress: 0,
-            total: 0
+            processing: false
         };
     },
 
@@ -83441,22 +83452,23 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         uploadVideo: function uploadVideo(video) {
             var _this = this;
 
+            var vm = this;
             this.filePicked = true;
 
-            axios.post('/api/videos', video.form).then(function (r) {
+            ajax.post('/api/videos', video.form, {
+                onUploadProgress: function onUploadProgress(e) {
+                    var percent = Math.round(e.loaded * 100 / e.total);
+                    vm.progress = percent;
+                }
+            }).then(function (r) {
                 _this.uploaded = true;
-                // window.location.href = r.data.edit_url;
+                _this.processing = true;
             });
         }
     },
 
     created: function created() {
-        var _this2 = this;
-
-        Echo.private('App.User.' + Foria.user.id).listen('UploadProgress', function (e) {
-            _this2.total = e.total;
-            _this2.progress = e.progress;
-        });
+        //
     }
 });
 
@@ -83471,7 +83483,17 @@ var render = function() {
   return _c("div", { staticClass: "card p-3" }, [
     _c(
       "form",
-      { attrs: { enctype: "multipart/form-data" } },
+      {
+        directives: [
+          {
+            name: "show",
+            rawName: "v-show",
+            value: !_vm.processing,
+            expression: "! processing"
+          }
+        ],
+        attrs: { enctype: "multipart/form-data" }
+      },
       [
         _c(
           "div",
@@ -83489,15 +83511,11 @@ var render = function() {
           [
             _c("div", { staticClass: "column is-4 is-offset-4" }, [
               _c("div", { staticClass: "w100 has-text-centered p-5" }, [
-                _c(
-                  "progress",
-                  {
-                    staticClass: "progress is-primary",
-                    attrs: { max: _vm.total },
-                    domProps: { value: _vm.progress }
-                  },
-                  [_vm._v(_vm._s(_vm.progress) + "%")]
-                )
+                _c("progress", {
+                  staticClass: "progress is-primary",
+                  attrs: { max: _vm.total },
+                  domProps: { value: _vm.progress }
+                })
               ])
             ])
           ]
@@ -83522,6 +83540,50 @@ var render = function() {
         })
       ],
       1
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        directives: [
+          {
+            name: "show",
+            rawName: "v-show",
+            value: _vm.filePicked,
+            expression: "filePicked"
+          }
+        ],
+        staticClass: "columns m-0"
+      },
+      [
+        _c("div", { staticClass: "column is-4 is-offset-4" }, [
+          _c(
+            "div",
+            {
+              directives: [
+                {
+                  name: "show",
+                  rawName: "v-show",
+                  value: _vm.processing,
+                  expression: "processing"
+                }
+              ],
+              staticClass: "w100 has-text-centered p-5"
+            },
+            [
+              _vm._v("\n                Video is now processing."),
+              _c("br"),
+              _vm._v(
+                "\n                You can close this window and check back later."
+              ),
+              _c("br"),
+              _vm._v(
+                "\n                You will be notified when the video is ready.\n            "
+              )
+            ]
+          )
+        ])
+      ]
     )
   ])
 }

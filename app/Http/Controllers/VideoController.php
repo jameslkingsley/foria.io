@@ -2,18 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Aws\Command;
 use App\Models\User;
 use App\Models\Video;
 use Illuminate\Http\Request;
-use Aws\S3\MultipartUploader;
-use App\Events\UploadProgress;
-use App\Jobs\TranscoderStatus;
-use Aws\CloudFront\CloudFrontClient;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\VideoUploadRequest;
-use Aws\Exception\MultipartUploadException;
-use Aws\ElasticTranscoder\ElasticTranscoderClient;
 
 class VideoController extends Controller
 {
@@ -46,73 +39,10 @@ class VideoController extends Controller
     public function store(VideoUploadRequest $request)
     {
         try {
-            $request->handle();
+            $request->upload();
         } catch (\Exception $e) {
-            \Log::info($e);
-            return $e->getMessage();
+            return abort(400, $e->getMessage());
         }
-
-        return;
-
-        // Validate file is video
-        $request->validate([
-            'video' => ['required'] // TODO Check if video
-        ]);
-
-        // Upload video to AWS S3
-        $file = $request->file('video');
-        $source = fopen($file->getRealPath(), 'r+');
-        $name = md5(microtime());
-        $destination = "videos/$name/$name.{$file->guessClientExtension()}";
-
-        $client = Storage::cloud()->getDriver()->getAdapter()->getClient();
-
-        $client->putObject([
-            'Bucket' => config('filesystems.disks.s3.bucket'),
-            'Key' => $destination,
-            'SourceFile' => $file,
-            '@http' => [
-                'progress' => function ($downloadTotalSize, $downloadSizeSoFar, $uploadTotalSize, $uploadSizeSoFar) {
-                    $lastEmit = session('lastUploadProgressTime', null);
-
-                    if (is_null($lastEmit) || (time() - $lastEmit) >= 1) {
-                        // Emit progress data
-                        event(new UploadProgress(auth()->user(), $uploadSizeSoFar, $uploadTotalSize));
-
-                        // Store emit time in session
-                        session(['lastUploadProgressTime' => time()]);
-                    }
-                }
-            ]
-        ]);
-
-        $transcodedPath = "videos/$name/transcoded/$name.mp4";
-
-        // Create the transcoder job (convert to MP4)
-        $transcode = $transcoder->createJob([
-            'PipelineId' => config('services.aws.ets.pipeline_id'),
-            'Input' => ['Key' => $destination],
-            'Output' => [
-                'Key' => $transcodedPath,
-                'PresetId' => config('services.aws.ets.preset_id'),
-                'ThumbnailPattern' => "videos/$name/thumbnails/{count}"
-            ]
-        ])->toArray();
-
-        // Create video record
-        $video = Video::create([
-            'user_id' => auth()->user()->id,
-            'name' => $file->getClientOriginalName(),
-            'key' => $name,
-            'path' => $transcodedPath,
-            'transcoder_id' => $transcode['Job']['Id']
-        ]);
-
-        // Dispatch the status job to update the processing
-        // status once the transcoder has completed
-        TranscoderStatus::dispatch(auth()->user(), $video);
-
-        return $video;
     }
 
     /**
