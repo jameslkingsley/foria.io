@@ -9,6 +9,8 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class VideoUploadRequest extends FormRequest
 {
+    protected $redirect = '/test';
+
     /**
      * The key name of the video.
      *
@@ -34,7 +36,7 @@ class VideoUploadRequest extends FormRequest
 
         $this->destination = (object) [
             'key' => $this->key,
-            'directory' => "videos/{$this->key}",
+            'directory' => "app/videos/{$this->key}",
             'unprocessed' => "app/videos/{$this->key}/unprocessed.",
             'processed' => "app/videos/{$this->key}/processed.mp4",
             'preview' => "app/videos/{$this->key}/preview.mp4",
@@ -61,14 +63,14 @@ class VideoUploadRequest extends FormRequest
     public function rules()
     {
         return [
-            'video' => ['required']
+            // 'video' => ['required']
         ];
     }
 
     /**
      * Uploads the video file.
      *
-     * @return mixed
+     * @return object
      */
     public function upload()
     {
@@ -80,6 +82,7 @@ class VideoUploadRequest extends FormRequest
         );
 
         $destination = $this->destination->unprocessed . $file->guessClientExtension();
+        \Log::info('Request Upload: '.$destination);
 
         Storage::disk('root')
             ->put($destination, $source, 'private');
@@ -90,5 +93,7 @@ class VideoUploadRequest extends FormRequest
             $file->getClientOriginalName(),
             auth()->user()
         );
+
+        return $this->destination;
     }
 }

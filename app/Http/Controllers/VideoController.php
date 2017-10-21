@@ -39,8 +39,11 @@ class VideoController extends Controller
     public function store(VideoUploadRequest $request)
     {
         try {
-            $request->upload();
+            return response()->json(
+                $request->upload()
+            );
         } catch (\Exception $e) {
+            // \Log::error($e);
             return abort(400, $e->getMessage());
         }
     }

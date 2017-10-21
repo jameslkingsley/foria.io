@@ -9,6 +9,7 @@ use FFMpeg\Format\Video\X264;
 use Illuminate\Bus\Queueable;
 use FFMpeg\Coordinate\TimeCode;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Queue\InteractsWithQueue;
 use App\Exceptions\VideoTooShortException;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -26,7 +27,7 @@ class ProcessVideo implements ShouldQueue
      *
      * @var object
      */
-    protected $paths;
+    public $paths;
 
     /**
      * The raw video file.
@@ -71,16 +72,34 @@ class ProcessVideo implements ShouldQueue
     protected $thumbnailInterval = 6;
 
     /**
+     * The tester object.
+     *
+     * @var object|null
+     */
+    protected $tester;
+
+    /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($paths, $file, $name, User $user)
+    public function __construct($paths, $file, $name, User $user, $tester = null)
     {
         $this->paths = $paths;
         $this->file = $file;
         $this->name = $name;
         $this->user = $user;
+        $this->tester = $tester;
+    }
+
+    /**
+     * Gets the tester object or a null proxy.
+     *
+     * @return mixed
+     */
+    public function tester()
+    {
+        return optional($this->tester);
     }
 
     /**
@@ -90,6 +109,8 @@ class ProcessVideo implements ShouldQueue
      */
     public function handle()
     {
+        \Log::info('Starting job');
+
         try {
             $this->createRecord();
             $this->convert();
@@ -104,6 +125,8 @@ class ProcessVideo implements ShouldQueue
                 new VideoProcessingComplete($this->record)
             );
         } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+
             $this->user->notify(
                 new VideoProcessingFailed($e->getMessage())
             );
@@ -124,7 +147,11 @@ class ProcessVideo implements ShouldQueue
             storage_path($this->paths->processed)
         );
 
+        $this->tester()->assertTrue(file_exists(storage_path($this->paths->processed)));
+
         unlink($this->file);
+
+        $this->tester()->assertFalse(file_exists($this->file));
 
         $this->video = FFMpeg::create()
             ->open(storage_path($this->paths->processed));
@@ -145,10 +172,12 @@ class ProcessVideo implements ShouldQueue
         if ($duration < 60) {
             $this->record->delete();
 
-            Storage::disk('root')
-                ->deleteDirectory("app/{$this->paths->directory}");
+            $this->tester()->assertFalse($this->record->exists());
 
-            // TODO Raise event
+            Storage::disk('root')
+                ->deleteDirectory($this->paths->directory);
+
+            $this->tester()->assertFalse(file_exists(storage_path($this->paths->directory)));
 
             throw new VideoTooShortException;
         }
@@ -169,12 +198,16 @@ class ProcessVideo implements ShouldQueue
         // Create thumbnails directory
         mkdir(storage_path($this->paths->thumbnails));
 
+        $this->tester()->assertTrue(file_exists(storage_path($this->paths->thumbnails)));
+
         $frames = floor($duration / $this->thumbnailInterval);
 
-        for ($i = 0; $i < $frames; $i++) {
-            $seconds = $i * $frames;
+        foreach (range(0, $frames) as $index) {
+            $seconds = $index * $frames;
             $frame = $this->video->frame(TimeCode::fromSeconds($seconds));
-            $frame->save(storage_path("{$this->paths->thumbnails}/$seconds.jpg"));
+            $path = storage_path("{$this->paths->thumbnails}/$seconds.jpg");
+            $frame->save($path);
+            $this->tester()->assertTrue(file_exists($path));
         }
     }
 
@@ -185,6 +218,12 @@ class ProcessVideo implements ShouldQueue
      */
     public function createPreview()
     {
+        /**
+         * TODO
+         * Clips different sections of the video
+         * Instead of just the center 20 seconds
+         */
+
         $video = FFMpeg::create()
             ->open(storage_path($this->paths->processed));
 
@@ -204,6 +243,8 @@ class ProcessVideo implements ShouldQueue
             new X264('aac'),
             storage_path($this->paths->preview)
         );
+
+        $this->tester()->assertTrue(file_exists(storage_path($this->paths->preview)));
     }
 
     /**
@@ -218,6 +259,8 @@ class ProcessVideo implements ShouldQueue
             'name' => str_before($this->name, '.'),
             'key' => $this->paths->key
         ]);
+
+        $this->tester()->assertTrue($this->record->exists());
     }
 
     /**
