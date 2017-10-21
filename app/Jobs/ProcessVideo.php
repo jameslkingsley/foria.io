@@ -109,8 +109,6 @@ class ProcessVideo implements ShouldQueue
      */
     public function handle()
     {
-        \Log::info('Starting job');
-
         try {
             $this->createRecord();
             $this->convert();

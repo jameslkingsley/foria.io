@@ -81,8 +81,7 @@ class VideoUploadRequest extends FormRequest
             'r+'
         );
 
-        $destination = $this->destination->unprocessed . $file->guessClientExtension();
-        \Log::info('Request Upload: '.$destination);
+        $destination = $this->destination->unprocessed . $file->getClientOriginalExtension();
 
         Storage::disk('root')
             ->put($destination, $source, 'private');
