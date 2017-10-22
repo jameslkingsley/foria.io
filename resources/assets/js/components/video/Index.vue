@@ -10,7 +10,7 @@
             :class="videoClasses"
             :poster="media.thumbnail"
             :data-setup="videoSetupJson">
-            <source :src="media.stream_url" type="video/mp4" v-if="media.stream_url && media.unlocked">
+            <source :src="media.stream_url" type="video/mp4" v-if="media.stream_url">
         </video>
 
         <div class="card p-3 m-t-3">

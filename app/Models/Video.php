@@ -115,18 +115,9 @@ class Video extends Model implements Purchase
      *
      * @return array
      */
-    public function getThumbnailsAttribute()
+    public function getThumbnailsAttribute($value)
     {
-        // TODO Store thumbnail URLs in database since they won't change
-        $video = $this;
-
-        return Cache::remember("videos-thumbnails-{$this->id}", 60, function () use ($video) {
-            $files = Storage::files($video->getPath('thumbnails'));
-
-            return collect($files)->sort()->transform(function ($file) {
-                return Storage::url($file);
-            });
-        });
+        return collect(json_decode($value));
     }
 
     /**
@@ -222,7 +213,7 @@ class Video extends Model implements Purchase
             return $this->purchased();
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -233,16 +224,14 @@ class Video extends Model implements Purchase
     public function getStreamUrlAttribute()
     {
         if (! $this->viewable()) {
+            if ($this->previewable()) {
+                return Storage::cloud()->url("videos/{$this->key}/preview.mp4");
+            }
+
             return null;
         }
 
-        if (! is_null($this->path)) {
-            if (starts_with($this->path, 'http')) {
-                return $this->path;
-            } else {
-                return Storage::url($this->path);
-            }
-        }
+        return Storage::cloud()->url("videos/{$this->key}/processed.mp4");
 
         return null;
     }

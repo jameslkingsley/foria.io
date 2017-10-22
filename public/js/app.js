@@ -83223,7 +83223,7 @@ var render = function() {
         }
       },
       [
-        _vm.media.stream_url && _vm.media.unlocked
+        _vm.media.stream_url
           ? _c("source", {
               attrs: { src: _vm.media.stream_url, type: "video/mp4" }
             })

@@ -60,6 +60,7 @@ class VideoUploadTest extends TestCase
         ))->handle();
 
         Storage::disk('root')->deleteDirectory($data->directory);
+        Storage::cloud()->deleteDirectory($data->directory);
     }
 
     /** @test */
@@ -103,6 +104,7 @@ class VideoUploadTest extends TestCase
         ))->handle();
 
         Storage::disk('root')->deleteDirectory($data->directory);
+        Storage::cloud()->deleteDirectory($data->directory);
     }
 
     /** @test */
@@ -151,5 +153,6 @@ class VideoUploadTest extends TestCase
         ))->handle();
 
         Storage::disk('root')->deleteDirectory($data->directory);
+        Storage::cloud()->deleteDirectory($data->directory);
     }
 }

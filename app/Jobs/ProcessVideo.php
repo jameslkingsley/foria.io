@@ -318,6 +318,9 @@ class ProcessVideo implements ShouldQueue
         $cloud->makeDirectory($this->paths->directory);
         $cloud->makeDirectory($this->paths->thumbnails);
 
+        $cloud->assertExists($this->paths->directory);
+        $cloud->assertExists($this->paths->thumbnails);
+
         $cloud->putFileAs(
             $this->paths->directory,
             new File(storage_path($this->paths->prefix('app')->processed)),
@@ -325,7 +328,29 @@ class ProcessVideo implements ShouldQueue
             'private'
         );
 
-        // TODO Rest of files
+        $cloud->assertExists($this->paths->processed);
+
+        $cloud->putFileAs(
+            $this->paths->directory,
+            new File(storage_path($this->paths->prefix('app')->preview)),
+            'preview.mp4',
+            'public'
+        );
+
+        $cloud->assertExists($this->paths->preview);
+
+        $thumbnails = $local->files($this->paths->prefix('app')->thumbnails);
+
+        foreach ($thumbnails as $thumbnail) {
+            $cloud->putFileAs(
+                $this->paths->thumbnails,
+                new File(storage_path($thumbnail)),
+                basename($thumbnail),
+                'public'
+            );
+
+            $cloud->assertExists($this->paths->thumbnails.'/'.basename($thumbnail));
+        }
 
         $local->deleteDirectory($this->paths->prefix('app')->directory);
     }
@@ -337,6 +362,20 @@ class ProcessVideo implements ShouldQueue
      */
     public function cacheThumbnails()
     {
-        //
+        $urls = [];
+        $thumbnails = Storage::cloud()->files($this->paths->thumbnails);
+
+        foreach ($thumbnails as $thumbnail) {
+            $urls[] = Storage::cloud()->url($thumbnail);
+        }
+
+        $this->record->update([
+            'thumbnails' => json_encode($urls)
+        ]);
+
+        $this->tester()->assertNotNull(
+            $this->record->fresh()->thumbnails,
+            'Thumbnails cache is still null'
+        );
     }
 }
