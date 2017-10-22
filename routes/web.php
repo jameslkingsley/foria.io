@@ -47,8 +47,8 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Purchases
-Route::get('/api/purchase/{type}/{id}', 'PurchaseController@show');
-Route::post('/api/purchase/{type}/{id}', 'PurchaseController@store');
+Route::get('/api/purchase/{ref}', 'PurchaseController@show');
+Route::post('/api/purchase/{ref}', 'PurchaseController@store');
 
 // Chat
 Route::get('/api/chat/past/{user}', 'ChatController@show');

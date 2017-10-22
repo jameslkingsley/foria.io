@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Exceptions\NoCustomerException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\AuthenticationException;
 
 class PurchaseController extends Controller
@@ -34,26 +35,15 @@ class PurchaseController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, string $type, int $id)
+    public function store(Request $request, Model $model)
     {
         try {
-            $model = 'App\\Models\\'.studly_case($type);
-
-            if (! class_exists($model)) {
-                throw new InvalidArgumentException;
-            }
-
-            $model = $model::findOrFail($id);
-
             return response()->json([
                 'status' => 'success',
                 'data' => $model->purchase()
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'data' => $e->getMessage()
-            ]);
+            return abort(403, $e->getMessage());
         }
     }
 
@@ -63,16 +53,8 @@ class PurchaseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, string $type, int $id)
+    public function show(Request $request, Model $model)
     {
-        $model = 'App\\Models\\'.studly_case($type);
-
-        if (! class_exists($model)) {
-            throw new InvalidArgumentException;
-        }
-
-        $model = $model::findOrFail($id);
-
         return response()->json([
             'purchase' => $model->purchases->first()
         ]);

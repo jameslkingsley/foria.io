@@ -99,7 +99,7 @@ class VideoController extends Controller
         $attributes = $request->validate([
             'name' => ['required', 'string', 'min:1'],
             'privacy' => ['required', 'string', 'in:public,private'],
-            'token_price' => ['nullable', 'numeric'],
+            'token_price' => ['nullable', 'numeric'], // TODO Add minimum
             'required_subscription' => ['nullable', 'string', 'in:bronze,silver,gold'],
         ]);
 

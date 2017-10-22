@@ -83770,7 +83770,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         submit: function submit(data) {
             var _this = this;
 
-            ajax.post('/api/videos/' + this.video.permalink, {
+            ajax.post('/api/videos/' + this.video.ref, {
                 name: this.title,
                 privacy: this.privacy.toLowerCase(),
                 required_subscription: this.selectedPlan,

@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\Purchase;
 use App\Events\TokensAdded;
+use App\Exceptions\PrivacyException;
 use App\Exceptions\NoCustomerException;
 use Illuminate\Auth\AuthenticationException;
 use App\Exceptions\InsufficientFundsException;
@@ -22,6 +23,10 @@ trait Purchasable
         }
 
         $details = (object) $this->getPurchaseDetails();
+
+        if (! $details->allowed) {
+            throw new PrivacyException;
+        }
 
         if ((int) auth()->user()->tokens < (int) $details->amount) {
             throw new InsufficientFundsException;

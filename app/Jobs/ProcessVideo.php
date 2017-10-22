@@ -121,6 +121,10 @@ class ProcessVideo implements ShouldQueue
             $this->deploy();
             $this->cacheThumbnails();
 
+            $this->record->update([
+                'has_processed' => true
+            ]);
+
             $this->user->notify(
                 new VideoProcessingComplete($this->record)
             );

@@ -19,6 +19,13 @@ class VideoUploadTest extends TestCase
      */
     protected $runLongTests = false;
 
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->markTestSkipped('Test when needed (slow)');
+    }
+
     /** @test */
     public function shortVideoGetsRejected()
     {
@@ -27,7 +34,6 @@ class VideoUploadTest extends TestCase
         $this->actingAs($this->user);
         $this->assertAuthenticated();
 
-        $token = str_random(20);
         $video = new UploadedFile(
             base_path('tests/Assets/too_short.mp4'),
             'too_short.mp4',
@@ -35,9 +41,9 @@ class VideoUploadTest extends TestCase
         );
 
         $response = $this
-            ->withSession(['_token' => $token])
+            ->withSession(['_token' => $this->token])
             ->post('/api/videos', [
-                '_token' => $token,
+                '_token' => $this->token,
                 'video' => $video
             ]);
 
@@ -71,7 +77,6 @@ class VideoUploadTest extends TestCase
         $this->actingAs($this->user);
         $this->assertAuthenticated();
 
-        $token = str_random(20);
         $video = new UploadedFile(
             base_path('tests/Assets/one_minute.mkv'),
             'one_minute.mkv',
@@ -79,9 +84,9 @@ class VideoUploadTest extends TestCase
         );
 
         $response = $this
-            ->withSession(['_token' => $token])
+            ->withSession(['_token' => $this->token])
             ->post('/api/videos', [
-                '_token' => $token,
+                '_token' => $this->token,
                 'video' => $video
             ]);
 
@@ -120,7 +125,6 @@ class VideoUploadTest extends TestCase
         $this->actingAs($this->user);
         $this->assertAuthenticated();
 
-        $token = str_random(20);
         $video = new UploadedFile(
             base_path('tests/Assets/five_minutes.mkv'),
             'five_minutes.mkv',
@@ -128,9 +132,9 @@ class VideoUploadTest extends TestCase
         );
 
         $response = $this
-            ->withSession(['_token' => $token])
+            ->withSession(['_token' => $this->token])
             ->post('/api/videos', [
-                '_token' => $token,
+                '_token' => $this->token,
                 'video' => $video
             ]);
 

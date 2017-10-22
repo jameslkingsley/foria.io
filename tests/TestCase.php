@@ -17,6 +17,7 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->user = User::first();
+        $this->token = str_random(20);
 
         // $this->seed();
     }

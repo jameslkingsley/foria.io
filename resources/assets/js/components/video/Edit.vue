@@ -121,7 +121,7 @@
 
         methods: {
             submit(data) {
-                ajax.post(`/api/videos/${this.video.permalink}`, {
+                ajax.post(`/api/videos/${this.video.ref}`, {
                     name: this.title,
                     privacy: this.privacy.toLowerCase(),
                     required_subscription: this.selectedPlan,

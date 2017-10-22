@@ -8,7 +8,7 @@ $factory->define(Video::class, function (Faker $faker) {
     $requireSubscription = $faker->boolean;
 
     return [
-        'key' => '6c8a07b274b682c1261828f904e3436c',
+        'key' => '8ef9136ef9abde83e29e65a9086bcd20',
         'name' => $faker->city,
         'user_id' => User::where('is_model', true)->inRandomOrder()->first()->id,
         'token_price' => $requireSubscription ? null : $faker->numberBetween(0, 10000),
