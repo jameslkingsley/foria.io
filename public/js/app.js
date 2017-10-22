@@ -84072,25 +84072,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['user'],
@@ -84102,12 +84083,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
 
 
-    computed: {
-        chunkedVideos: function chunkedVideos() {
-            return _.chunk(this.videos, 4);
-        }
-    },
-
     methods: {
         fetchVideos: function fetchVideos() {
             var _this = this;
@@ -84115,11 +84090,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             return axios.get('/api/videos/list/' + this.user.name).then(function (r) {
                 return _this.videos = r.data;
             });
-        },
-        getStyle: function getStyle(video) {
-            return {
-                'background-image': 'url(' + video.thumbnail + ')'
-            };
         }
     },
 
@@ -84138,55 +84108,9 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
-    _vm._l(_vm.chunkedVideos, function(videos) {
-      return _c(
-        "div",
-        { staticClass: "video-list" },
-        _vm._l(videos, function(video) {
-          return _c("div", { staticClass: "video-item" }, [
-            _c("a", { staticClass: "video", attrs: { href: video.url } }, [
-              _c(
-                "div",
-                { staticClass: "video-thumbnail", style: _vm.getStyle(video) },
-                [
-                  _c("span", { staticClass: "video-duration" }, [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm._f("duration")(video.duration)) +
-                        "\n                    "
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("span", { staticClass: "video-hd" }, [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(video.height >= 720 ? "HD" : "") +
-                        "\n                        " +
-                        _vm._s(video.height) +
-                        "P\n                    "
-                    )
-                  ])
-                ]
-              ),
-              _vm._v(" "),
-              _c("span", {
-                staticClass: "video-name",
-                domProps: { textContent: _vm._s(video.name) }
-              }),
-              _vm._v(" "),
-              _c("span", { staticClass: "video-meta" }, [
-                _vm._v(
-                  "\n                    " +
-                    _vm._s(_vm._f("fromnow")(video.created_at)) +
-                    "\n                    ·\n                    " +
-                    _vm._s(_vm.user.name) +
-                    "\n                "
-                )
-              ])
-            ])
-          ])
-        })
-      )
+    { staticClass: "video-list" },
+    _vm._l(_vm.videos, function(video, index) {
+      return _c("f-video-item", { key: index, attrs: { video: video } })
     })
   )
 }

@@ -43,7 +43,7 @@ class VideoController extends Controller
                 $request->upload()
             );
         } catch (\Exception $e) {
-            // \Log::error($e);
+            \Log::error($e->getMessage());
             return abort(400, $e->getMessage());
         }
     }

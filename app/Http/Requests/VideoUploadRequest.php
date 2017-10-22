@@ -4,13 +4,12 @@ namespace App\Http\Requests;
 
 use FFMpeg\FFMpeg;
 use App\Jobs\ProcessVideo;
+use App\Support\VideoDestinations;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Http\FormRequest;
 
 class VideoUploadRequest extends FormRequest
 {
-    protected $redirect = '/test';
-
     /**
      * The key name of the video.
      *
@@ -19,11 +18,11 @@ class VideoUploadRequest extends FormRequest
     protected $key;
 
     /**
-     * Destination directory path.
+     * Destination object.
      *
-     * @var string
+     * @var App\Support\VideoDestinations
      */
-    protected $destination;
+    protected $destinations;
 
     /**
      * Constructor method.
@@ -34,14 +33,7 @@ class VideoUploadRequest extends FormRequest
     {
         $this->key = md5(microtime());
 
-        $this->destination = (object) [
-            'key' => $this->key,
-            'directory' => "app/videos/{$this->key}",
-            'unprocessed' => "app/videos/{$this->key}/unprocessed.",
-            'processed' => "app/videos/{$this->key}/processed.mp4",
-            'preview' => "app/videos/{$this->key}/preview.mp4",
-            'thumbnails' => "app/videos/{$this->key}/thumbnails"
-        ];
+        $this->destinations = new VideoDestinations($this->key);
     }
 
     /**
@@ -81,18 +73,18 @@ class VideoUploadRequest extends FormRequest
             'r+'
         );
 
-        $destination = $this->destination->unprocessed . $file->getClientOriginalExtension();
+        $destination = $this->destinations->prefix('app')->unprocessed . $file->getClientOriginalExtension();
 
         Storage::disk('root')
             ->put($destination, $source, 'private');
 
         ProcessVideo::dispatch(
-            $this->destination,
+            $this->destinations,
             storage_path($destination),
             $file->getClientOriginalName(),
             auth()->user()
         );
 
-        return $this->destination;
+        return $this->destinations->getPaths();
     }
 }

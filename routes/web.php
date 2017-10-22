@@ -1,9 +1,5 @@
 <?php
 
-Route::get('/test', function () {
-    dd(reference('hash'));
-});
-
 // Homepage
 Route::get('/', 'HomeController@index')->name('home');
 
@@ -34,7 +30,7 @@ Route::get('/api/videos/list/{user}', 'VideoController@index');
 Route::get('/api/videos/{ref}', 'VideoController@showJson');
 Route::post('/api/videos', 'VideoController@store');
 Route::post('/api/videos/{ref}', 'VideoController@update');
-Route::get('/videos/new', 'VideoController@create');
+Route::get('/videos/upload', 'VideoController@create');
 Route::get('/videos/edit/{ref}', 'VideoController@edit');
 Route::get('/videos/{ref}', 'VideoController@show');
 

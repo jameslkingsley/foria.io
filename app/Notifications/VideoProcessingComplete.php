@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\Video;
 use App\Models\Follow;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;

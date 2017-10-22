@@ -5,6 +5,7 @@ namespace App\Jobs;
 use FFMpeg\FFMpeg;
 use App\Models\User;
 use App\Models\Video;
+use Illuminate\Http\File;
 use FFMpeg\Format\Video\X264;
 use Illuminate\Bus\Queueable;
 use FFMpeg\Coordinate\TimeCode;
@@ -16,6 +17,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Notifications\VideoProcessingFailed;
 use App\Notifications\VideoProcessingComplete;
+use PHPUnit\Framework\ExpectationFailedException;
 use FFMpeg\Filters\Video\ExtractMultipleFramesFilter;
 
 class ProcessVideo implements ShouldQueue
@@ -23,9 +25,9 @@ class ProcessVideo implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * The video's paths.
+     * Destination object.
      *
-     * @var object
+     * @var App\Support\VideoDestinations
      */
     public $paths;
 
@@ -95,7 +97,7 @@ class ProcessVideo implements ShouldQueue
     /**
      * Gets the tester object or a null proxy.
      *
-     * @return mixed
+     * @return object
      */
     public function tester()
     {
@@ -122,6 +124,8 @@ class ProcessVideo implements ShouldQueue
             $this->user->notify(
                 new VideoProcessingComplete($this->record)
             );
+        } catch (ExpectationFailedException $e) {
+            $this->tester()->assertTrue(false, $e->getMessage());
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
 
@@ -142,17 +146,23 @@ class ProcessVideo implements ShouldQueue
 
         $video->save(
             new X264('aac'),
-            storage_path($this->paths->processed)
+            storage_path($this->paths->prefix('app')->processed)
         );
 
-        $this->tester()->assertTrue(file_exists(storage_path($this->paths->processed)));
+        $this->tester()->assertTrue(
+            file_exists(storage_path($this->paths->prefix('app')->processed)),
+            'Processed video does not exist'
+        );
 
         unlink($this->file);
 
-        $this->tester()->assertFalse(file_exists($this->file));
+        $this->tester()->assertFalse(
+            file_exists($this->file),
+            'Original client file was not deleted'
+        );
 
         $this->video = FFMpeg::create()
-            ->open(storage_path($this->paths->processed));
+            ->open(storage_path($this->paths->prefix('app')->processed));
     }
 
     /**
@@ -170,12 +180,18 @@ class ProcessVideo implements ShouldQueue
         if ($duration < 60) {
             $this->record->delete();
 
-            $this->tester()->assertFalse($this->record->exists());
+            $this->tester()->assertNull(
+                $this->record->fresh(),
+                'Record still exists after failing duration check'
+            );
 
             Storage::disk('root')
-                ->deleteDirectory($this->paths->directory);
+                ->deleteDirectory($this->paths->prefix('app')->directory);
 
-            $this->tester()->assertFalse(file_exists(storage_path($this->paths->directory)));
+            $this->tester()->assertFalse(
+                file_exists(storage_path($this->paths->prefix('app')->directory)),
+                'Directory still exists after failing duration check'
+            );
 
             throw new VideoTooShortException;
         }
@@ -194,18 +210,20 @@ class ProcessVideo implements ShouldQueue
             ->get('duration');
 
         // Create thumbnails directory
-        mkdir(storage_path($this->paths->thumbnails));
+        mkdir(storage_path($this->paths->prefix('app')->thumbnails));
 
-        $this->tester()->assertTrue(file_exists(storage_path($this->paths->thumbnails)));
+        $this->tester()->assertTrue(
+            file_exists(storage_path($this->paths->prefix('app')->thumbnails)),
+            'Thumbnail directory was not created'
+        );
 
         $frames = floor($duration / $this->thumbnailInterval);
 
         foreach (range(0, $frames) as $index) {
             $seconds = $index * $frames;
             $frame = $this->video->frame(TimeCode::fromSeconds($seconds));
-            $path = storage_path("{$this->paths->thumbnails}/$seconds.jpg");
+            $path = storage_path("{$this->paths->prefix('app')->thumbnails}/$seconds.jpg");
             $frame->save($path);
-            $this->tester()->assertTrue(file_exists($path));
         }
     }
 
@@ -223,7 +241,7 @@ class ProcessVideo implements ShouldQueue
          */
 
         $video = FFMpeg::create()
-            ->open(storage_path($this->paths->processed));
+            ->open(storage_path($this->paths->prefix('app')->processed));
 
         $duration = $video->getStreams()
             ->videos()
@@ -239,10 +257,13 @@ class ProcessVideo implements ShouldQueue
 
         $video->save(
             new X264('aac'),
-            storage_path($this->paths->preview)
+            storage_path($this->paths->prefix('app')->preview)
         );
 
-        $this->tester()->assertTrue(file_exists(storage_path($this->paths->preview)));
+        $this->tester()->assertTrue(
+            file_exists(storage_path($this->paths->prefix('app')->preview)),
+            'Preview video does not exist'
+        );
     }
 
     /**
@@ -258,7 +279,10 @@ class ProcessVideo implements ShouldQueue
             'key' => $this->paths->key
         ]);
 
-        $this->tester()->assertTrue($this->record->exists());
+        $this->tester()->assertTrue(
+            $this->record->exists(),
+            'Record was not created'
+        );
     }
 
     /**
@@ -288,7 +312,22 @@ class ProcessVideo implements ShouldQueue
      */
     public function deploy()
     {
-        //
+        $local = Storage::disk('root');
+        $cloud = Storage::cloud();
+
+        $cloud->makeDirectory($this->paths->directory);
+        $cloud->makeDirectory($this->paths->thumbnails);
+
+        $cloud->putFileAs(
+            $this->paths->directory,
+            new File(storage_path($this->paths->prefix('app')->processed)),
+            'processed.mp4',
+            'private'
+        );
+
+        // TODO Rest of files
+
+        $local->deleteDirectory($this->paths->prefix('app')->directory);
     }
 
     /**

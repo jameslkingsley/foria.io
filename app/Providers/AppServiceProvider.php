@@ -10,6 +10,7 @@ use Laravel\Cashier\Cashier;
 use Aws\Credentials\Credentials;
 use Aws\CloudFront\CloudFrontClient;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -30,6 +31,11 @@ class AppServiceProvider extends ServiceProvider
         View::share('reportableReasons', Report::reasons());
 
         Stripe::setApiKey(config('services.stripe.secret'));
+
+        Blade::if('model', function () {
+            return auth()->check()
+                && auth()->user()->is_model;
+        });
     }
 
     /**

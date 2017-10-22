@@ -68,7 +68,7 @@ class VideoProcessingFailed extends Notification
             'icon' => 'videocam',
             'group' => 'VideoProcessingFailed',
             'timestamp' => now(),
-            'text' => "Video processing failed. Please try again.",
+            'text' => $this->message,
         ];
     }
 

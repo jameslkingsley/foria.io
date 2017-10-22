@@ -17,6 +17,12 @@
                 <a class="navbar-item">
                     Home
                 </a>
+
+                @model
+                    <a href="{{ url('/videos/upload') }}" class="navbar-item">
+                        Upload
+                    </a>
+                @endmodel
             </div>
 
             <div class="navbar-end">
