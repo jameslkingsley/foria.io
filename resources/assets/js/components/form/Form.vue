@@ -34,12 +34,12 @@
 
             footerStyle: {
                 type: Object,
-                default: {}
+                default: () => { return {} }
             },
 
             submitStyle: {
                 type: Object,
-                default: {}
+                default: () => { return {} }
             }
         },
 

@@ -18,6 +18,7 @@ Vue.component('f-video-list', require('./components/video/List.vue'));
 Vue.component('f-video-item', require('./components/video/Item.vue'));
 Vue.component('f-video-comments', require('./components/video/Comments.vue'));
 Vue.component('f-video-library', require('./components/video/Library.vue'));
+Vue.component('f-video-manager', require('./components/video/Manager.vue'));
 
 // Ratings
 Vue.component('f-rating', require('./components/Rating.vue'));

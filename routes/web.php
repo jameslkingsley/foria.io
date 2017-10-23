@@ -30,8 +30,9 @@ Route::get('/api/videos/list/{user}', 'VideoController@index');
 Route::get('/api/videos/{ref}', 'VideoController@showJson');
 Route::post('/api/videos', 'VideoController@store');
 Route::post('/api/videos/{ref}', 'VideoController@update');
+Route::get('/api/videos/{ref}/edit', 'VideoController@edit');
 Route::get('/videos/upload', 'VideoController@create');
-Route::get('/videos/edit/{ref}', 'VideoController@edit');
+Route::get('/videos/manager', 'VideoManagerController@index');
 Route::get('/videos/{ref}', 'VideoController@show');
 
 // Comments

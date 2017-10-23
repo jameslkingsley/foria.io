@@ -8,6 +8,22 @@
         padding: 0 0 12px 0;
         color: $text;
 
+        .settings-nav-item-icon {
+            float: left;
+            width: 2.75rem;
+            height: 2.75rem;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            border-radius: 4px;
+            margin-right: 0.66rem;
+        }
+
+        p {
+            font-size: 12px;
+            opacity: .75;
+        }
+
         .material-icons {
             margin: 1px 7px 0 0;
             float: left;

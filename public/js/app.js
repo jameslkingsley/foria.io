@@ -17303,6 +17303,7 @@ Vue.component('f-video-list', __webpack_require__(199));
 Vue.component('f-video-item', __webpack_require__(202));
 Vue.component('f-video-comments', __webpack_require__(205));
 Vue.component('f-video-library', __webpack_require__(208));
+Vue.component('f-video-manager', __webpack_require__(292));
 
 // Ratings
 Vue.component('f-rating', __webpack_require__(211));
@@ -89462,12 +89463,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
         footerStyle: {
             type: Object,
-            default: {}
+            default: function _default() {
+                return {};
+            }
         },
 
         submitStyle: {
             type: Object,
-            default: {}
+            default: function _default() {
+                return {};
+            }
         }
     },
 
@@ -90553,6 +90558,466 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 287 */,
+/* 288 */,
+/* 289 */,
+/* 290 */,
+/* 291 */,
+/* 292 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(293)
+/* template */
+var __vue_template__ = __webpack_require__(294)
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\video\\Manager.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Manager.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-ceec35c0", Component.options)
+  } else {
+    hotAPI.reload("data-v-ceec35c0", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 293 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['videos'],
+
+    data: function data() {
+        return {
+            video: this.videos.length ? this.videos[0] : {},
+            plans: [{ id: 'bronze', title: 'Bronze', price: 499 }, { id: 'silver', title: 'Silver', price: 999 }, { id: 'gold', title: 'Gold', price: 2499 }],
+            footerStyle: {
+                'float': 'left',
+                'width': '100%',
+                'display': 'block',
+                'margin-top': '2rem'
+            },
+            submitStyle: {
+                'margin-top': '0 !important'
+            }
+        };
+    },
+
+
+    computed: {
+        tokenPriceNet: function tokenPriceNet() {
+            var pence = this.video.token_price * 0.1 * 100;
+
+            return 0.7 * pence;
+        },
+        selectedPlanNet: function selectedPlanNet() {
+            var plan = _.find(this.plans, ['id', this.video.required_subscription]);
+
+            if (plan) {
+                return plan.price * 0.6;
+            }
+
+            return 0;
+        }
+    },
+
+    watch: {
+        video: {
+            token_price: function token_price() {
+                if (this.video.token_price > 0) {
+                    this.video.required_subscription = null;
+                }
+            }
+        }
+    },
+
+    methods: {
+        navItemClasses: function navItemClasses(video) {
+            return {
+                'settings-nav-item': true,
+                'settings-nav-item-thick': true,
+                'is-active': video.ref === opt(this.video).ref
+            };
+        },
+        submit: function submit(data) {
+            var _this = this;
+
+            ajax.post('/api/videos/' + this.video.ref, this.video).then(function (r) {
+                _this.$toast.open({
+                    message: 'Changes Saved',
+                    type: 'is-success',
+                    duration: 4000
+                });
+            });
+        },
+        edit: function edit(video) {
+            this.video = video;
+        },
+        choosePlan: function choosePlan(plan) {
+            this.video.required_subscription = plan.id;
+            this.video.token_price = null;
+        },
+        planClasses: function planClasses(plan) {
+            return {
+                'veao-plan': true,
+                'is-active': plan.id === this.video.required_subscription && this.video.token_price === null
+            };
+        }
+    },
+
+    created: function created() {
+        //
+    }
+});
+
+/***/ }),
+/* 294 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "main-page-columns columns" }, [
+    _c(
+      "div",
+      { staticClass: "column is-sidebar settings-nav p-l-0" },
+      _vm._l(_vm.videos, function(v, i) {
+        return _c(
+          "a",
+          {
+            class: _vm.navItemClasses(v),
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                _vm.edit(v)
+              }
+            }
+          },
+          [
+            _c("i", {
+              staticClass: "settings-nav-item-icon",
+              style: "background-image: url(" + v.thumbnail + ")"
+            }),
+            _vm._v(" "),
+            _c("span", { domProps: { textContent: _vm._s(v.name) } }),
+            _vm._v(" "),
+            _c("p", [_vm._v(_vm._s(_vm._f("fromnow")(v.created_at)))])
+          ]
+        )
+      })
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "column is-6 m-r-4 settings-content card" },
+      [
+        _c(
+          "f-form",
+          {
+            attrs: {
+              confirm: "Save Changes",
+              "footer-style": _vm.footerStyle,
+              "submit-style": _vm.submitStyle
+            },
+            on: { submit: _vm.submit }
+          },
+          [
+            _c(
+              "b-field",
+              { attrs: { label: "Title" } },
+              [
+                _c("b-input", {
+                  attrs: { name: "name" },
+                  model: {
+                    value: _vm.video.name,
+                    callback: function($$v) {
+                      _vm.video.name = $$v
+                    },
+                    expression: "video.name"
+                  }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c("hr"),
+            _vm._v(" "),
+            _c("p", { staticClass: "has-text-centered subtitle m-0" }, [
+              _vm._v("Video Access")
+            ]),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "video-edit-access-option" },
+              [
+                _c("p", { staticClass: "veao-description" }, [
+                  _vm._v(
+                    "\n                    Require users to pay with tokens.\n                    "
+                  ),
+                  _c("br"),
+                  _vm._v(" "),
+                  _c(
+                    "strong",
+                    {
+                      directives: [
+                        {
+                          name: "show",
+                          rawName: "v-show",
+                          value: _vm.video.token_price,
+                          expression: "video.token_price"
+                        }
+                      ]
+                    },
+                    [
+                      _vm._v(
+                        "You will receive " +
+                          _vm._s(_vm._f("currency")(_vm.tokenPriceNet))
+                      )
+                    ]
+                  )
+                ]),
+                _vm._v(" "),
+                _c("b-input", {
+                  staticClass: "veao-field",
+                  attrs: {
+                    placeholder: "Amount",
+                    type: "number",
+                    icon: "local_play"
+                  },
+                  model: {
+                    value: _vm.video.token_price,
+                    callback: function($$v) {
+                      _vm.video.token_price = $$v
+                    },
+                    expression: "video.token_price"
+                  }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c("p", { staticClass: "veao-separator" }, [_vm._v("OR")]),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "video-edit-access-option" },
+              [
+                _c("p", { staticClass: "veao-description" }, [
+                  _vm._v(
+                    "\n                    Require users to be subscribed with the selected plan (or higher). You're guaranteed the first month's subscription.\n\n                    "
+                  ),
+                  _c("br"),
+                  _c("br"),
+                  _vm._v(" "),
+                  _c(
+                    "strong",
+                    {
+                      directives: [
+                        {
+                          name: "show",
+                          rawName: "v-show",
+                          value: _vm.video.required_subscription,
+                          expression: "video.required_subscription"
+                        }
+                      ]
+                    },
+                    [
+                      _vm._v(
+                        "\n                        You will receive " +
+                          _vm._s(_vm._f("currency")(_vm.selectedPlanNet)) +
+                          " each month (providing the user continues the subscription after the first month)\n                    "
+                      )
+                    ]
+                  )
+                ]),
+                _vm._v(" "),
+                _vm._l(_vm.plans, function(plan) {
+                  return _c(
+                    "div",
+                    {
+                      class: _vm.planClasses(plan),
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          _vm.choosePlan(plan)
+                        }
+                      }
+                    },
+                    [
+                      _c("span", { staticClass: "veaop-title" }, [
+                        _vm._v(_vm._s(plan.title))
+                      ]),
+                      _vm._v(" "),
+                      _c("span", { staticClass: "veaop-price" }, [
+                        _vm._v(
+                          _vm._s(_vm._f("currency")(plan.price)) + "/month"
+                        )
+                      ])
+                    ]
+                  )
+                })
+              ],
+              2
+            ),
+            _vm._v(" "),
+            _c("hr"),
+            _vm._v(" "),
+            _c(
+              "b-switch",
+              {
+                staticClass: "is-pulled-left",
+                attrs: {
+                  slot: "footer",
+                  "true-value": "public",
+                  "false-value": "private"
+                },
+                slot: "footer",
+                model: {
+                  value: _vm.video.privacy,
+                  callback: function($$v) {
+                    _vm.video.privacy = $$v
+                  },
+                  expression: "video.privacy"
+                }
+              },
+              [
+                _vm._v(
+                  "\n                " +
+                    _vm._s(_vm._f("capitalize")(_vm.video.privacy)) +
+                    "\n            "
+                )
+              ]
+            )
+          ],
+          1
+        )
+      ],
+      1
+    ),
+    _vm._v(" "),
+    _c("div", { staticClass: "column is-3 card" }, [
+      _vm._v("\n        Info\n    ")
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-ceec35c0", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);
