@@ -10,6 +10,10 @@ Vue.component('f-profile-avatar', require('./components/profile/Avatar.vue'));
 // Notifications
 Vue.component('f-notifications', require('./components/Notifications.vue'));
 
+// Navigation
+Vue.component('f-vertical-nav', require('./components/nav/VerticalNav.vue'));
+Vue.component('f-vertical-nav-item', require('./components/nav/VerticalNavItem.vue'));
+
 // Videos
 Vue.component('f-video', require('./components/video/Index.vue'));
 Vue.component('f-video-upload', require('./components/video/Upload.vue'));

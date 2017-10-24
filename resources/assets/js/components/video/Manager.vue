@@ -1,17 +1,25 @@
 <template>
-    <div class="main-page-columns columns">
-        <div class="column is-sidebar settings-nav p-l-0">
-            <a
-                :class="navItemClasses(v)"
-                v-for="(v, i) in videos"
-                @click.prevent="edit(v)">
-                <i class="settings-nav-item-icon" :style="'background-image: url('+v.thumbnail+')'"></i>
-                <span v-text="v.name"></span>
-                <p>{{ v.created_at | fromnow }}</p>
-            </a>
+    <div class="main-page-columns grid grid-template-manager with-info with-borders card">
+        <div class="grid-item p-0">
+            <!-- <f-vertical-nav>
+                <f-vertical-nav-item
+                    v-for="(v, i) in videos"
+                    @click="edit(v)"
+                    :text="v.name"
+                    :icon="v.thumbnail"
+                    :subtext="v.created_at">
+                </f-vertical-nav-item>
+            </f-vertical-nav> -->
+            <div class="f-vertical-nav">
+                <a :class="navItemClasses(v)" v-for="(v, i) in videos" @click.prevent="edit(v)">
+                    <i :style="'background-image: url('+v.thumbnail+')'"></i>
+                    <span v-text="v.name"></span>
+                    <p>{{ v.created_at | fromnow }}</p>
+                </a>
+            </div>
         </div>
 
-        <div class="column is-6 m-r-4 settings-content card">
+        <div class="grid-item">
             <f-form confirm="Save Changes" @submit="submit" :footer-style="footerStyle" :submit-style="submitStyle">
                 <b-field label="Title">
                     <b-input name="name" v-model="video.name"></b-input>
@@ -67,7 +75,7 @@
             </f-form>
         </div>
 
-        <div class="column is-3 card">
+        <div class="grid-item">
             Info
         </div>
     </div>
@@ -128,8 +136,7 @@
         methods: {
             navItemClasses(video) {
                 return {
-                    'settings-nav-item': true,
-                    'settings-nav-item-thick': true,
+                    'f-vertical-nav-item': true,
                     'is-active': video.ref === opt(this.video).ref
                 };
             },
