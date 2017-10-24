@@ -14,7 +14,7 @@
                 <a :class="navItemClasses(v)" v-for="(v, i) in videos" @click.prevent="edit(v)">
                     <i :style="'background-image: url('+v.thumbnail+')'"></i>
                     <span v-text="v.name"></span>
-                    <p>{{ v.created_at | fromnow }}</p>
+                    <p>{{ v.views | locale }} views</p>
                 </a>
             </div>
         </div>
@@ -48,12 +48,12 @@
 
                 <div class="video-edit-access-option">
                     <p class="veao-description">
-                        Require users to be subscribed with the selected plan (or higher). You're guaranteed the first month's subscription.
+                        Require users to be subscribed with the selected plan (or higher).
 
-                        <br /><br />
+                        <br />
 
                         <strong v-show="video.required_subscription">
-                            You will receive {{ selectedPlanNet | currency }} each month (providing the user continues the subscription after the first month)
+                            You will receive {{ selectedPlanNet | currency }} each month*
                         </strong>
                     </p>
 
@@ -76,7 +76,17 @@
         </div>
 
         <div class="grid-item">
-            Info
+            <h2 class="subtitle m-b-2">Tokens</h2>
+            <p class="text-small m-b-3">You can set a token price for your video, which will require users to purchase tokens and use those tokens to gain access to your video. Upon purchase, the given token price will be added to your account.</p>
+
+            <h2 class="subtitle m-b-2">Subscriptions</h2>
+            <p class="text-small m-b-3">You can also choose a subscription plan that is required for users to access the video. A subscription can provide you with a regular income each month*, and offers the user added benefits such as access to your other videos that meet the required plan and access to subscriber only shows**.</p>
+
+            <small>
+                * Subscriptions will auto-renew for the user each month, however they have the option to cancel their subscription at anytime.
+                <br /><br />
+                ** In the near future you will be able to live stream your webcam to your audience, collect tips and host subscriber only shows.
+            </small>
         </div>
     </div>
 </template>

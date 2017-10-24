@@ -19,6 +19,7 @@ class CreatePurchasesTable extends Migration
             $table->morphs('model');
             $table->string('name');
             $table->bigInteger('amount')->unsigned()->nullable();
+            $table->bigInteger('payout')->unsigned()->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

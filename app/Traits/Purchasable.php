@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Support\Payout;
 use App\Models\Purchase;
 use App\Events\TokensAdded;
 use App\Exceptions\PrivacyException;
@@ -39,9 +40,10 @@ trait Purchasable
 
         return $this->purchases()->save(
             new Purchase([
-                'user_id' => auth()->user()->id,
                 'name' => $details->name,
-                'amount' => $details->amount
+                'amount' => $details->amount,
+                'user_id' => auth()->user()->id,
+                'payout' => Payout::amount($details->amount)
             ])
         );
     }

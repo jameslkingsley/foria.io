@@ -54,15 +54,11 @@
                             <i class="material-icons">keyboard_arrow_down</i>
                         </a>
 
-                        <b-dropdown-item has-link>
-                            <a href="{{ url('/profile/'.auth()->user()->name) }}">Profile</a>
-                        </b-dropdown-item>
-
-                        @if (auth()->user()->is_model)
+                        @model
                             <b-dropdown-item has-link>
-                                <a href="{{ auth()->user()->watch_url }}">Broadcast</a>
+                                <a href="{{ url('/profile/'.auth()->user()->name) }}">Profile</a>
                             </b-dropdown-item>
-                        @endif
+                        @endmodel
 
                         <b-dropdown-item has-link>
                             <a href="{{ url('/settings') }}">Settings</a>

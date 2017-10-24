@@ -20,6 +20,7 @@ class CreateVideosTable extends Migration
             $table->string('name');
             $table->longText('key');
             $table->json('thumbnails')->nullable();
+            $table->bigInteger('views')->default(0);
             $table->bigInteger('duration')->nullable();
             $table->integer('width')->nullable();
             $table->integer('height')->nullable();

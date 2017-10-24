@@ -32,8 +32,7 @@
     export default {
         props: {
             amount: { type: Number, default: 0 },
-            type: { type: String },
-            id: { type: Number }
+            reference: { type: String }
         },
 
         data() {
@@ -48,7 +47,6 @@
         computed: {
             classes() {
                 return {
-                    'tag': true,
                     'button': true,
                     'is-primary': ! this.purchased,
                     'is-success': this.purchased,
@@ -77,7 +75,7 @@
 
                 this.purchasing = true;
 
-                ajax.post(`/api/purchase/${this.type}/${this.id}`)
+                ajax.post(`/api/purchase/${this.reference}`)
                     .then(r => {
                         if (r.data.status == 'success') {
                             this.$emit('success', r.data.data);
@@ -98,7 +96,7 @@
             },
 
             fetch() {
-                return ajax.get(`/api/purchase/${this.type}/${this.id}`)
+                return ajax.get(`/api/purchase/${this.reference}`)
                     .then(r => {
                         this.loaded = true;
                         this.purchase = r.data.purchase;

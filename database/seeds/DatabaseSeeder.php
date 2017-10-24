@@ -16,7 +16,9 @@ class DatabaseSeeder extends Seeder
         $this->call(UsersTableSeeder::class);
         $this->call(TokenPackageSeeder::class);
 
-        // factory(Video::class, 30)->create();
+        factory(Video::class, 30)->create();
+        $this->call(PurchaseSeeder::class);
+
         // factory(Comment::class, 50)->create();
     }
 }

@@ -29,15 +29,16 @@
                 <f-purchase
                     v-if="! media.is_mine && media.token_price"
                     class="is-pulled-right"
-                    type="video"
                     :amount="media.token_price"
-                    :id="media.id"
+                    :reference="media.ref"
                     @success="purchaseSuccess">
                 </f-purchase>
             </h2>
 
             <span class="video-meta">
-                <a :href="media.user.profile_url">{{ media.user.name }}</a>
+                {{ media.views | locale }} views
+                &middot;
+                <a class="font-bold" :href="media.user.profile_url">{{ media.user.name }}</a>
                 &middot;
                 {{ media.created_at | fromnow }}
             </span>
@@ -49,13 +50,6 @@
             </span>
         </div>
 
-        <div class="card p-3 m-t-3" v-if="media.is_mine">
-            <a :href="media.edit_url" class="button is-primary">
-                <i class="material-icons m-r-2">settings</i>
-                Manage Video
-            </a>
-        </div>
-
         <div class="columns">
             <div class="column is-9">
                 <div class="card p-3 m-t-3">
@@ -65,7 +59,7 @@
 
             <div class="column is-3">
                 <div class="card p-3 m-t-3">
-                    <h1 class="subtitle">Recommended videos</h1>
+                    <h1 class="subtitle">Recommended</h1>
                 </div>
             </div>
         </div>

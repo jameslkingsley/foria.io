@@ -1,10 +1,8 @@
 .video-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 180px));
-    grid-template-rows: repeat(auto-fit, minmax(240px, 240px));
-    grid-auto-rows: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     grid-column-gap: 1rem;
-    grid-row-gap: 5rem;
+    grid-auto-rows: 282px;
 
     .video-item {
         .video {
@@ -32,11 +30,12 @@
                 .video-hd, .video-duration {
                     position: absolute;
                     top: 5px;
-                    background: rgba(0, 0, 0, 0.66);
+                    background: rgb(0, 0, 0);
                     color: white;
-                    font-weight: 400;
+                    font-weight: 500;
                     padding: 1px 5px;
                     font-size: 12px;
+                    border-radius: 3px;
                 }
 
                 .video-hd {

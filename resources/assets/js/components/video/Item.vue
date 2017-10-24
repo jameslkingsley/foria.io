@@ -2,10 +2,6 @@
     <div class="video-item">
         <a :href="video.url" class="video">
             <div class="video-thumbnail" :style="getStyle(video)">
-                <span class="video-duration">
-                    {{ video.duration | duration }}
-                </span>
-
                 <span class="video-hd">
                     {{ (video.height >= 720) ? 'HD' : '' }}
                     {{ video.height }}P
@@ -15,9 +11,8 @@
             <span class="video-name" v-text="video.name"></span>
 
             <span class="video-meta">
-                {{ video.user.name }}
-                &middot;
-                {{ video.created_at | fromnow }}
+                <p class="is-pulled-left">{{ video.views | locale }} views</p>
+                <p class="is-pulled-right">{{ video.duration | duration }}</p>
             </span>
         </a>
     </div>

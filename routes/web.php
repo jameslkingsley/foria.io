@@ -3,6 +3,9 @@
 // Homepage
 Route::get('/', 'HomeController@index')->name('home');
 
+// Dashboard
+Route::get('/dashboard', 'DashboardController@index');
+
 // Reporting
 Route::post('/api/report/{ref}', 'ReportController@store');
 Route::get('/api/report/{ref}', 'ReportController@index');

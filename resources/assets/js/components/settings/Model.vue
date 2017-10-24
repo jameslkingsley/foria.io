@@ -14,9 +14,44 @@
                     <b-input name="full_name"></b-input>
                 </b-field>
 
+                <b-field label="Date of Birth">
+                    <b-datepicker
+                        placeholder="Click to select..."
+                        icon="today">
+                    </b-datepicker>
+                </b-field>
+
                 <b-field label="About Yourself">
                     <b-input type="textarea" name="about"></b-input>
                 </b-field>
+
+                <b-field label="Proof of Age">
+                    <b-upload v-model="dropFiles" multiple drag-drop>
+                        <section class="section">
+                            <div class="content has-text-centered">
+                                <p>
+                                    <b-icon
+                                        icon="file_upload"
+                                        size="is-large">
+                                    </b-icon>
+                                </p>
+                                <p>Drop your files here or click to upload</p>
+                            </div>
+                        </section>
+                    </b-upload>
+                </b-field>
+
+                <div class="tags">
+                    <span v-for="(file, index) in dropFiles"
+                        :key="index"
+                        class="tag is-primary" >
+                        {{ file.name }}
+                        <button class="delete is-small"
+                            type="button"
+                            @click="deleteDropFile(index)">
+                        </button>
+                    </span>
+                </div>
             </f-form>
         </div>
 
@@ -43,11 +78,16 @@
 
         data() {
             return {
+                dropFiles: [],
                 avatar: this.user.avatar_url
             };
         },
 
         methods: {
+            deleteDropFile(index) {
+                this.dropFiles.splice(index, 1);
+            },
+
             submitRequest(data) {
                 console.log(data);
             },

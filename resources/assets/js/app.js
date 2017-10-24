@@ -7,6 +7,9 @@ require('./livestream/index');
 Vue.component('f-profile', require('./components/profile/Index.vue'));
 Vue.component('f-profile-avatar', require('./components/profile/Avatar.vue'));
 
+// Dashboard
+Vue.component('f-dashboard', require('./components/dashboard/Index.vue'));
+
 // Notifications
 Vue.component('f-notifications', require('./components/Notifications.vue'));
 
