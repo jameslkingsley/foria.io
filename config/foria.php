@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'app' => [
+        'name' => config('app.name')
+    ],
+
     'subscription' => [
         /**
          * Percentage paid out to the model.

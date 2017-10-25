@@ -34,7 +34,11 @@
         </div>
 
         <div class="card p-3">
-            <small>By submitting your videos to Foria, you acknowledge that you agree to Foria's <a target="_newtab">Terms of Service</a>.</small>
+            <small>
+                By submitting your videos to {{ 'app.name' | config }}, you acknowledge that you agree to {{ 'app.name' | config }}'s
+                <a target="_newtab">Terms of Service</a>.
+            </small>
+
             <small>Please be sure not to violate others' copyright or privacy rights.</small>
         </div>
     </div>

@@ -8,6 +8,16 @@ Vue.filter('locale', value => {
     return value.toLocaleString();
 });
 
+Vue.filter('config', key => {
+    let value = Foria.config;
+
+    for (let k of key.split('.')) {
+        value = value[k];
+    }
+
+    return value;
+});
+
 Vue.filter('lastFour', value => {
     return Util.formatLastFour(value);
 });

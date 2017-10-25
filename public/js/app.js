@@ -79162,6 +79162,37 @@ Vue.filter('locale', function (value) {
     return value.toLocaleString();
 });
 
+Vue.filter('config', function (key) {
+    var value = Foria.config;
+
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+        for (var _iterator = key.split('.')[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var k = _step.value;
+
+            value = value[k];
+        }
+    } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+    } finally {
+        try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+            }
+        } finally {
+            if (_didIteratorError) {
+                throw _iteratorError;
+            }
+        }
+    }
+
+    return value;
+});
+
 Vue.filter('lastFour', function (value) {
     return Util.formatLastFour(value);
 });
@@ -86021,6 +86052,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
@@ -86168,7 +86203,25 @@ var render = function() {
       )
     ]),
     _vm._v(" "),
-    _vm._m(1)
+    _c("div", { staticClass: "card p-3" }, [
+      _c("small", [
+        _vm._v(
+          "\n            By submitting your videos to " +
+            _vm._s(_vm._f("config")("app.name")) +
+            ", you acknowledge that you agree to " +
+            _vm._s(_vm._f("config")("app.name")) +
+            "'s\n            "
+        ),
+        _c("a", { attrs: { target: "_newtab" } }, [_vm._v("Terms of Service")]),
+        _vm._v(".\n        ")
+      ]),
+      _vm._v(" "),
+      _c("small", [
+        _vm._v(
+          "Please be sure not to violate others' copyright or privacy rights."
+        )
+      ])
+    ])
   ])
 }
 var staticRenderFns = [
@@ -86182,26 +86235,6 @@ var staticRenderFns = [
           _vm._v("keyboard_backspace")
         ]),
         _vm._v("\n            Video Manager\n        ")
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "card p-3" }, [
-      _c("small", [
-        _vm._v(
-          "By submitting your videos to Foria, you acknowledge that you agree to Foria's "
-        ),
-        _c("a", { attrs: { target: "_newtab" } }, [_vm._v("Terms of Service")]),
-        _vm._v(".")
-      ]),
-      _vm._v(" "),
-      _c("small", [
-        _vm._v(
-          "Please be sure not to violate others' copyright or privacy rights."
-        )
       ])
     ])
   }
