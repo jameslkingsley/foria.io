@@ -96,3 +96,17 @@ hr {
 .font-bold {
     font-weight: 500;
 }
+
+.flat {
+    font-weight: 700;
+    font-size: 14px;
+    color: $text;
+
+    i {
+        line-height: 0;
+        margin-top: 13px;
+        float: left;
+        margin-right: 5px;
+        font-size: 18px;
+    }
+}

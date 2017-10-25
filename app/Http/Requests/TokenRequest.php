@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Stripe\Charge;
 use Stripe\Customer;
+use App\Models\Purchase;
 use App\Events\TokensAdded;
 use App\Models\TokenPackage;
 use Illuminate\Foundation\Http\FormRequest;
@@ -17,7 +18,8 @@ class TokenRequest extends FormRequest
      */
     public function authorize()
     {
-        return ! auth()->guest() && auth()->user()->hasCardOnFile();
+        return auth()->check()
+            && auth()->user()->hasCardOnFile();
     }
 
     /**
@@ -41,7 +43,7 @@ class TokenRequest extends FormRequest
     {
         $package = TokenPackage::findOrFail($this->package_id);
 
-        auth()->user()->charge($package->cost);
+        $purchase = $package->purchase();
 
         auth()->user()->tokens += $package->token_count;
         auth()->user()->save();
@@ -49,10 +51,10 @@ class TokenRequest extends FormRequest
         event(new TokensAdded(auth()->user(), $package->token_count));
 
         return [
-            'message' => "{$package->token_count} tokens added to your account",
             'style' => 'success',
             'amount' => $package->token_count,
-            'total' => auth()->user()->tokens
+            'total' => auth()->user()->tokens,
+            'message' => "{$package->token_count} tokens added to your account",
         ];
     }
 }

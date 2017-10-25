@@ -1,8 +1,10 @@
 Vue.filter('currency', value => {
+    if (value === null) return null;
     return Util.formatAsCurrency(value);
 });
 
 Vue.filter('locale', value => {
+    if (value === null) return null;
     return value.toLocaleString();
 });
 

@@ -38,7 +38,7 @@ class Token
      */
     public function asPayout()
     {
-        $this->amount = $this->amount * 0.8;
+        $this->amount = $this->amount * config('foria.tokens.payout');
 
         return $this;
     }
@@ -50,7 +50,7 @@ class Token
      */
     public function asProfit()
     {
-        $this->amount = $this->amount * 0.2;
+        $this->amount = $this->amount * (1 - config('foria.tokens.payout'));
 
         return $this;
     }
@@ -62,6 +62,6 @@ class Token
      */
     public function toCurrency()
     {
-        return $this->amount * 10;
+        return $this->amount * config('foria.tokens.value');
     }
 }

@@ -96,7 +96,7 @@
             pay() {
                 this.buttonState = true;
 
-                axios.post('/tokens', { package_id: this.packageId }).then(r => {
+                ajax.post('/api/tokens', { package_id: this.packageId }).then(r => {
                     this.$toast.open({
                         message: r.data.message,
                         type: `is-${r.data.style}`,
@@ -116,7 +116,7 @@
         },
 
         created() {
-            axios.get('/tokens/packages').then(
+            ajax.get('/api/tokens').then(
                 r => this.packages = r.data
             );
         },

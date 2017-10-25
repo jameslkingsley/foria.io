@@ -15,18 +15,19 @@
 
         <script>
             var Foria = {
-                stripeKey: '{{ config('services.stripe.key') }}',
-                pusherKey: '{{ config('broadcasting.connections.pusher.key') }}',
-                reportableReasons: JSON.parse('{!! json_encode($reportableReasons) !!}'),
+                user: null,
                 csrfToken: '{{ csrf_token() }}',
-                user: null
+                stripeKey: '{{ config('services.stripe.key') }}',
+                config: {!! json_encode(config('foria'), JSON_PRETTY_PRINT) !!},
+                pusherKey: '{{ config('broadcasting.connections.pusher.key') }}',
+                reportableReasons: JSON.parse('{!! json_encode($reportableReasons) !!}')
             };
         </script>
 
         @unless (auth()->guest())
             <script>
                 Foria.user = {
-                    id: {{ auth()->user()->id }},
+                    name: '{{ auth()->user()->name }}',
                     tokens: {{ auth()->user()->tokens }}
                 };
             </script>

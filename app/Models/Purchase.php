@@ -41,6 +41,10 @@ class Purchase extends Model
      */
     public function getProfitAttribute()
     {
-        return Token::make($this->tokens)->asProfit()->toCurrency();
+        if ($this->via_tokens) {
+            return Token::make($this->tokens)->asProfit()->toCurrency();
+        }
+
+        return $this->amount - $this->payout;
     }
 }

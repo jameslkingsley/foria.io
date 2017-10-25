@@ -30,6 +30,10 @@
         border-color: lighten($black, 50%) !important;
     }
 
+    &:focus:not(:active), &.is-focused:not(:active) {
+        box-shadow: $shadow-active;
+    }
+
     .material-icons {
         font-size: 16px;
     }

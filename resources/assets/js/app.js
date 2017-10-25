@@ -85,7 +85,7 @@ const app = new Vue({
     created() {
         if (! Foria.user) return;
 
-        Echo.private(`App.User.${Foria.user.id}`)
+        Echo.private(`App.Models.User.${Foria.user.name}`)
             .listen('TokensAdded', e => {
                 this.user.tokens = e.total;
             })

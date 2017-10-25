@@ -24,28 +24,57 @@ trait Purchasable
             throw new AuthenticationException;
         }
 
-        $details = (object) $this->getPurchaseDetails();
+        $details = (object) array_merge([
+            'once' => false,
+            'payee' => null,
+            'amount' => null,
+            'payout' => null,
+            'allowed' => true,
+            'name' => 'Purchase',
+            'via_tokens' => true,
+        ], $this->getPurchaseDetails());
+
+        // Throw if already bought and once is true
+        if ($details->once && $this->purchased()) {
+            throw new AlreadyPurchasedException;
+        }
 
         if (! $details->allowed) {
             throw new PrivacyException;
         }
 
-        if ((int) auth()->user()->tokens < (int) $details->amount) {
-            throw new InsufficientFundsException;
+        $stripe = null;
+
+        if ($details->via_tokens) {
+            if ((int) auth()->user()->tokens < (int) $details->amount) {
+                throw new InsufficientFundsException;
+            }
+
+            auth()->user()->tokens -= (int) $details->amount;
+            auth()->user()->save();
+
+            // TODO We're not adding tokens, we're just providing the feedback
+            event(new TokensAdded(auth()->user(), -(int) $details->amount));
+        } else {
+            $stripe = auth()->user()->charge((int) $details->amount);
         }
-
-        auth()->user()->tokens -= (int) $details->amount;
-        auth()->user()->save();
-
-        event(new TokensAdded(auth()->user(), -(int) $details->amount));
 
         return $this->purchases()->save(
             new Purchase([
                 'name' => $details->name,
-                'tokens' => $details->amount,
+                'tokens' => $details->via_tokens
+                    ? $details->amount
+                    : null,
+                'payee_id' => $details->payee,
                 'user_id' => auth()->user()->id,
-                'amount' => Token::make($details->amount)->toCurrency(),
-                'payout' => Token::make($details->amount)->asPayout()->toCurrency(),
+                'stripe_id' => optional($stripe)->id,
+                'via_tokens' => $details->via_tokens,
+                'amount' => $details->via_tokens
+                    ? Token::make($details->amount)->toCurrency()
+                    : $details->amount,
+                'payout' => $details->via_tokens
+                    ? Token::make($details->amount)->asPayout()->toCurrency()
+                    : $details->payout,
             ])
         );
     }

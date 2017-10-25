@@ -57,7 +57,8 @@ class VideoPurchaseTest extends TestCase
 
         $video = factory(Video::class)->create([
             'privacy' => 'public',
-            'token_price' => 500
+            'token_price' => 500,
+            'user_id' => 2
         ]);
 
         $response = $this
@@ -67,11 +68,7 @@ class VideoPurchaseTest extends TestCase
             ]);
 
         $response
-            ->assertStatus(200)
-            ->assertJson([
-                'status' => 'success',
-                'data' => $video->purchases()->first()->toArray(),
-            ]);
+            ->assertStatus(200);
 
         $this->assertTrue($video->purchased());
     }

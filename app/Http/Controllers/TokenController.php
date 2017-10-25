@@ -22,7 +22,7 @@ class TokenController extends Controller
      */
     public function index()
     {
-        return view('tokens.index');
+        return TokenPackage::all();
     }
 
     /**
@@ -43,18 +43,13 @@ class TokenController extends Controller
      */
     public function store(TokenRequest $request)
     {
-        $response = null;
-
         try {
-            $response = $request->handle();
+            return response()->json(
+                $request->handle()
+            );
         } catch (\Exception $e) {
-            $response = [
-                'message' => $e->getMessage(),
-                'style' => 'danger'
-            ];
+            return abort(400, $e->getMessage());
         }
-
-        return $response;
     }
 
     /**
@@ -100,15 +95,5 @@ class TokenController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    /**
-     * Gets the token packages as JSON.
-     *
-     * @return mixed
-     */
-    public function packages()
-    {
-        return TokenPackage::all();
     }
 }

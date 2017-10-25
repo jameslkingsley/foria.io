@@ -72,7 +72,7 @@
         },
 
         created() {
-            Echo.private(`App.Models.User.${Foria.user.id}`)
+            Echo.private(`App.Models.User.${Foria.user.name}`)
                 .notification(n => {
                     this.alerts.unshift({ data: n });
                 });

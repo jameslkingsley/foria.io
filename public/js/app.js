@@ -17577,7 +17577,7 @@ var app = new Vue({
 
         if (!Foria.user) return;
 
-        Echo.private('App.User.' + Foria.user.id).listen('TokensAdded', function (e) {
+        Echo.private('App.Models.User.' + Foria.user.name).listen('TokensAdded', function (e) {
             _this.user.tokens = e.total;
         }).listen('TranscodeCompleted', function (e) {
             _this.$toast.open({
@@ -79153,10 +79153,12 @@ if (typeof window !== 'undefined' && window.Vue) {
 /***/ (function(module, exports) {
 
 Vue.filter('currency', function (value) {
+    if (value === null) return null;
     return Util.formatAsCurrency(value);
 });
 
 Vue.filter('locale', function (value) {
+    if (value === null) return null;
     return value.toLocaleString();
 });
 
@@ -85256,7 +85258,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     created: function created() {
         var _this2 = this;
 
-        Echo.private('App.Models.User.' + Foria.user.id).notification(function (n) {
+        Echo.private('App.Models.User.' + Foria.user.name).notification(function (n) {
             _this2.alerts.unshift({ data: n });
         });
     }
@@ -86012,6 +86014,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
@@ -86058,6 +86067,8 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "grid grid-gap-1 grid-small" }, [
+    _vm._m(0),
+    _vm._v(" "),
     _c("div", { staticClass: "card p-3" }, [
       _c(
         "form",
@@ -86157,10 +86168,23 @@ var render = function() {
       )
     ]),
     _vm._v(" "),
-    _vm._m(0)
+    _vm._m(1)
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", [
+      _c("a", { staticClass: "flat", attrs: { href: "/videos/manager" } }, [
+        _c("i", { staticClass: "material-icons" }, [
+          _vm._v("keyboard_backspace")
+        ]),
+        _vm._v("\n            Video Manager\n        ")
+      ])
+    ])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -87382,8 +87406,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     data: function data() {
         return {
-            video: this.videos.length ? this.videos[0] : {},
-            plans: [{ id: 'bronze', title: 'Bronze', price: 499 }, { id: 'silver', title: 'Silver', price: 999 }, { id: 'gold', title: 'Gold', price: 2499 }],
+            video: this.videos.length ? this.videos[0] : opt({}),
+            plans: Foria.config.subscription.plans,
             footerStyle: {
                 'float': 'left',
                 'width': '100%',
@@ -87399,15 +87423,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     computed: {
         tokenPriceNet: function tokenPriceNet() {
-            var pence = this.video.token_price * 0.1 * 100;
+            var pence = this.video.token_price * Foria.config.tokens.value;
 
-            return 0.7 * pence;
+            return Foria.config.tokens.payout * pence;
         },
         selectedPlanNet: function selectedPlanNet() {
             var plan = _.find(this.plans, ['id', this.video.required_subscription]);
 
             if (plan) {
-                return plan.price * 0.6;
+                return plan.price * Foria.config.subscription.payout;
             }
 
             return 0;
@@ -87470,235 +87494,259 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    {
-      staticClass:
-        "main-page-columns grid grid-template-manager with-info with-borders card"
-    },
-    [
-      _c("div", { staticClass: "grid-item p-0" }, [
-        _c(
-          "div",
-          { staticClass: "f-vertical-nav" },
-          _vm._l(_vm.videos, function(v, i) {
-            return _c(
-              "a",
-              {
-                class: _vm.navItemClasses(v),
-                on: {
-                  click: function($event) {
-                    $event.preventDefault()
-                    _vm.edit(v)
-                  }
-                }
-              },
-              [
-                _c("i", {
-                  style: "background-image: url(" + v.thumbnail + ")"
-                }),
-                _vm._v(" "),
-                _c("span", { domProps: { textContent: _vm._s(v.name) } }),
-                _vm._v(" "),
-                _c("p", [_vm._v(_vm._s(_vm._f("locale")(v.views)) + " views")])
-              ]
-            )
-          })
-        )
-      ]),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "grid-item" },
-        [
+  return _c("div", [
+    _vm._m(0),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass:
+          "main-page-columns grid grid-template-manager with-info with-borders card"
+      },
+      [
+        _c("div", { staticClass: "grid-item p-0" }, [
           _c(
-            "f-form",
-            {
-              attrs: {
-                confirm: "Save Changes",
-                "footer-style": _vm.footerStyle,
-                "submit-style": _vm.submitStyle
-              },
-              on: { submit: _vm.submit }
-            },
-            [
-              _c(
-                "b-field",
-                { attrs: { label: "Title" } },
-                [
-                  _c("b-input", {
-                    attrs: { name: "name" },
-                    model: {
-                      value: _vm.video.name,
-                      callback: function($$v) {
-                        _vm.video.name = $$v
-                      },
-                      expression: "video.name"
-                    }
-                  })
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c("hr"),
-              _vm._v(" "),
-              _c("p", { staticClass: "has-text-centered subtitle m-0" }, [
-                _vm._v("Video Access")
-              ]),
-              _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "video-edit-access-option" },
-                [
-                  _c("p", { staticClass: "veao-description" }, [
-                    _vm._v(
-                      "\n                    Require users to pay with tokens.\n                    "
-                    ),
-                    _c("br"),
-                    _vm._v(" "),
-                    _c(
-                      "strong",
-                      {
-                        directives: [
-                          {
-                            name: "show",
-                            rawName: "v-show",
-                            value: _vm.video.token_price,
-                            expression: "video.token_price"
-                          }
-                        ]
-                      },
-                      [
-                        _vm._v(
-                          "You will receive " +
-                            _vm._s(_vm._f("currency")(_vm.tokenPriceNet))
-                        )
-                      ]
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("b-input", {
-                    staticClass: "veao-field",
-                    attrs: {
-                      placeholder: "Amount",
-                      type: "number",
-                      icon: "local_play"
-                    },
-                    model: {
-                      value: _vm.video.token_price,
-                      callback: function($$v) {
-                        _vm.video.token_price = $$v
-                      },
-                      expression: "video.token_price"
-                    }
-                  })
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c("p", { staticClass: "veao-separator" }, [_vm._v("OR")]),
-              _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "video-edit-access-option" },
-                [
-                  _c("p", { staticClass: "veao-description" }, [
-                    _vm._v(
-                      "\n                    Require users to be subscribed with the selected plan (or higher).\n\n                    "
-                    ),
-                    _c("br"),
-                    _vm._v(" "),
-                    _c(
-                      "strong",
-                      {
-                        directives: [
-                          {
-                            name: "show",
-                            rawName: "v-show",
-                            value: _vm.video.required_subscription,
-                            expression: "video.required_subscription"
-                          }
-                        ]
-                      },
-                      [
-                        _vm._v(
-                          "\n                        You will receive " +
-                            _vm._s(_vm._f("currency")(_vm.selectedPlanNet)) +
-                            " each month*\n                    "
-                        )
-                      ]
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _vm._l(_vm.plans, function(plan) {
-                    return _c(
-                      "div",
-                      {
-                        class: _vm.planClasses(plan),
-                        on: {
-                          click: function($event) {
-                            $event.preventDefault()
-                            _vm.choosePlan(plan)
-                          }
-                        }
-                      },
-                      [
-                        _c("span", { staticClass: "veaop-title" }, [
-                          _vm._v(_vm._s(plan.title))
-                        ]),
-                        _vm._v(" "),
-                        _c("span", { staticClass: "veaop-price" }, [
-                          _vm._v(
-                            _vm._s(_vm._f("currency")(plan.price)) + "/month"
-                          )
-                        ])
-                      ]
-                    )
-                  })
-                ],
-                2
-              ),
-              _vm._v(" "),
-              _c("hr"),
-              _vm._v(" "),
-              _c(
-                "b-switch",
+            "div",
+            { staticClass: "f-vertical-nav" },
+            _vm._l(_vm.videos, function(v, i) {
+              return _c(
+                "a",
                 {
-                  staticClass: "is-pulled-left",
-                  attrs: {
-                    slot: "footer",
-                    "true-value": "public",
-                    "false-value": "private"
-                  },
-                  slot: "footer",
-                  model: {
-                    value: _vm.video.privacy,
-                    callback: function($$v) {
-                      _vm.video.privacy = $$v
-                    },
-                    expression: "video.privacy"
+                  class: _vm.navItemClasses(v),
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      _vm.edit(v)
+                    }
                   }
                 },
                 [
-                  _vm._v(
-                    "\n                " +
-                      _vm._s(_vm._f("capitalize")(_vm.video.privacy)) +
-                      "\n            "
-                  )
+                  _c("i", {
+                    style: "background-image: url(" + v.thumbnail + ")"
+                  }),
+                  _vm._v(" "),
+                  _c("span", { domProps: { textContent: _vm._s(v.name) } }),
+                  _vm._v(" "),
+                  _c("p", [
+                    _vm._v(_vm._s(_vm._f("locale")(v.views)) + " views")
+                  ])
                 ]
               )
-            ],
-            1
+            })
           )
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _vm._m(0)
-    ]
-  )
+        ]),
+        _vm._v(" "),
+        _c(
+          "div",
+          { staticClass: "grid-item" },
+          [
+            _c(
+              "f-form",
+              {
+                attrs: {
+                  confirm: "Save Changes",
+                  "footer-style": _vm.footerStyle,
+                  "submit-style": _vm.submitStyle
+                },
+                on: { submit: _vm.submit }
+              },
+              [
+                _c(
+                  "b-field",
+                  { attrs: { label: "Title" } },
+                  [
+                    _c("b-input", {
+                      attrs: { name: "name" },
+                      model: {
+                        value: _vm.video.name,
+                        callback: function($$v) {
+                          _vm.video.name = $$v
+                        },
+                        expression: "video.name"
+                      }
+                    })
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c("hr"),
+                _vm._v(" "),
+                _c("p", { staticClass: "has-text-centered subtitle m-0" }, [
+                  _vm._v("Video Access")
+                ]),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "video-edit-access-option" },
+                  [
+                    _c("p", { staticClass: "veao-description" }, [
+                      _vm._v(
+                        "\n                        Require users to pay with tokens.\n                        "
+                      ),
+                      _c("br"),
+                      _vm._v(" "),
+                      _c(
+                        "strong",
+                        {
+                          directives: [
+                            {
+                              name: "show",
+                              rawName: "v-show",
+                              value: _vm.video.token_price,
+                              expression: "video.token_price"
+                            }
+                          ]
+                        },
+                        [
+                          _vm._v(
+                            "You will receive " +
+                              _vm._s(_vm._f("currency")(_vm.tokenPriceNet))
+                          )
+                        ]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("b-input", {
+                      staticClass: "veao-field",
+                      attrs: {
+                        placeholder: "Amount",
+                        type: "number",
+                        min: "100",
+                        icon: "local_play"
+                      },
+                      model: {
+                        value: _vm.video.token_price,
+                        callback: function($$v) {
+                          _vm.video.token_price = $$v
+                        },
+                        expression: "video.token_price"
+                      }
+                    })
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c("p", { staticClass: "veao-separator" }, [_vm._v("OR")]),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "video-edit-access-option" },
+                  [
+                    _c("p", { staticClass: "veao-description" }, [
+                      _vm._v(
+                        "\n                        Require users to be subscribed with the selected plan (or higher).\n\n                        "
+                      ),
+                      _c("br"),
+                      _vm._v(" "),
+                      _c(
+                        "strong",
+                        {
+                          directives: [
+                            {
+                              name: "show",
+                              rawName: "v-show",
+                              value: _vm.video.required_subscription,
+                              expression: "video.required_subscription"
+                            }
+                          ]
+                        },
+                        [
+                          _vm._v(
+                            "\n                            You will receive " +
+                              _vm._s(_vm._f("currency")(_vm.selectedPlanNet)) +
+                              " each month*\n                        "
+                          )
+                        ]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _vm._l(_vm.plans, function(plan) {
+                      return _c(
+                        "div",
+                        {
+                          class: _vm.planClasses(plan),
+                          on: {
+                            click: function($event) {
+                              $event.preventDefault()
+                              _vm.choosePlan(plan)
+                            }
+                          }
+                        },
+                        [
+                          _c("span", { staticClass: "veaop-title" }, [
+                            _vm._v(_vm._s(plan.title))
+                          ]),
+                          _vm._v(" "),
+                          _c("span", { staticClass: "veaop-price" }, [
+                            _vm._v(
+                              _vm._s(_vm._f("currency")(plan.price)) + "/month"
+                            )
+                          ])
+                        ]
+                      )
+                    })
+                  ],
+                  2
+                ),
+                _vm._v(" "),
+                _c("hr"),
+                _vm._v(" "),
+                _c(
+                  "b-switch",
+                  {
+                    staticClass: "is-pulled-left",
+                    attrs: {
+                      slot: "footer",
+                      "true-value": "public",
+                      "false-value": "private"
+                    },
+                    slot: "footer",
+                    model: {
+                      value: _vm.video.privacy,
+                      callback: function($$v) {
+                        _vm.video.privacy = $$v
+                      },
+                      expression: "video.privacy"
+                    }
+                  },
+                  [
+                    _vm._v(
+                      "\n                    " +
+                        _vm._s(_vm._f("capitalize")(_vm.video.privacy)) +
+                        "\n                "
+                    )
+                  ]
+                )
+              ],
+              1
+            )
+          ],
+          1
+        ),
+        _vm._v(" "),
+        _vm._m(1)
+      ]
+    )
+  ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "grid m-b-3" }, [
+      _c("div", [
+        _c(
+          "a",
+          {
+            staticClass: "button is-pulled-right",
+            attrs: { href: "/videos/upload" }
+          },
+          [_vm._v("Upload Video")]
+        )
+      ])
+    ])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -87722,12 +87770,12 @@ var staticRenderFns = [
       _vm._v(" "),
       _c("small", [
         _vm._v(
-          "\n            * Subscriptions will auto-renew for the user each month, however they have the option to cancel their subscription at anytime.\n            "
+          "\n                * Subscriptions will auto-renew for the user each month, however they have the option to cancel their subscription at anytime.\n                "
         ),
         _c("br"),
         _c("br"),
         _vm._v(
-          "\n            ** In the near future you will be able to live stream your webcam to your audience, collect tips and host subscriber only shows.\n        "
+          "\n                ** In the near future you will be able to live stream your webcam to your audience, collect tips and host subscriber only shows.\n            "
         )
       ])
     ])
@@ -90195,7 +90243,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             this.buttonState = true;
 
-            axios.post('/tokens', { package_id: this.packageId }).then(function (r) {
+            ajax.post('/api/tokens', { package_id: this.packageId }).then(function (r) {
                 _this2.$toast.open({
                     message: r.data.message,
                     type: 'is-' + r.data.style,
@@ -90217,7 +90265,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     created: function created() {
         var _this3 = this;
 
-        axios.get('/tokens/packages').then(function (r) {
+        ajax.get('/api/tokens').then(function (r) {
             return _this3.packages = r.data;
         });
     },

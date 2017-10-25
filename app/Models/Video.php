@@ -64,9 +64,11 @@ class Video extends Model implements Purchase
     {
         return [
             'name' => $this->name,
+            'payee' => $this->user->id,
             'amount' => $this->token_price,
             'once' => true, // Can only purchase a video once
             'allowed' => $this->privacy === 'public'
+                && !$this->user->is_mine,
         ];
     }
 

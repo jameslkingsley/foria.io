@@ -1,5 +1,12 @@
 <template>
     <div class="grid grid-gap-1 grid-small">
+        <div>
+            <a href="/videos/manager" class="flat">
+                <i class="material-icons">keyboard_backspace</i>
+                Video Manager
+            </a>
+        </div>
+
         <div class="card p-3">
             <form enctype="multipart/form-data" v-show="! processing">
                 <div class="grid grid-small" v-show="filePicked">

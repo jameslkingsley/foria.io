@@ -64,8 +64,8 @@ Route::get('/logout', 'Auth\LogoutController@index');
 Auth::routes();
 
 // Tokens
-Route::get('/tokens/packages', 'TokenController@packages');
-Route::resource('/tokens', 'TokenController');
+Route::get('/api/tokens', 'TokenController@index');
+Route::post('/api/tokens', 'TokenController@store');
 
 // Following
 Route::get('/api/follow/{user}', 'FollowController@index');
