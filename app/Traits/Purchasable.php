@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Support\Token;
 use App\Support\Payout;
 use App\Models\Purchase;
 use App\Events\TokensAdded;
@@ -41,9 +42,10 @@ trait Purchasable
         return $this->purchases()->save(
             new Purchase([
                 'name' => $details->name,
-                'amount' => $details->amount,
+                'tokens' => $details->amount,
                 'user_id' => auth()->user()->id,
-                'payout' => Payout::amount($details->amount)
+                'amount' => Token::make($details->amount)->toCurrency(),
+                'payout' => Token::make($details->amount)->asPayout()->toCurrency(),
             ])
         );
     }

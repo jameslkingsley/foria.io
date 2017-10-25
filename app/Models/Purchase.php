@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\User;
+use App\Support\Token;
 use Illuminate\Database\Eloquent\Model;
 
 class Purchase extends Model
@@ -15,6 +16,15 @@ class Purchase extends Model
     protected $guarded = [];
 
     /**
+     * Appended attributes.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'profit'
+    ];
+
+    /**
      * Gets the user model.
      *
      * @return App\Models\User
@@ -22,5 +32,15 @@ class Purchase extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Gets the profit attribute.
+     *
+     * @return integer
+     */
+    public function getProfitAttribute()
+    {
+        return Token::make($this->tokens)->asProfit()->toCurrency();
     }
 }

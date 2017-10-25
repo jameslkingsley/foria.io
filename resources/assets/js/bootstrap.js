@@ -3,6 +3,9 @@ window._ = require('lodash');
 require('webrtc-adapter');
 window.Red5 = window.red5prosdk;
 
+import collect from 'collect.js';
+window.collect = collect;
+
 require('./utils');
 window.videojs = require('video.js/dist/video');
 

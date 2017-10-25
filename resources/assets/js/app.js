@@ -9,6 +9,7 @@ Vue.component('f-profile-avatar', require('./components/profile/Avatar.vue'));
 
 // Dashboard
 Vue.component('f-dashboard', require('./components/dashboard/Index.vue'));
+Vue.component('f-dashboard-revenue', require('./components/dashboard/Revenue.vue'));
 
 // Notifications
 Vue.component('f-notifications', require('./components/Notifications.vue'));

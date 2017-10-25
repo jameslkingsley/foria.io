@@ -18,6 +18,7 @@ class CreatePurchasesTable extends Migration
             $table->unsignedInteger('user_id');
             $table->morphs('model');
             $table->string('name');
+            $table->bigInteger('tokens')->unsigned()->nullable();
             $table->bigInteger('amount')->unsigned()->nullable();
             $table->bigInteger('payout')->unsigned()->nullable();
             $table->timestamps();

@@ -4,6 +4,7 @@
 Route::get('/', 'HomeController@index')->name('home');
 
 // Dashboard
+Route::get('/api/dashboard/revenue', 'DashboardRevenueController@index');
 Route::get('/dashboard', 'DashboardController@index');
 
 // Reporting
