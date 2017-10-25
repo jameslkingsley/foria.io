@@ -1,5 +1,12 @@
 .grid {
     display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+
+    &.grid-small {
+        width: 50%;
+        margin: 0 auto;
+    }
 
     &.with-borders {
         .grid-item {
@@ -12,7 +19,15 @@
     }
 
     &.grid-gap-1 {
+        grid-gap: 1rem;
+    }
+
+    &.grid-column-gap-1 {
         grid-column-gap: 1rem;
+    }
+
+    &.grid-row-gap-1 {
+        grid-row-gap: 1rem;
     }
 
     &.grid-template-manager {
