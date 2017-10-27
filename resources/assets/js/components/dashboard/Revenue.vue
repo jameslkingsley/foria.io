@@ -1,11 +1,32 @@
 <template>
     <div>
+        <div class="grid grid-repeat-columns-5">
+            <b-field class="m-r-3">
+                <f-form-user-search
+                    placeholder="Filter by user"
+                    :users="users"
+                    @select="user => { filteredUser = user.name; fetch() }"
+                    @clear="() => { filteredUser = null; fetch() }">
+                </f-form-user-search>
+            </b-field>
+
+            <b-field>
+                <f-form-user-search
+                    placeholder="Filter by payee"
+                    :users="users"
+                    @select="user => { filteredPayee = user.name; fetch() }"
+                    @clear="() => { filteredPayee = null; fetch() }">
+                </f-form-user-search>
+            </b-field>
+        </div>
+
         <table class="table">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
                     <th>User</th>
+                    <th>Payee</th>
                     <th align="right">Tokens</th>
                     <th align="right">Amount</th>
                     <th align="right">Payout</th>
@@ -18,6 +39,7 @@
                     <td v-text="purchase.id"></td>
                     <td v-text="purchase.name"></td>
                     <td v-text="purchase.user.name"></td>
+                    <td>{{ purchase.payee ? purchase.payee.name : '' }}</td>
                     <td align="right">{{ purchase.tokens | locale }}</td>
                     <td align="right">{{ purchase.amount | currency }}</td>
                     <td align="right">{{ purchase.payout | currency }}</td>
@@ -27,7 +49,7 @@
 
             <tfoot>
                 <tr>
-                    <th colspan="3"></th>
+                    <th colspan="4"></th>
                     <th align="right">{{ totalTokens | locale }}</th>
                     <th align="right">{{ totalAmount | currency }}</th>
                     <th align="right">{{ totalPayout | currency }}</th>
@@ -40,9 +62,13 @@
 
 <script>
     export default {
+        props: ['users'],
+
         data() {
             return {
-                purchases: []
+                purchases: [],
+                filteredUser: null,
+                filteredPayee: null
             };
         },
 
@@ -66,8 +92,10 @@
 
         methods: {
             fetch() {
-                ajax.get('/api/dashboard/revenue')
-                    .then(r => this.purchases = r.data);
+                ajax.get(nonNullQuery('/api/dashboard/revenue', {
+                    user: this.filteredUser,
+                    payee: this.filteredPayee
+                })).then(r => this.purchases = r.data);
             }
         },
 

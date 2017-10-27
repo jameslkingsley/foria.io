@@ -23,3 +23,30 @@ window.opt = window.optional = (object) => {
         }
     });
 }
+
+window.nonNullQuery = (url, params) => {
+    if (!_.endsWith(url, '/')) {
+        url += '/';
+    }
+
+    let parts = [];
+
+    for (let key in params) {
+        let value = params[key];
+        if (value === null) continue;
+        parts.push(`${key}=${value}&`);
+    }
+
+    if (parts.length) {
+        url += '?';
+        for (let part of parts) {
+            url += part;
+        }
+    }
+
+    if (_.endsWith(url, '&')) {
+        url = _.trimEnd(url, '&');
+    }
+
+    return url;
+}

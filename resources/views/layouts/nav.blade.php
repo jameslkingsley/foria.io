@@ -14,8 +14,8 @@
 
         <div id="navMenu" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item">
-                    Home
+                <a href="{{ url('/dashboard') }}" class="navbar-item">
+                    Dashboard
                 </a>
 
                 @model

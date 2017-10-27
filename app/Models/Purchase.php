@@ -35,6 +35,16 @@ class Purchase extends Model
     }
 
     /**
+     * Gets the payee user model.
+     *
+     * @return App\Models\User
+     */
+    public function payee()
+    {
+        return $this->belongsTo(User::class, 'payee_id');
+    }
+
+    /**
      * Gets the profit attribute.
      *
      * @return integer

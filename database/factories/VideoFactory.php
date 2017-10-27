@@ -27,8 +27,8 @@ $factory->define(Video::class, function (Faker $faker) {
         'views' => $faker->numberBetween(0, 100000),
         'key' => '8ef9136ef9abde83e29e65a9086bcd20',
         'privacy' => $faker->randomElement(['private', 'public']),
-        'user_id' => $faker->boolean ? User::where('is_model', true)->inRandomOrder()->first()->id : User::first()->id,
-        'token_price' => $requireSubscription ? null : $faker->numberBetween(0, 10000),
+        'token_price' => $requireSubscription ? null : $faker->numberBetween(0, 1000),
         'required_subscription' => $requireSubscription ? $faker->randomElement(['bronze', 'silver', 'gold']) : null,
+        'user_id' => User::where('is_model', true)->inRandomOrder()->first()->id,
     ];
 });

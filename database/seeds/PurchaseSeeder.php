@@ -13,17 +13,26 @@ class PurchaseSeeder extends Seeder
      */
     public function run()
     {
-        auth()->login(User::first());
-
-        $videos = Video::wherePrivacy('public')
-            ->whereHasProcessed(true)
-            ->where('user_id', '!=', auth()->user()->id)
-            ->where('token_price', '>', 0)
+        $users = User::whereNotNull('stripe_id')
             ->inRandomOrder()
+            ->take(15)
             ->get();
 
-        foreach ($videos as $video) {
-            $video->purchase();
+        foreach ($users as $user) {
+            auth()->logout();
+            auth()->login($user);
+
+            $videos = Video::wherePrivacy('public')
+                ->whereHasProcessed(true)
+                ->where('user_id', '!=', $user->id)
+                ->where('token_price', '>', 0)
+                ->where('token_price', '<', $user->tokens)
+                ->inRandomOrder()
+                ->get();
+
+            foreach ($videos as $video) {
+                $video->purchase();
+            }
         }
     }
 }

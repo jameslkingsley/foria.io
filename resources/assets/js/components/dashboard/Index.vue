@@ -11,6 +11,7 @@
 
         <div class="grid-item">
             <component
+                :users="users"
                 v-bind:is="contentComponent">
             </component>
         </div>
@@ -19,6 +20,8 @@
 
 <script>
     export default {
+        props: ['users'],
+
         data() {
             return {
                 activeTab: opt({}),

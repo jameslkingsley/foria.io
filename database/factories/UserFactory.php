@@ -12,7 +12,10 @@ $factory->define(App\Models\User::class, function (Faker $faker) {
         'avatar' => $faker->imageUrl(),
         'bio' => $faker->sentence,
         'remember_token' => str_random(10),
-        'tokens' => $faker->numberBetween(0, 100000),
-        'is_model' => $faker->boolean
+        'tokens' => $faker->numberBetween(1000, 100000),
+        'is_model' => $faker->boolean,
+        'stripe_id' => 'cus_BOXtJ54MeJrMvy',
+        'card_brand' => 'Visa',
+        'card_last_four' => '4242'
     ];
 });

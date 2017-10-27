@@ -3,6 +3,11 @@
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
 
+    &.grid-repeat-columns-3 {grid-template-columns: repeat(3, 33.3333%);}
+    &.grid-repeat-columns-4 {grid-template-columns: repeat(4, 25%);}
+    &.grid-repeat-columns-5 {grid-template-columns: repeat(5, 20%);}
+    &.grid-repeat-columns-6 {grid-template-columns: repeat(6, 16.6666%);}
+
     &.grid-small {
         width: 50%;
         margin: 0 auto;

@@ -62,6 +62,7 @@ Vue.component('f-settings-stats', require('./components/settings/Stats.vue'));
 
 // Form
 Vue.component('f-form', require('./components/form/Form.vue'));
+Vue.component('f-form-user-search', require('./components/form/UserSearch.vue'));
 Vue.component('f-form-button', require('./components/form/Button.vue'));
 Vue.component('f-form-image-upload', require('./components/form/ImageUpload.vue'));
 Vue.component('f-form-video-upload', require('./components/form/VideoUpload.vue'));

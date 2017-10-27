@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
 
@@ -12,11 +13,20 @@ class DashboardRevenueController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $purchases = Purchase::orderBy('created_at', 'desc')->with('user')->get();
+        $purchases = Purchase::orderBy('created_at', 'desc')
+            ->with('user', 'payee')->get();
 
-        return response()->json($purchases);
+        if ($request->user) {
+            $purchases = $purchases->where('user.name', $request->user);
+        }
+
+        if ($request->payee) {
+            $purchases = $purchases->where('payee.name', $request->payee);
+        }
+
+        return $purchases->values();
     }
 
     /**

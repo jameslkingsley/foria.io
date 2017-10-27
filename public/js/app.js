@@ -17552,6 +17552,7 @@ Vue.component('f-settings-stats', __webpack_require__(365));
 
 // Form
 Vue.component('f-form', __webpack_require__(368));
+Vue.component('f-form-user-search', __webpack_require__(395));
 Vue.component('f-form-button', __webpack_require__(371));
 Vue.component('f-form-image-upload', __webpack_require__(374));
 Vue.component('f-form-video-upload', __webpack_require__(377));
@@ -40374,6 +40375,54 @@ window.opt = window.optional = function (object) {
             return name in target ? target[name] : null;
         }
     });
+};
+
+window.nonNullQuery = function (url, params) {
+    if (!_.endsWith(url, '/')) {
+        url += '/';
+    }
+
+    var parts = [];
+
+    for (var key in params) {
+        var value = params[key];
+        if (value === null) continue;
+        parts.push(key + '=' + value + '&');
+    }
+
+    if (parts.length) {
+        url += '?';
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+            for (var _iterator = parts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var part = _step.value;
+
+                url += part;
+            }
+        } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion && _iterator.return) {
+                    _iterator.return();
+                }
+            } finally {
+                if (_didIteratorError) {
+                    throw _iteratorError;
+                }
+            }
+        }
+    }
+
+    if (_.endsWith(url, '&')) {
+        url = _.trimEnd(url, '&');
+    }
+
+    return url;
 };
 
 /***/ }),
@@ -84838,8 +84887,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['users'],
+
     data: function data() {
         return {
             activeTab: opt({}),
@@ -84915,7 +84967,12 @@ var render = function() {
       _c(
         "div",
         { staticClass: "grid-item" },
-        [_c(_vm.contentComponent, { tag: "component" })],
+        [
+          _c(_vm.contentComponent, {
+            tag: "component",
+            attrs: { users: _vm.users }
+          })
+        ],
         1
       )
     ]
@@ -85023,11 +85080,37 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['users'],
+
     data: function data() {
         return {
-            purchases: []
+            purchases: [],
+            filteredUser: null,
+            filteredPayee: null
         };
     },
 
@@ -85051,7 +85134,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         fetch: function fetch() {
             var _this = this;
 
-            ajax.get('/api/dashboard/revenue').then(function (r) {
+            ajax.get(nonNullQuery('/api/dashboard/revenue', {
+                user: this.filteredUser,
+                payee: this.filteredPayee
+            })).then(function (r) {
                 return _this.purchases = r.data;
             });
         }
@@ -85071,6 +85157,54 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
+    _c(
+      "div",
+      { staticClass: "grid grid-repeat-columns-5" },
+      [
+        _c(
+          "b-field",
+          { staticClass: "m-r-3" },
+          [
+            _c("f-form-user-search", {
+              attrs: { placeholder: "Filter by user", users: _vm.users },
+              on: {
+                select: function(user) {
+                  _vm.filteredUser = user.name
+                  _vm.fetch()
+                },
+                clear: function() {
+                  _vm.filteredUser = null
+                  _vm.fetch()
+                }
+              }
+            })
+          ],
+          1
+        ),
+        _vm._v(" "),
+        _c(
+          "b-field",
+          [
+            _c("f-form-user-search", {
+              attrs: { placeholder: "Filter by payee", users: _vm.users },
+              on: {
+                select: function(user) {
+                  _vm.filteredPayee = user.name
+                  _vm.fetch()
+                },
+                clear: function() {
+                  _vm.filteredPayee = null
+                  _vm.fetch()
+                }
+              }
+            })
+          ],
+          1
+        )
+      ],
+      1
+    ),
+    _vm._v(" "),
     _c("table", { staticClass: "table" }, [
       _vm._m(0),
       _vm._v(" "),
@@ -85083,6 +85217,10 @@ var render = function() {
             _c("td", { domProps: { textContent: _vm._s(purchase.name) } }),
             _vm._v(" "),
             _c("td", { domProps: { textContent: _vm._s(purchase.user.name) } }),
+            _vm._v(" "),
+            _c("td", [
+              _vm._v(_vm._s(purchase.payee ? purchase.payee.name : ""))
+            ]),
             _vm._v(" "),
             _c("td", { attrs: { align: "right" } }, [
               _vm._v(_vm._s(_vm._f("locale")(purchase.tokens)))
@@ -85105,7 +85243,7 @@ var render = function() {
       _vm._v(" "),
       _c("tfoot", [
         _c("tr", [
-          _c("th", { attrs: { colspan: "3" } }),
+          _c("th", { attrs: { colspan: "4" } }),
           _vm._v(" "),
           _c("th", { attrs: { align: "right" } }, [
             _vm._v(_vm._s(_vm._f("locale")(_vm.totalTokens)))
@@ -85139,6 +85277,8 @@ var staticRenderFns = [
         _c("th", [_vm._v("Name")]),
         _vm._v(" "),
         _c("th", [_vm._v("User")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Payee")]),
         _vm._v(" "),
         _c("th", { attrs: { align: "right" } }, [_vm._v("Tokens")]),
         _vm._v(" "),
@@ -93806,6 +93946,162 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 390 */,
+/* 391 */,
+/* 392 */,
+/* 393 */,
+/* 394 */,
+/* 395 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(396)
+/* template */
+var __vue_template__ = __webpack_require__(397)
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\form\\UserSearch.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] UserSearch.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-18ca26f6", Component.options)
+  } else {
+    hotAPI.reload("data-v-18ca26f6", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 396 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: {
+        users: { type: Array, default: function _default() {
+                return [];
+            } },
+        field: { type: String, default: 'name' },
+        icon: { type: String, default: 'search' },
+        placeholder: { type: String, default: 'Filter by user' },
+        notFoundText: { type: String, default: 'No results found' }
+    },
+
+    data: function data() {
+        return {
+            name: ''
+        };
+    },
+
+
+    computed: {
+        filteredUsers: function filteredUsers() {
+            var _this = this;
+
+            return this.users.filter(function (user) {
+                return user.name.toLowerCase().indexOf(_this.name.toLowerCase()) >= 0;
+            });
+        }
+    },
+
+    methods: {
+        selectUser: function selectUser(user) {
+            if (user === null) return;
+            this.$emit('select', user);
+        },
+        inputUser: function inputUser() {
+            if (!this.name.length) {
+                this.$emit('clear');
+            }
+        }
+    }
+});
+
+/***/ }),
+/* 397 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "b-autocomplete",
+    {
+      attrs: {
+        field: _vm.field,
+        data: _vm.filteredUsers,
+        placeholder: _vm.placeholder,
+        icon: _vm.icon
+      },
+      on: { select: _vm.selectUser, input: _vm.inputUser },
+      model: {
+        value: _vm.name,
+        callback: function($$v) {
+          _vm.name = $$v
+        },
+        expression: "name"
+      }
+    },
+    [
+      _c("template", { attrs: { slot: "empty" }, slot: "empty" }, [
+        _vm._v(_vm._s(_vm.notFoundText))
+      ])
+    ],
+    2
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-18ca26f6", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);
