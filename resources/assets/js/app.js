@@ -80,11 +80,23 @@ const app = new Vue({
     data: {
         user: {
             tokens: Foria.user ? Foria.user.tokens : 0
+        },
+
+        tokens: {
+            showHint: false
         }
     },
 
     created() {
         if (! Foria.user) return;
+
+        ForiaEvent.listen('TokensHint', e => {
+            this.tokens.showHint = true;
+        });
+
+        ForiaEvent.listen('TokensPurchased', e => {
+            this.user.tokens = e.total;
+        });
 
         Echo.private(`App.Models.User.${Foria.user.name}`)
             .listen('TokensAdded', e => {

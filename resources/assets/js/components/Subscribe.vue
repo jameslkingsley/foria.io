@@ -10,8 +10,8 @@
 
             <b-dropdown-item custom v-if="loaded">
                 <div v-if="!auth || unauthorized" class="subscription-content has-text-centered">
-                    <p>You need to be logged in to subscribe. Click the buttons below to login or register.</p>
-                    <a href="/login" class="button is-primary m-t-3 m-b-3">Login</a>
+                    <p>You need to be logged in to subscribe.</p>
+                    <a :href="'/login/?ref=' + reference" class="button is-primary m-t-3 m-b-3">Login</a>
                     <a href="/register" class="button is-primary m-t-3 m-b-3">Register</a>
                 </div>
 
@@ -82,7 +82,8 @@
         props: {
             user: { type: Object },
             plan: { default: null },
-            tag: { type: String, default: '' }
+            tag: { type: String, default: '' },
+            reference: { type: String, default: '' }
         },
 
         data() {

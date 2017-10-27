@@ -22,6 +22,7 @@
                     class="is-pulled-right"
                     :tag="subscribeTag"
                     :user="media.user"
+                    :reference="media.ref"
                     :plan="media.required_subscription"
                     @success="subscribeSuccess">
                 </f-subscribe>

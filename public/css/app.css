@@ -15306,6 +15306,24 @@ hr {
   font-size: 18px;
 }
 
+.title {
+  font-size: 18px;
+  font-weight: 400;
+  color: #525f7f;
+}
+
+.nav-hint {
+  margin-top: 14px;
+  font-weight: 500;
+  font-size: 14px;
+  background: black;
+  color: white;
+  height: 26px;
+  padding: 0 8px;
+  line-height: 26px;
+  border-radius: 4px;
+}
+
 .watch-video-container {
   height: 640px;
   background: #fff;
@@ -16006,6 +16024,18 @@ nav.navbar .navbar-link:focus {
   background-color: #fefde5 !important;
 }
 
+.checkbox input[type=checkbox] + .check {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0;
+  background-color: #e9eaf7;
+  background-size: 75% !important;
+  -webkit-box-shadow: none !important;
+          box-shadow: none !important;
+  -webkit-transition: none !important;
+  transition: none !important;
+}
+
 .video-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -16415,6 +16445,11 @@ nav.navbar .navbar-link:focus {
 
 .grid.grid-small {
   width: 50%;
+  margin: 0 auto;
+}
+
+.grid.grid-narrow {
+  width: 30%;
   margin: 0 auto;
 }
 

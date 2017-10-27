@@ -110,3 +110,21 @@ hr {
         font-size: 18px;
     }
 }
+
+.title {
+    font-size: 18px;
+    font-weight: 400;
+    color: $text;
+}
+
+.nav-hint {
+    margin-top: 14px;
+    font-weight: 500;
+    font-size: 14px;
+    background: black;
+    color: white;
+    height: 26px;
+    padding: 0 8px;
+    line-height: 26px;
+    border-radius: 4px;
+}

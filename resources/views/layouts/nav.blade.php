@@ -35,6 +35,10 @@
                         Register
                     </a>
                 @else
+                    <span class="nav-hint" v-if="tokens.showHint">
+                        You can purchase tokens here
+                    </span>
+
                     <b-dropdown position="is-bottom-left" id="token-checkout">
                         <a class="navbar-item" slot="trigger">
                             <i class="material-icons m-r-2">local_play</i>

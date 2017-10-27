@@ -1,12 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="columns">
-        <div class="column is-4 is-offset-4">
+    <div class="grid grid-gap-1 grid-narrow">
+        <div class="card p-3">
             <h1 class="title has-text-centered">Login</h1>
 
             <form method="POST" action="{{ route('login') }}">
                 {{ csrf_field() }}
+
+                <input type="hidden" name="referrer" value="{{ request('ref', '') }}">
 
                 <b-field label="Email Address"
                     @if ($errors->has('email'))
@@ -37,9 +39,9 @@
                 </button>
 
                 <div class="field">
-                <a href="{{ route('password.request') }}">
-                    Forgot Your Password?
-                </a>
+                    <a href="{{ route('password.request') }}">
+                        <small>Forgot Your Password?</small>
+                    </a>
                 </div>
             </form>
         </div>

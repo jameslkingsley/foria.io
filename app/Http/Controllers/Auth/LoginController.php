@@ -35,5 +35,10 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+
+        if (request('referrer')) {
+            $model = reference(request('referrer'));
+            $this->redirectTo = $model->relative_url;
+        }
     }
 }

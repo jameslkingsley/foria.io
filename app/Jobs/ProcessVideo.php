@@ -278,9 +278,10 @@ class ProcessVideo implements ShouldQueue
     public function createRecord()
     {
         $this->record = Video::create([
+            'key' => $this->paths->key,
             'user_id' => $this->user->id,
             'name' => str_before($this->name, '.'),
-            'key' => $this->paths->key
+            'private_key' => $this->paths->private_key,
         ]);
 
         $this->tester()->assertTrue(
@@ -328,7 +329,7 @@ class ProcessVideo implements ShouldQueue
         $cloud->putFileAs(
             $this->paths->directory,
             new File(storage_path($this->paths->prefix('app')->processed)),
-            'processed.mp4',
+            "{$this->paths->private_key}.mp4",
             'private'
         );
 

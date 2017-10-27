@@ -58,6 +58,12 @@ class AppServiceProvider extends ServiceProvider
             ]);
         });
 
+        Route::macro('vue', function ($url, $component) {
+            return Route::get($url, function () use ($component) {
+                return vue($component);
+            });
+        });
+
         require_once app_path('Support/Helpers.php');
     }
 }

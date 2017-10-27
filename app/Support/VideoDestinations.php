@@ -34,13 +34,16 @@ class VideoDestinations
     {
         $this->key = $key;
 
+        $privateKey = str_random(32);
+
         $this->paths = $data
             ? (object) $data
             : (object) [
                 'key' => $this->key,
+                'private_key' => $privateKey,
                 'directory' => "videos/{$this->key}",
                 'unprocessed' => "videos/{$this->key}/unprocessed.",
-                'processed' => "videos/{$this->key}/processed.mp4",
+                'processed' => "videos/{$this->key}/{$privateKey}.mp4",
                 'preview' => "videos/{$this->key}/preview.mp4",
                 'thumbnails' => "videos/{$this->key}/thumbnails"
             ];

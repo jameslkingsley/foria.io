@@ -55,6 +55,10 @@ class PurchaseController extends Controller
      */
     public function show(Request $request, Model $model)
     {
+        if (auth()->guest()) {
+            return abort(403);
+        }
+
         return response()->json([
             'purchase' => $model->purchases->first()
         ]);

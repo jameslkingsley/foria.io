@@ -36,7 +36,8 @@ class Video extends Model implements Purchase
      */
     protected $hidden = [
         'id',
-        'user_id'
+        'user_id',
+        'private_key'
     ];
 
     /**
@@ -46,6 +47,7 @@ class Video extends Model implements Purchase
      */
     protected $appends = [
         'url',
+        'relative_url',
         'stream_url',
         'edit_url',
         'is_mine',
@@ -151,6 +153,16 @@ class Video extends Model implements Purchase
     }
 
     /**
+     * Gets the relative watch URL for this video.
+     *
+     * @return string
+     */
+    public function getRelativeUrlAttribute()
+    {
+        return "/videos/{$this->ref}";
+    }
+
+    /**
      * Determines if the video belongs to the authenticated user.
      *
      * @return boolean
@@ -211,6 +223,10 @@ class Video extends Model implements Purchase
             if (auth()->guest() || ! auth()->user()->subscribedTo($this->user)) {
                 return false;
             }
+
+            if (auth()->user()->subscribedTo($this->user)) {
+                return true;
+            }
         }
 
         if ($this->token_price) {
@@ -235,9 +251,7 @@ class Video extends Model implements Purchase
             return null;
         }
 
-        return Storage::cloud()->url("videos/{$this->key}/processed.mp4");
-
-        return null;
+        return Storage::cloud()->url("videos/{$this->key}/{$this->private_key}.mp4");
     }
 
     /**

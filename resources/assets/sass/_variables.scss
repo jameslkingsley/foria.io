@@ -5,6 +5,7 @@ $warning: #ffd157;
 $success: #7dbd2c;
 $light: #f5f5f5;
 $lighter: #f1f5fa69;
+$light-primary: lighten($primary, 40%);
 $text: #525f7f;
 $text-hovered: #32325d;
 $border-color: #dae4f169;

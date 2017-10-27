@@ -13,6 +13,11 @@
         margin: 0 auto;
     }
 
+    &.grid-narrow {
+        width: 30%;
+        margin: 0 auto;
+    }
+
     &.with-borders {
         .grid-item {
             border-right: 1px solid $border-color;

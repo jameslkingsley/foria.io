@@ -100,6 +100,10 @@ trait Purchasable
      */
     public function purchased()
     {
+        if (auth()->guest()) {
+            return false;
+        }
+
         return $this->purchases()->exists();
     }
 }
