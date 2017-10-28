@@ -1,10 +1,16 @@
 <template>
     <form :method="method" @submit.prevent="handle">
-        <slot></slot>
+        <span v-if="title.length" class="f-form-title title has-text-centered">
+            {{ title }}
+        </span>
 
-        <b-field class="has-text-right" :style="footerStyle">
+        <div :class="wrapperClasses">
+            <slot></slot>
+        </div>
+
+        <b-field class="f-form-footer has-text-right" :style="footerStyle">
             <slot name="footer"></slot>
-            <f-form-button class="m-t-3 m-l-2" :style="submitStyle" :submitting="submitting">{{ confirm }}</f-form-button>
+            <f-form-button class="m-0 is-pulled-right" :style="submitStyle" :submitting="submitting">{{ confirm }}</f-form-button>
         </b-field>
     </form>
 </template>
@@ -27,6 +33,11 @@
                 default: 'Save'
             },
 
+            title: {
+                type: String,
+                default: ''
+            },
+
             submit: {
                 type: Function,
                 default() {}
@@ -47,6 +58,16 @@
             return {
                 submitting: false
             };
+        },
+
+        computed: {
+            wrapperClasses() {
+                return {
+                    'p-3': this.title.length,
+                    'is-pulled-left': this.title.length,
+                    'w100': this.title.length
+                };
+            }
         },
 
         methods: {

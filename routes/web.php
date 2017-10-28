@@ -7,6 +7,11 @@ Route::get('/', 'HomeController@index')->name('home');
 Route::get('/api/dashboard/revenue', 'DashboardRevenueController@index');
 Route::get('/dashboard', 'DashboardController@index');
 
+// Model Application
+Route::get('/model-application', 'ModelApplicationController@index');
+Route::post('/api/model-application/id', 'ModelApplicationController@update');
+Route::post('/api/model-application', 'ModelApplicationController@store');
+
 // Reporting
 Route::post('/api/report/{ref}', 'ReportController@store');
 Route::get('/api/report/{ref}', 'ReportController@index');

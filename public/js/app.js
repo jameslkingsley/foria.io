@@ -17497,6 +17497,9 @@ __webpack_require__(266);
 Vue.component('f-profile', __webpack_require__(269));
 Vue.component('f-profile-avatar', __webpack_require__(272));
 
+// Model Application
+Vue.component('f-model-application', __webpack_require__(398));
+
 // Dashboard
 Vue.component('f-dashboard', __webpack_require__(275));
 Vue.component('f-dashboard-revenue', __webpack_require__(278));
@@ -92934,6 +92937,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: {
@@ -92950,6 +92959,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         confirm: {
             type: String,
             default: 'Save'
+        },
+
+        title: {
+            type: String,
+            default: ''
         },
 
         submit: {
@@ -92978,6 +92992,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         };
     },
 
+
+    computed: {
+        wrapperClasses: function wrapperClasses() {
+            return {
+                'p-3': this.title.length,
+                'is-pulled-left': this.title.length,
+                'w100': this.title.length
+            };
+        }
+    },
 
     methods: {
         handle: function handle() {
@@ -93018,18 +93042,24 @@ var render = function() {
       }
     },
     [
-      _vm._t("default"),
+      _vm.title.length
+        ? _c("span", { staticClass: "f-form-title title has-text-centered" }, [
+            _vm._v("\n        " + _vm._s(_vm.title) + "\n    ")
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      _c("div", { class: _vm.wrapperClasses }, [_vm._t("default")], 2),
       _vm._v(" "),
       _c(
         "b-field",
-        { staticClass: "has-text-right", style: _vm.footerStyle },
+        { staticClass: "f-form-footer has-text-right", style: _vm.footerStyle },
         [
           _vm._t("footer"),
           _vm._v(" "),
           _c(
             "f-form-button",
             {
-              staticClass: "m-t-3 m-l-2",
+              staticClass: "m-0 is-pulled-right",
               style: _vm.submitStyle,
               attrs: { submitting: _vm.submitting }
             },
@@ -93039,7 +93069,7 @@ var render = function() {
         2
       )
     ],
-    2
+    1
   )
 }
 var staticRenderFns = []
@@ -94154,6 +94184,414 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 393 */,
+/* 394 */,
+/* 395 */,
+/* 396 */,
+/* 397 */,
+/* 398 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(399)
+/* template */
+var __vue_template__ = __webpack_require__(400)
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\model\\Application.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Application.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-2181f671", Component.options)
+  } else {
+    hotAPI.reload("data-v-2181f671", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 399 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    data: function data() {
+        return {
+            photoForm: new FormData(),
+            showDetailsForm: true,
+            showIdentityForm: false,
+            form: {
+                gender: '',
+                country: '',
+                nicknames: '',
+                full_name: '',
+                maiden_name: '',
+                date_of_birth: null
+            }
+        };
+    },
+
+
+    methods: {
+        formContinue: function formContinue() {
+            var _this = this;
+
+            ajax.post('/api/model-application', this.form).then(function (r) {
+                _this.showDetailsForm = false;
+                _this.showIdentityForm = true;
+                _this.photoForm.append('application_id', r.data.id);
+            });
+        },
+        formComplete: function formComplete() {
+            var _this2 = this;
+
+            ajax.post('/api/model-application/id', this.photoForm).then(function (r) {
+                _this2.$toast.open({
+                    message: 'Uploaded',
+                    type: 'is-success',
+                    duration: 4000
+                });
+            });
+        },
+        selectPhotoId: function selectPhotoId(photo) {
+            this.photoForm.append('photo_id', photo.file);
+        },
+        selectPhotoSelf: function selectPhotoSelf(photo) {
+            this.photoForm.append('photo_self', photo.file);
+        }
+    }
+});
+
+/***/ }),
+/* 400 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "grid grid-gap-1 grid-narrow" }, [
+    _vm._m(0),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "card" },
+      [
+        _c(
+          "f-form",
+          {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.showDetailsForm,
+                expression: "showDetailsForm"
+              }
+            ],
+            attrs: { title: "Become a Model", confirm: "Continue" },
+            on: { submit: _vm.formContinue }
+          },
+          [
+            _c(
+              "b-field",
+              { attrs: { label: "Full Legal Name" } },
+              [
+                _c("b-input", {
+                  attrs: { required: "", name: "full_name" },
+                  model: {
+                    value: _vm.form.full_name,
+                    callback: function($$v) {
+                      _vm.form.full_name = $$v
+                    },
+                    expression: "form.full_name"
+                  }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "b-field",
+              { attrs: { label: "Gender" } },
+              [
+                _c(
+                  "b-select",
+                  {
+                    attrs: { placeholder: "Select your gender", expanded: "" },
+                    model: {
+                      value: _vm.form.gender,
+                      callback: function($$v) {
+                        _vm.form.gender = $$v
+                      },
+                      expression: "form.gender"
+                    }
+                  },
+                  [
+                    _c("option", { attrs: { value: "male" } }, [
+                      _vm._v("Male")
+                    ]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "female" } }, [
+                      _vm._v("Female")
+                    ])
+                  ]
+                )
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "b-field",
+              {
+                directives: [
+                  {
+                    name: "show",
+                    rawName: "v-show",
+                    value: _vm.form.gender === "female",
+                    expression: "form.gender === 'female'"
+                  }
+                ],
+                attrs: { label: "Maiden Name" }
+              },
+              [
+                _c("b-input", {
+                  attrs: { name: "maiden_name" },
+                  model: {
+                    value: _vm.form.maiden_name,
+                    callback: function($$v) {
+                      _vm.form.maiden_name = $$v
+                    },
+                    expression: "form.maiden_name"
+                  }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "b-field",
+              { attrs: { label: "List of Used Nicknames" } },
+              [
+                _c("b-input", {
+                  attrs: { required: "", name: "nicknames" },
+                  model: {
+                    value: _vm.form.nicknames,
+                    callback: function($$v) {
+                      _vm.form.nicknames = $$v
+                    },
+                    expression: "form.nicknames"
+                  }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "b-field",
+              { attrs: { label: "Date of Birth" } },
+              [
+                _c("b-datepicker", {
+                  attrs: {
+                    required: "",
+                    placeholder: "Click to select...",
+                    icon: "today"
+                  },
+                  model: {
+                    value: _vm.form.date_of_birth,
+                    callback: function($$v) {
+                      _vm.form.date_of_birth = $$v
+                    },
+                    expression: "form.date_of_birth"
+                  }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "b-field",
+              { attrs: { label: "Country of Residence" } },
+              [
+                _c("b-input", {
+                  attrs: { required: "", name: "country" },
+                  model: {
+                    value: _vm.form.country,
+                    callback: function($$v) {
+                      _vm.form.country = $$v
+                    },
+                    expression: "form.country"
+                  }
+                })
+              ],
+              1
+            )
+          ],
+          1
+        ),
+        _vm._v(" "),
+        _c(
+          "f-form",
+          {
+            directives: [
+              {
+                name: "show",
+                rawName: "v-show",
+                value: _vm.showIdentityForm,
+                expression: "showIdentityForm"
+              }
+            ],
+            attrs: { title: "Become a Model", confirm: "Complete" },
+            on: { submit: _vm.formComplete }
+          },
+          [
+            _c(
+              "b-field",
+              {
+                attrs: { label: "Picture of your valid, government-issued ID" }
+              },
+              [
+                _c("f-form-image-upload", {
+                  attrs: { name: "photo_id" },
+                  on: { loaded: _vm.selectPhotoId }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "b-field",
+              { attrs: { label: "Picture of yourself holding the ID" } },
+              [
+                _c("f-form-image-upload", {
+                  attrs: { name: "photo_self" },
+                  on: { loaded: _vm.selectPhotoSelf }
+                })
+              ],
+              1
+            )
+          ],
+          1
+        )
+      ],
+      1
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", [
+      _c("a", { staticClass: "flat", attrs: { href: "/settings" } }, [
+        _c("i", { staticClass: "material-icons" }, [
+          _vm._v("keyboard_backspace")
+        ]),
+        _vm._v("\n            Settings\n        ")
+      ])
+    ])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-2181f671", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

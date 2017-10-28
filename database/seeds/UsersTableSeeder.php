@@ -16,7 +16,7 @@ class UsersTableSeeder extends Seeder
             'name' => 'Kingsley',
             'email' => 'jlkingsley97@gmail.com',
             'password' => bcrypt('password'),
-            'is_model' => true,
+            'is_model' => false,
             'remember_token' => str_random(10),
             'stripe_id' => 'cus_BOXtJ54MeJrMvy',
             'card_brand' => 'Visa',

@@ -16036,6 +16036,57 @@ nav.navbar .navbar-link:focus {
   transition: none !important;
 }
 
+.f-form-footer {
+  display: inline-block !important;
+  font-size: 18px;
+  font-weight: 500;
+  border-radius: 0 0 4px 4px;
+  background: #f1f5fa69;
+  border-top: 1px solid #dae4f169;
+  padding: 1rem;
+  float: left;
+  width: 100%;
+}
+
+.f-form-title {
+  display: inline-block;
+  width: 100%;
+  font-size: 18px;
+  font-weight: 500;
+  border-radius: 4px 4px 0 0;
+  background: #f1f5fa69;
+  border-bottom: 1px solid #dae4f169;
+  padding: 1rem 0;
+  margin-bottom: 0 !important;
+}
+
+.datepicker.control {
+  border: 1px solid transparent;
+  -webkit-box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent;
+          box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent;
+  font-size: 15px;
+  outline: 0;
+  border-radius: 4px;
+}
+
+.datepicker.control .pagination a {
+  border: none;
+  -webkit-box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent;
+          box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.07), 0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 0 0 0 transparent;
+}
+
+.datepicker.control .pagination a:hover {
+  -webkit-box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.1), 0 3px 9px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.08);
+          box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.1), 0 2px 5px 0 rgba(50, 50, 93, 0.1), 0 3px 9px 0 rgba(50, 50, 93, 0.08), 0 1px 1.5px 0 rgba(0, 0, 0, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.08);
+  color: #32325d;
+}
+
+.datepicker.control .pagination a:active {
+  -webkit-box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.08), 0 2px 5px 0 rgba(50, 50, 93, 0.06), 0 1px 1.5px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.06), 0 0 0 0 transparent;
+          box-shadow: 0 0 0 1px rgba(50, 50, 93, 0.08), 0 2px 5px 0 rgba(50, 50, 93, 0.06), 0 1px 1.5px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.06), 0 0 0 0 transparent;
+  color: #32325d;
+}
+
 .video-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

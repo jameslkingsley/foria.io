@@ -58,3 +58,52 @@
     box-shadow: none !important;
     transition: none !important;
 }
+
+.f-form-footer {
+    display: inline-block !important;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 0 0 4px 4px;
+    background: $lighter;
+    border-top: 1px solid $border-color;
+    padding: 1rem;
+    float: left;
+    width: 100%;
+}
+
+.f-form-title {
+    display: inline-block;
+    width: 100%;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 4px 4px 0 0;
+    background: $lighter;
+    border-bottom: 1px solid $border-color;
+    padding: 1rem 0;
+    margin-bottom: 0 !important;
+}
+
+.datepicker.control {
+    border: 1px solid transparent;
+    box-shadow: $shadow;
+    font-size: 15px;
+    outline: 0;
+    border-radius: $radius;
+
+    .pagination {
+        a {
+            border: none;
+            box-shadow: $shadow;
+
+            &:hover {
+                box-shadow: $shadow-hovered;
+                color: $text-hovered;
+            }
+
+            &:active {
+                box-shadow: $shadow-active;
+                color: $text-hovered;
+            }
+        }
+    }
+}
