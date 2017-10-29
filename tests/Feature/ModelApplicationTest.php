@@ -13,7 +13,7 @@ class ModelApplicationTest extends TestCase
     /** @test */
     public function canSubmitApplication()
     {
-        $this->actingAs($this->user);
+        $this->actingAs($this->userDisposable);
         $this->assertAuthenticated();
 
         $response = $this
@@ -45,6 +45,6 @@ class ModelApplicationTest extends TestCase
         $this->assertNotNull($application->fresh()->photo_id);
         $this->assertNotNull($application->fresh()->photo_self);
 
-        Storage::cloud()->deleteDirectory("models/{$this->user->name}");
+        Storage::cloud()->deleteDirectory("models/{$this->userDisposable->name}");
     }
 }
