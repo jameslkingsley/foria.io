@@ -26,8 +26,16 @@ Vue.filter('datetime', value => {
     return moment(value).format('D/M/YYYY HH:mm');
 });
 
+Vue.filter('date', value => {
+    return moment(value).format('D/M/YYYY');
+});
+
 Vue.filter('calendar', value => {
     return moment(value).format('MMMM YYYY');
+});
+
+Vue.filter('age', value => {
+    return moment().diff(value, 'years');
 });
 
 Vue.filter('fromnow', value => {

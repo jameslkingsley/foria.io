@@ -2,6 +2,11 @@ html {
     background-color: $background;
 }
 
+body {
+    font-size: 14px;
+    line-height: 1.5rem;
+}
+
 strong {
     color: inherit;
 }
@@ -92,6 +97,7 @@ hr {
 
 .text-small {font-size: 14px;}
 .text-large {font-size: 36px;}
+.text-larger {font-size: 3rem;}
 
 .font-bold {
     font-weight: 500;

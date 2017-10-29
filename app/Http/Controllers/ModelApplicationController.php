@@ -98,17 +98,22 @@ class ModelApplicationController extends Controller
             'application_id' => 'required|exists:applications,id',
         ]);
 
+        $application = Application::findOrFail($attributes['application_id']);
+
         $pathToId = Storage::cloud()->putFile(
-            'models/'.auth()->user()->name.'/id',
+            'models/'.auth()->user()->name.'/application',
             $request->file('photo_id')
         );
 
         $pathToSelf = Storage::cloud()->putFile(
-            'models/'.auth()->user()->name.'/id',
+            'models/'.auth()->user()->name.'/application',
             $request->file('photo_self')
         );
 
-        // dd($attributes);
+        $application->update([
+            'photo_id' => $pathToId,
+            'photo_self' => $pathToSelf,
+        ]);
     }
 
     /**

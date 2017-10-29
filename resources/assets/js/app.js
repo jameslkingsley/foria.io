@@ -13,6 +13,7 @@ Vue.component('f-model-application', require('./components/model/Application.vue
 // Dashboard
 Vue.component('f-dashboard', require('./components/dashboard/Index.vue'));
 Vue.component('f-dashboard-revenue', require('./components/dashboard/Revenue.vue'));
+Vue.component('f-dashboard-applications', require('./components/dashboard/Applications.vue'));
 
 // Notifications
 Vue.component('f-notifications', require('./components/Notifications.vue'));

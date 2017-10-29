@@ -15190,6 +15190,11 @@ html {
   background-color: #f1f5f9;
 }
 
+body {
+  font-size: 14px;
+  line-height: 1.5rem;
+}
+
 strong {
   color: inherit;
 }
@@ -15286,6 +15291,10 @@ hr {
 
 .text-large {
   font-size: 36px;
+}
+
+.text-larger {
+  font-size: 3rem;
 }
 
 .font-bold {

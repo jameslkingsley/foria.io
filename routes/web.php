@@ -5,12 +5,13 @@ Route::get('/', 'HomeController@index')->name('home');
 
 // Dashboard
 Route::get('/api/dashboard/revenue', 'DashboardRevenueController@index');
+Route::get('/api/dashboard/applications', 'DashboardApplicationController@index');
 Route::get('/dashboard', 'DashboardController@index');
 
 // Model Application
-Route::get('/model-application', 'ModelApplicationController@index');
-Route::post('/api/model-application/id', 'ModelApplicationController@update');
-Route::post('/api/model-application', 'ModelApplicationController@store');
+Route::get('/application', 'ModelApplicationController@index');
+Route::post('/api/application/id', 'ModelApplicationController@update');
+Route::post('/api/application', 'ModelApplicationController@store');
 
 // Reporting
 Route::post('/api/report/{ref}', 'ReportController@store');

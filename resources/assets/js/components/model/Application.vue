@@ -57,6 +57,22 @@
                     </f-form-image-upload>
                 </b-field>
             </f-form>
+
+            <div class="p-4" v-show="showCompleteForm">
+                <p class="m-b-3 has-text-success has-text-centered">
+                    <i class="material-icons text-larger">done_all</i>
+                </p>
+
+                <p class="has-text-centered">
+                    <strong>Your application has been sent!</strong>
+                </p>
+
+                <p class="m-b-3 has-text-centered">We'll get back to you within 48 hours.</p>
+
+                <p>
+                    If accepted you will be given access to the model dashboard, where you can provide billing information for payouts, privacy settings and start uploading your videos. If you have any questions or concerns feel free to email <u>{{ 'app.emails.support' | config }}</u>.
+                </p>
+            </div>
         </div>
     </div>
 </template>
@@ -68,6 +84,7 @@
                 photoForm: new FormData(),
                 showDetailsForm: true,
                 showIdentityForm: false,
+                showCompleteForm: false,
                 form: {
                     gender: '',
                     country: '',
@@ -81,7 +98,7 @@
 
         methods: {
             formContinue() {
-                ajax.post('/api/model-application', this.form)
+                ajax.post('/api/application', this.form)
                     .then(r => {
                         this.showDetailsForm = false;
                         this.showIdentityForm = true;
@@ -90,13 +107,10 @@
             },
 
             formComplete() {
-                ajax.post(`/api/model-application/id`, this.photoForm)
+                ajax.post(`/api/application/id`, this.photoForm)
                     .then(r => {
-                        this.$toast.open({
-                            message: 'Uploaded',
-                            type: 'is-success',
-                            duration: 4000
-                        });
+                        this.showIdentityForm = false;
+                        this.showCompleteForm = true;
                     });
             },
 

@@ -26,7 +26,8 @@
             return {
                 activeTab: opt({}),
                 tabs: [
-                    { id: 'revenue', name: 'Revenue', description: '', component: 'f-dashboard-revenue' }
+                    { id: 'revenue', name: 'Revenue', description: '', component: 'f-dashboard-revenue' },
+                    { id: 'applications', name: 'Applications', description: '', component: 'f-dashboard-applications' }
                 ]
             };
         },

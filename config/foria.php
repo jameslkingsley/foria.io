@@ -2,7 +2,10 @@
 
 return [
     'app' => [
-        'name' => config('app.name')
+        'name' => config('app.name'),
+        'emails' => [
+            'support' => 'support@foria.io'
+        ]
     ],
 
     'subscription' => [
